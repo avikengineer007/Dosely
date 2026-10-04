@@ -1,0 +1,1280 @@
+{
+  "_comment": "40 synthetic prescription test cases — no real patient data. Generated for QA/testing of the prescription assistant MVP.",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "label": "Happy path — single antibiotic, complete data",
+      "prescription": {
+        "prescription_id": "rx-tc-001",
+        "image_quality": "good",
+        "prescription_date": "2026-09-15",
+        "prescriber": {
+          "name": "Dr. A. Sharma",
+          "registration_number": "MH-12345",
+          "clinic_or_hospital": "City Health Clinic"
+        },
+        "medicines": [
+          {
+            "name_raw": "Tab. Amoxicillin 500 mg",
+            "name_generic": "amoxicillin",
+            "drug_class": "antibiotic",
+            "purpose": "Kills bacteria causing the infection",
+            "strength": "500 mg",
+            "form": "tablet",
+            "frequency_raw": "TDS",
+            "frequency_normalized": "Three times daily (morning, afternoon & night)",
+            "timing_slots": ["morning", "afternoon", "night"],
+            "duration_days": 5,
+            "food_instruction": "after_food",
+            "confidence": 0.97,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-002",
+      "label": "OD abbreviation — once daily antacid",
+      "prescription": {
+        "prescription_id": "rx-tc-002",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Cap. Pantoprazole 40 mg",
+            "name_generic": "pantoprazole",
+            "drug_class": "antacid",
+            "purpose": "Reduces stomach acid production",
+            "strength": "40 mg",
+            "form": "capsule",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["morning"],
+            "duration_days": 14,
+            "food_instruction": "empty_stomach",
+            "confidence": 0.95,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-003",
+      "label": "BD abbreviation — twice daily antihistamine",
+      "prescription": {
+        "prescription_id": "rx-tc-003",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Cetirizine 10 mg",
+            "name_generic": "cetirizine",
+            "drug_class": "antihistamine",
+            "purpose": "Relieves allergy symptoms like runny nose and itching",
+            "strength": "10 mg",
+            "form": "tablet",
+            "frequency_raw": "BD",
+            "frequency_normalized": "Twice daily (morning & night)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 7,
+            "food_instruction": "any_time",
+            "confidence": 0.96,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-004",
+      "label": "1-0-1 notation — skip afternoon dose",
+      "prescription": {
+        "prescription_id": "rx-tc-004",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Metformin 500 mg",
+            "name_generic": "metformin",
+            "drug_class": "antidiabetic",
+            "purpose": "Controls blood sugar levels in type 2 diabetes",
+            "strength": "500 mg",
+            "form": "tablet",
+            "frequency_raw": "1-0-1",
+            "frequency_normalized": "Morning and night (skip afternoon)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 30,
+            "food_instruction": "with_food",
+            "confidence": 0.93,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-005",
+      "label": "1-1-1 notation — three times daily painkiller",
+      "prescription": {
+        "prescription_id": "rx-tc-005",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Ibuprofen 400 mg",
+            "name_generic": "ibuprofen",
+            "drug_class": "painkiller",
+            "purpose": "Reduces pain, fever, and inflammation",
+            "strength": "400 mg",
+            "form": "tablet",
+            "frequency_raw": "1-1-1",
+            "frequency_normalized": "Three times daily (morning, afternoon & night)",
+            "timing_slots": ["morning", "afternoon", "night"],
+            "duration_days": 3,
+            "food_instruction": "after_food",
+            "confidence": 0.94,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-006",
+      "label": "Missing frequency — needs_review triggered",
+      "prescription": {
+        "prescription_id": "rx-tc-006",
+        "image_quality": "fair",
+        "medicines": [
+          {
+            "name_raw": "Tab. Azithromycin 500 mg",
+            "name_generic": "azithromycin",
+            "drug_class": "antibiotic",
+            "purpose": "Treats bacterial respiratory and skin infections",
+            "strength": "500 mg",
+            "form": "tablet",
+            "frequency_raw": null,
+            "frequency_normalized": null,
+            "timing_slots": null,
+            "duration_days": 3,
+            "food_instruction": "any_time",
+            "confidence": 0.78,
+            "needs_review": true,
+            "review_reasons": ["Frequency is missing or could not be normalised."]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-007",
+      "label": "Missing strength — needs_review triggered",
+      "prescription": {
+        "prescription_id": "rx-tc-007",
+        "image_quality": "fair",
+        "medicines": [
+          {
+            "name_raw": "Tab. Atorvastatin",
+            "name_generic": "atorvastatin",
+            "drug_class": "other",
+            "purpose": "Lowers cholesterol and reduces heart disease risk",
+            "strength": null,
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["night"],
+            "duration_days": 30,
+            "food_instruction": "any_time",
+            "confidence": 0.82,
+            "needs_review": true,
+            "review_reasons": ["Strength is missing or illegible."]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-008",
+      "label": "SOS (as-needed) dose — painkiller",
+      "prescription": {
+        "prescription_id": "rx-tc-008",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Paracetamol 650 mg",
+            "name_generic": "paracetamol",
+            "drug_class": "painkiller",
+            "purpose": "Relieves mild to moderate pain and reduces fever",
+            "strength": "650 mg",
+            "form": "tablet",
+            "frequency_raw": "SOS",
+            "frequency_normalized": "Only when needed",
+            "timing_slots": ["as_needed"],
+            "duration_days": null,
+            "food_instruction": "any_time",
+            "confidence": 0.92,
+            "needs_review": true,
+            "review_reasons": ["Duration not specified."]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-009",
+      "label": "Two similar drug names — Metformin 500 and Metformin 1000",
+      "prescription": {
+        "prescription_id": "rx-tc-009",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Metformin 500 mg",
+            "name_generic": "metformin",
+            "drug_class": "antidiabetic",
+            "purpose": "Controls blood sugar in type 2 diabetes",
+            "strength": "500 mg",
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["morning"],
+            "duration_days": 30,
+            "food_instruction": "with_food",
+            "confidence": 0.91,
+            "needs_review": true,
+            "review_reasons": ["Similar drug name exists on this prescription — verify these are distinct entries."]
+          },
+          {
+            "name_raw": "Tab. Metformin 1000 mg",
+            "name_generic": "metformin",
+            "drug_class": "antidiabetic",
+            "purpose": "Controls blood sugar in type 2 diabetes",
+            "strength": "1000 mg",
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["night"],
+            "duration_days": 30,
+            "food_instruction": "with_food",
+            "confidence": 0.90,
+            "needs_review": true,
+            "review_reasons": ["Similar drug name exists on this prescription — verify these are distinct entries."]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-010",
+      "label": "Two similar drug names — Amoxicillin vs Amoxicillin+Clavulanate",
+      "prescription": {
+        "prescription_id": "rx-tc-010",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Amoxicillin 500 mg",
+            "name_generic": "amoxicillin",
+            "drug_class": "antibiotic",
+            "purpose": "Kills a broad range of bacteria",
+            "strength": "500 mg",
+            "form": "tablet",
+            "frequency_raw": "TDS",
+            "frequency_normalized": "Three times daily (morning, afternoon & night)",
+            "timing_slots": ["morning", "afternoon", "night"],
+            "duration_days": 5,
+            "food_instruction": "after_food",
+            "confidence": 0.88,
+            "needs_review": true,
+            "review_reasons": ["Similar drug name exists on this prescription — verify these are distinct entries."]
+          },
+          {
+            "name_raw": "Tab. Augmentin 625 mg",
+            "name_generic": "amoxicillin + clavulanate",
+            "drug_class": "antibiotic",
+            "purpose": "Kills bacteria resistant to amoxicillin alone",
+            "strength": "625 mg",
+            "form": "tablet",
+            "frequency_raw": "BD",
+            "frequency_normalized": "Twice daily (morning & night)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 5,
+            "food_instruction": "after_food",
+            "confidence": 0.89,
+            "needs_review": true,
+            "review_reasons": ["Similar drug name exists on this prescription — verify these are distinct entries."]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-011",
+      "label": "Blurry image — poor quality, all medicines flagged",
+      "prescription": {
+        "prescription_id": "rx-tc-011",
+        "image_quality": "poor",
+        "needs_human_review": true,
+        "review_summary": ["Image quality is POOR; OCR accuracy is unreliable."],
+        "medicines": [
+          {
+            "name_raw": "T?b. Cl?rithromycin 500",
+            "name_generic": null,
+            "drug_class": "unknown",
+            "purpose": null,
+            "strength": null,
+            "form": "unknown",
+            "frequency_raw": "BD",
+            "frequency_normalized": "Twice daily (morning & night)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": null,
+            "food_instruction": "unknown",
+            "confidence": 0.41,
+            "needs_review": true,
+            "review_reasons": [
+              "Generic name could not be resolved from raw name.",
+              "Strength is missing or illegible.",
+              "Duration not specified.",
+              "Overall confidence (0.41) is below threshold (0.70).",
+              "Potential numeric/alpha OCR confusion in strength field."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-012",
+      "label": "QID abbreviation — four times daily",
+      "prescription": {
+        "prescription_id": "rx-tc-012",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Metronidazole 400 mg",
+            "name_generic": "metronidazole",
+            "drug_class": "antibiotic",
+            "purpose": "Treats bacterial and parasitic infections",
+            "strength": "400 mg",
+            "form": "tablet",
+            "frequency_raw": "QID",
+            "frequency_normalized": "Four times daily",
+            "timing_slots": ["morning", "afternoon", "evening", "night"],
+            "duration_days": 7,
+            "food_instruction": "after_food",
+            "confidence": 0.95,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-013",
+      "label": "HS (bedtime only) — sleep aid",
+      "prescription": {
+        "prescription_id": "rx-tc-013",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Melatonin 5 mg",
+            "name_generic": "melatonin",
+            "drug_class": "other",
+            "purpose": "Helps regulate sleep onset",
+            "strength": "5 mg",
+            "form": "tablet",
+            "frequency_raw": "HS",
+            "frequency_normalized": "At bedtime only",
+            "timing_slots": ["night"],
+            "duration_days": 14,
+            "food_instruction": "any_time",
+            "confidence": 0.93,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-014",
+      "label": "0-0-1 notation — night dose only",
+      "prescription": {
+        "prescription_id": "rx-tc-014",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Amlodipine 5 mg",
+            "name_generic": "amlodipine",
+            "drug_class": "antihypertensive",
+            "purpose": "Relaxes blood vessels to lower blood pressure",
+            "strength": "5 mg",
+            "form": "tablet",
+            "frequency_raw": "0-0-1",
+            "frequency_normalized": "At night only",
+            "timing_slots": ["night"],
+            "duration_days": 30,
+            "food_instruction": "any_time",
+            "confidence": 0.91,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-015",
+      "label": "0-1-0 notation — afternoon dose only",
+      "prescription": {
+        "prescription_id": "rx-tc-015",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Folic Acid 5 mg",
+            "name_generic": "folic acid",
+            "drug_class": "vitamin_supplement",
+            "purpose": "Supports cell growth and prevents folate deficiency",
+            "strength": "5 mg",
+            "form": "tablet",
+            "frequency_raw": "0-1-0",
+            "frequency_normalized": "Once in the afternoon only",
+            "timing_slots": ["afternoon"],
+            "duration_days": 30,
+            "food_instruction": "any_time",
+            "confidence": 0.92,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-016",
+      "label": "1-1-0 notation — morning and afternoon only",
+      "prescription": {
+        "prescription_id": "rx-tc-016",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Domperidone 10 mg",
+            "name_generic": "domperidone",
+            "drug_class": "other",
+            "purpose": "Reduces nausea and vomiting",
+            "strength": "10 mg",
+            "form": "tablet",
+            "frequency_raw": "1-1-0",
+            "frequency_normalized": "Morning and afternoon only (skip night)",
+            "timing_slots": ["morning", "afternoon"],
+            "duration_days": 5,
+            "food_instruction": "before_food",
+            "confidence": 0.90,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-017",
+      "label": "Multi-drug prescription — 4 medicines",
+      "prescription": {
+        "prescription_id": "rx-tc-017",
+        "image_quality": "good",
+        "prescription_date": "2026-09-20",
+        "prescriber": {
+          "name": "Dr. R. Iyer",
+          "clinic_or_hospital": "Sunrise Hospital"
+        },
+        "medicines": [
+          {
+            "name_raw": "Tab. Amoxicillin 500 mg",
+            "name_generic": "amoxicillin",
+            "drug_class": "antibiotic",
+            "purpose": "Kills bacteria causing the infection",
+            "strength": "500 mg",
+            "form": "tablet",
+            "frequency_raw": "TDS",
+            "frequency_normalized": "Three times daily (morning, afternoon & night)",
+            "timing_slots": ["morning", "afternoon", "night"],
+            "duration_days": 5,
+            "food_instruction": "after_food",
+            "confidence": 0.96,
+            "needs_review": false,
+            "review_reasons": []
+          },
+          {
+            "name_raw": "Tab. Pantoprazole 40 mg",
+            "name_generic": "pantoprazole",
+            "drug_class": "antacid",
+            "purpose": "Reduces stomach acid production",
+            "strength": "40 mg",
+            "form": "tablet",
+            "frequency_raw": "BD",
+            "frequency_normalized": "Twice daily (morning & night)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 5,
+            "food_instruction": "empty_stomach",
+            "confidence": 0.95,
+            "needs_review": false,
+            "review_reasons": []
+          },
+          {
+            "name_raw": "Tab. Paracetamol 500 mg",
+            "name_generic": "paracetamol",
+            "drug_class": "painkiller",
+            "purpose": "Relieves fever and mild pain",
+            "strength": "500 mg",
+            "form": "tablet",
+            "frequency_raw": "SOS",
+            "frequency_normalized": "Only when needed",
+            "timing_slots": ["as_needed"],
+            "duration_days": null,
+            "food_instruction": "any_time",
+            "confidence": 0.93,
+            "needs_review": true,
+            "review_reasons": ["Duration not specified."]
+          },
+          {
+            "name_raw": "Tab. Cetirizine 10 mg",
+            "name_generic": "cetirizine",
+            "drug_class": "antihistamine",
+            "purpose": "Relieves allergy and cold symptoms",
+            "strength": "10 mg",
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["night"],
+            "duration_days": 5,
+            "food_instruction": "any_time",
+            "confidence": 0.94,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-018",
+      "label": "Paediatric syrup — liquid form with per-mL strength",
+      "prescription": {
+        "prescription_id": "rx-tc-018",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Syp. Amoxicillin 125 mg/5 mL",
+            "name_generic": "amoxicillin",
+            "drug_class": "antibiotic",
+            "purpose": "Kills bacteria causing ear, throat, and chest infections",
+            "strength": "125 mg/5 mL",
+            "form": "syrup",
+            "frequency_raw": "TDS",
+            "frequency_normalized": "Three times daily (morning, afternoon & night)",
+            "timing_slots": ["morning", "afternoon", "night"],
+            "duration_days": 7,
+            "food_instruction": "after_food",
+            "special_instructions": "5 mL per dose. Shake well before use.",
+            "confidence": 0.91,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-019",
+      "label": "Topical ointment — no oral frequency",
+      "prescription": {
+        "prescription_id": "rx-tc-019",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Oint. Mupirocin 2%",
+            "name_generic": "mupirocin",
+            "drug_class": "antibiotic",
+            "purpose": "Treats bacterial skin infections like impetigo",
+            "strength": "2%",
+            "form": "ointment",
+            "frequency_raw": "BD",
+            "frequency_normalized": "Twice daily (morning & night)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 7,
+            "food_instruction": "any_time",
+            "special_instructions": "Apply thin layer to affected area only.",
+            "confidence": 0.90,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-020",
+      "label": "Injection entry — single dose",
+      "prescription": {
+        "prescription_id": "rx-tc-020",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Inj. Diclofenac 75 mg/3 mL",
+            "name_generic": "diclofenac",
+            "drug_class": "painkiller",
+            "purpose": "Fast-acting pain and inflammation relief by injection",
+            "strength": "75 mg/3 mL",
+            "form": "injection",
+            "frequency_raw": "STAT",
+            "frequency_normalized": "Immediately — single dose only",
+            "timing_slots": ["as_needed"],
+            "duration_days": 1,
+            "food_instruction": "any_time",
+            "special_instructions": "IM injection. Administer by healthcare professional only.",
+            "confidence": 0.93,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-021",
+      "label": "Unknown abbreviation QWKLY — frequency flagged",
+      "prescription": {
+        "prescription_id": "rx-tc-021",
+        "image_quality": "fair",
+        "medicines": [
+          {
+            "name_raw": "Tab. Alendronate 70 mg",
+            "name_generic": "alendronate",
+            "drug_class": "other",
+            "purpose": "Strengthens bones and reduces fracture risk",
+            "strength": "70 mg",
+            "form": "tablet",
+            "frequency_raw": "QWKLY",
+            "frequency_normalized": null,
+            "timing_slots": null,
+            "duration_days": null,
+            "food_instruction": "empty_stomach",
+            "confidence": 0.75,
+            "needs_review": true,
+            "review_reasons": [
+              "Frequency is missing or could not be normalised.",
+              "Duration not specified.",
+              "Unknown abbreviation 'QWKLY' — not in frequency mapping table."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-022",
+      "label": "Low confidence — multiple illegible tokens",
+      "prescription": {
+        "prescription_id": "rx-tc-022",
+        "image_quality": "fair",
+        "medicines": [
+          {
+            "name_raw": "T?b. P?ntop?azole 4? mg",
+            "name_generic": null,
+            "drug_class": "unknown",
+            "purpose": null,
+            "strength": null,
+            "form": "unknown",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["morning"],
+            "duration_days": null,
+            "food_instruction": "unknown",
+            "confidence": 0.52,
+            "needs_review": true,
+            "review_reasons": [
+              "Generic name could not be resolved from raw name.",
+              "Strength is missing or illegible.",
+              "Duration not specified.",
+              "Overall confidence (0.52) is below threshold (0.70).",
+              "Potential numeric/alpha OCR confusion in strength field."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-023",
+      "label": "Antifungal — topical drops with OD",
+      "prescription": {
+        "prescription_id": "rx-tc-023",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Ear drops Clotrimazole 1%",
+            "name_generic": "clotrimazole",
+            "drug_class": "antifungal",
+            "purpose": "Treats fungal ear infections",
+            "strength": "1%",
+            "form": "drops",
+            "frequency_raw": "TDS",
+            "frequency_normalized": "Three times daily (morning, afternoon & night)",
+            "timing_slots": ["morning", "afternoon", "night"],
+            "duration_days": 14,
+            "food_instruction": "any_time",
+            "special_instructions": "3 drops in affected ear. Keep head tilted for 2 minutes.",
+            "confidence": 0.92,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-024",
+      "label": "Steroid — short tapering course",
+      "prescription": {
+        "prescription_id": "rx-tc-024",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Prednisolone 10 mg",
+            "name_generic": "prednisolone",
+            "drug_class": "steroid",
+            "purpose": "Reduces severe inflammation and immune responses",
+            "strength": "10 mg",
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["morning"],
+            "duration_days": 5,
+            "food_instruction": "after_food",
+            "special_instructions": "Do not stop abruptly. Taper as advised.",
+            "confidence": 0.94,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-025",
+      "label": "Bronchodilator inhaler — BD",
+      "prescription": {
+        "prescription_id": "rx-tc-025",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Inhaler Salbutamol 100 mcg/dose",
+            "name_generic": "salbutamol",
+            "drug_class": "bronchodilator",
+            "purpose": "Opens airways during asthma or breathing difficulty",
+            "strength": "100 mcg/dose",
+            "form": "inhaler",
+            "frequency_raw": "SOS",
+            "frequency_normalized": "Only when needed",
+            "timing_slots": ["as_needed"],
+            "duration_days": null,
+            "food_instruction": "any_time",
+            "special_instructions": "2 puffs as needed. Max 4 times per day.",
+            "confidence": 0.93,
+            "needs_review": true,
+            "review_reasons": ["Duration not specified."]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-026",
+      "label": "Vitamin supplement — OD, long course",
+      "prescription": {
+        "prescription_id": "rx-tc-026",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Vitamin D3 60000 IU",
+            "name_generic": "cholecalciferol",
+            "drug_class": "vitamin_supplement",
+            "purpose": "Corrects Vitamin D deficiency",
+            "strength": "60000 IU",
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["morning"],
+            "duration_days": 30,
+            "food_instruction": "after_food",
+            "confidence": 0.94,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-027",
+      "label": "Empty prescription — no medicines extracted",
+      "prescription": {
+        "prescription_id": "rx-tc-027",
+        "image_quality": "poor",
+        "needs_human_review": true,
+        "review_summary": [
+          "Image quality is POOR; OCR accuracy is unreliable.",
+          "No medicines could be extracted — manual entry required."
+        ],
+        "medicines": []
+      }
+    },
+    {
+      "id": "TC-028",
+      "label": "Brand name unresolvable — confidence < 0.70",
+      "prescription": {
+        "prescription_id": "rx-tc-028",
+        "image_quality": "fair",
+        "medicines": [
+          {
+            "name_raw": "Tab. Zonvit Plus",
+            "name_generic": null,
+            "drug_class": "unknown",
+            "purpose": null,
+            "strength": null,
+            "form": "tablet",
+            "frequency_raw": "BD",
+            "frequency_normalized": "Twice daily (morning & night)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 15,
+            "food_instruction": "unknown",
+            "confidence": 0.61,
+            "needs_review": true,
+            "review_reasons": [
+              "Generic name could not be resolved from raw name.",
+              "Strength is missing or illegible.",
+              "Overall confidence (0.61) is below threshold (0.70)."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-029",
+      "label": "Partial strength OCR — '50? mg' illegible digit",
+      "prescription": {
+        "prescription_id": "rx-tc-029",
+        "image_quality": "fair",
+        "medicines": [
+          {
+            "name_raw": "Tab. Sertraline 50? mg",
+            "name_generic": "sertraline",
+            "drug_class": "antidepressant",
+            "purpose": "Treats depression and anxiety disorders",
+            "strength": null,
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["morning"],
+            "duration_days": 30,
+            "food_instruction": "any_time",
+            "confidence": 0.74,
+            "needs_review": true,
+            "review_reasons": [
+              "Strength is missing or illegible.",
+              "Potential numeric/alpha OCR confusion in strength field (raw: '50? mg')."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-030",
+      "label": "Anticoagulant — strict dosing, no guessing",
+      "prescription": {
+        "prescription_id": "rx-tc-030",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Warfarin 2 mg",
+            "name_generic": "warfarin",
+            "drug_class": "anticoagulant",
+            "purpose": "Prevents blood clots by thinning the blood",
+            "strength": "2 mg",
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["evening"],
+            "duration_days": null,
+            "food_instruction": "any_time",
+            "special_instructions": "INR monitoring required. Do not adjust dose without doctor advice.",
+            "confidence": 0.95,
+            "needs_review": true,
+            "review_reasons": ["Duration not specified."]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-031",
+      "label": "Handwritten scrawl — name partially readable",
+      "prescription": {
+        "prescription_id": "rx-tc-031",
+        "image_quality": "poor",
+        "medicines": [
+          {
+            "name_raw": "T?b. M?tr?nid??ole",
+            "name_generic": null,
+            "drug_class": "unknown",
+            "purpose": null,
+            "strength": null,
+            "form": "unknown",
+            "frequency_raw": null,
+            "frequency_normalized": null,
+            "timing_slots": null,
+            "duration_days": null,
+            "food_instruction": "unknown",
+            "confidence": 0.38,
+            "needs_review": true,
+            "review_reasons": [
+              "Generic name could not be resolved from raw name.",
+              "Strength is missing or illegible.",
+              "Frequency is missing or could not be normalised.",
+              "Duration not specified.",
+              "Overall confidence (0.38) is below threshold (0.70)."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-032",
+      "label": "Two drugs same class — antacid and antacid",
+      "prescription": {
+        "prescription_id": "rx-tc-032",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Pantoprazole 40 mg",
+            "name_generic": "pantoprazole",
+            "drug_class": "antacid",
+            "purpose": "Reduces stomach acid (proton pump inhibitor)",
+            "strength": "40 mg",
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["morning"],
+            "duration_days": 7,
+            "food_instruction": "empty_stomach",
+            "confidence": 0.95,
+            "needs_review": false,
+            "review_reasons": []
+          },
+          {
+            "name_raw": "Syp. Antacid (Magnesium Hydroxide)",
+            "name_generic": "magnesium hydroxide",
+            "drug_class": "antacid",
+            "purpose": "Neutralises excess stomach acid for fast relief",
+            "strength": null,
+            "form": "syrup",
+            "frequency_raw": "TDS",
+            "frequency_normalized": "Three times daily (morning, afternoon & night)",
+            "timing_slots": ["morning", "afternoon", "night"],
+            "duration_days": 7,
+            "food_instruction": "after_food",
+            "special_instructions": "10 mL per dose after meals.",
+            "confidence": 0.88,
+            "needs_review": true,
+            "review_reasons": ["Strength is missing or illegible."]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-033",
+      "label": "Antiviral — fixed duration",
+      "prescription": {
+        "prescription_id": "rx-tc-033",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Tab. Acyclovir 400 mg",
+            "name_generic": "acyclovir",
+            "drug_class": "antiviral",
+            "purpose": "Treats herpes virus infections",
+            "strength": "400 mg",
+            "form": "tablet",
+            "frequency_raw": "TDS",
+            "frequency_normalized": "Three times daily (morning, afternoon & night)",
+            "timing_slots": ["morning", "afternoon", "night"],
+            "duration_days": 7,
+            "food_instruction": "any_time",
+            "confidence": 0.93,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-034",
+      "label": "Inhaled steroid — BD with special instructions",
+      "prescription": {
+        "prescription_id": "rx-tc-034",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Inhaler Budesonide 200 mcg/dose",
+            "name_generic": "budesonide",
+            "drug_class": "steroid",
+            "purpose": "Reduces airway inflammation in asthma",
+            "strength": "200 mcg/dose",
+            "form": "inhaler",
+            "frequency_raw": "BD",
+            "frequency_normalized": "Twice daily (morning & night)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 30,
+            "food_instruction": "any_time",
+            "special_instructions": "Rinse mouth with water after each use.",
+            "confidence": 0.92,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-035",
+      "label": "Drug name ambiguous — two candidates",
+      "prescription": {
+        "prescription_id": "rx-tc-035",
+        "image_quality": "fair",
+        "medicines": [
+          {
+            "name_raw": "Tab. Carvedilol 12.5 mg",
+            "name_generic": null,
+            "drug_class": "unknown",
+            "purpose": null,
+            "strength": "12.5 mg",
+            "form": "tablet",
+            "frequency_raw": "BD",
+            "frequency_normalized": "Twice daily (morning & night)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 30,
+            "food_instruction": "with_food",
+            "confidence": 0.68,
+            "needs_review": true,
+            "review_reasons": [
+              "Generic name could not be resolved from raw name.",
+              "Ambiguous match: candidates are 'carvedilol' (score 0.82) and 'carbimazole' (score 0.79). Please confirm.",
+              "Overall confidence (0.68) is below threshold (0.70)."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-036",
+      "label": "Prescription with no date and no prescriber",
+      "prescription": {
+        "prescription_id": "rx-tc-036",
+        "image_quality": "fair",
+        "prescription_date": null,
+        "prescriber": null,
+        "medicines": [
+          {
+            "name_raw": "Tab. Levocetirizine 5 mg",
+            "name_generic": "levocetirizine",
+            "drug_class": "antihistamine",
+            "purpose": "Relieves allergic rhinitis and chronic urticaria",
+            "strength": "5 mg",
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["night"],
+            "duration_days": 7,
+            "food_instruction": "any_time",
+            "confidence": 0.89,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-037",
+      "label": "Paediatric suspension — weight-based dose in instructions",
+      "prescription": {
+        "prescription_id": "rx-tc-037",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Susp. Ibuprofen 100 mg/5 mL",
+            "name_generic": "ibuprofen",
+            "drug_class": "painkiller",
+            "purpose": "Reduces fever and pain in children",
+            "strength": "100 mg/5 mL",
+            "form": "suspension",
+            "frequency_raw": "TDS",
+            "frequency_normalized": "Three times daily (morning, afternoon & night)",
+            "timing_slots": ["morning", "afternoon", "night"],
+            "duration_days": 3,
+            "food_instruction": "after_food",
+            "special_instructions": "Give 7.5 mL per dose (based on 15 kg body weight). Shake well.",
+            "confidence": 0.91,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-038",
+      "label": "Cream for skin — TDS topical",
+      "prescription": {
+        "prescription_id": "rx-tc-038",
+        "image_quality": "good",
+        "medicines": [
+          {
+            "name_raw": "Cr. Clotrimazole + Betamethasone 1%/0.05%",
+            "name_generic": "clotrimazole + betamethasone",
+            "drug_class": "antifungal",
+            "purpose": "Treats fungal skin infections with inflammation",
+            "strength": "1%/0.05%",
+            "form": "cream",
+            "frequency_raw": "BD",
+            "frequency_normalized": "Twice daily (morning & night)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 14,
+            "food_instruction": "any_time",
+            "special_instructions": "Apply sparingly to affected skin only. Avoid eyes.",
+            "confidence": 0.90,
+            "needs_review": false,
+            "review_reasons": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-039",
+      "label": "Full prescription — 5 medicines, one SOS, one needs review",
+      "prescription": {
+        "prescription_id": "rx-tc-039",
+        "image_quality": "good",
+        "prescription_date": "2026-09-25",
+        "prescriber": {
+          "name": "Dr. P. Menon",
+          "registration_number": "KL-98765",
+          "clinic_or_hospital": "Apollo Outpatient"
+        },
+        "medicines": [
+          {
+            "name_raw": "Tab. Metformin 500 mg",
+            "name_generic": "metformin",
+            "drug_class": "antidiabetic",
+            "purpose": "Controls blood sugar in type 2 diabetes",
+            "strength": "500 mg",
+            "form": "tablet",
+            "frequency_raw": "1-0-1",
+            "frequency_normalized": "Morning and night (skip afternoon)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 30,
+            "food_instruction": "with_food",
+            "confidence": 0.95,
+            "needs_review": false,
+            "review_reasons": []
+          },
+          {
+            "name_raw": "Tab. Amlodipine 5 mg",
+            "name_generic": "amlodipine",
+            "drug_class": "antihypertensive",
+            "purpose": "Relaxes blood vessels to lower blood pressure",
+            "strength": "5 mg",
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["morning"],
+            "duration_days": 30,
+            "food_instruction": "any_time",
+            "confidence": 0.94,
+            "needs_review": false,
+            "review_reasons": []
+          },
+          {
+            "name_raw": "Tab. Atorvastatin 20 mg",
+            "name_generic": "atorvastatin",
+            "drug_class": "other",
+            "purpose": "Lowers bad cholesterol and protects heart health",
+            "strength": "20 mg",
+            "form": "tablet",
+            "frequency_raw": "HS",
+            "frequency_normalized": "At bedtime only",
+            "timing_slots": ["night"],
+            "duration_days": 30,
+            "food_instruction": "any_time",
+            "confidence": 0.93,
+            "needs_review": false,
+            "review_reasons": []
+          },
+          {
+            "name_raw": "Tab. Pantoprazole 40 mg",
+            "name_generic": "pantoprazole",
+            "drug_class": "antacid",
+            "purpose": "Reduces stomach acid production",
+            "strength": "40 mg",
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["morning"],
+            "duration_days": 30,
+            "food_instruction": "empty_stomach",
+            "confidence": 0.94,
+            "needs_review": false,
+            "review_reasons": []
+          },
+          {
+            "name_raw": "Tab. Aspirin 75 mg",
+            "name_generic": "aspirin",
+            "drug_class": "painkiller",
+            "purpose": "Prevents blood clotting (low-dose cardioprotective use)",
+            "strength": "75 mg",
+            "form": "tablet",
+            "frequency_raw": "OD",
+            "frequency_normalized": "Once daily",
+            "timing_slots": ["morning"],
+            "duration_days": null,
+            "food_instruction": "after_food",
+            "confidence": 0.92,
+            "needs_review": true,
+            "review_reasons": ["Duration not specified."]
+          }
+        ]
+      }
+    },
+    {
+      "id": "TC-040",
+      "label": "Scanned photocopy — fair quality, one drug with font bleed",
+      "prescription": {
+        "prescription_id": "rx-tc-040",
+        "image_quality": "fair",
+        "medicines": [
+          {
+            "name_raw": "Cap. Doxycycline 100 mg",
+            "name_generic": "doxycycline",
+            "drug_class": "antibiotic",
+            "purpose": "Treats bacterial infections including chest and skin",
+            "strength": "100 mg",
+            "form": "capsule",
+            "frequency_raw": "BD",
+            "frequency_normalized": "Twice daily (morning & night)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 7,
+            "food_instruction": "with_food",
+            "special_instructions": "Take with plenty of water. Do not lie down for 30 minutes after.",
+            "confidence": 0.83,
+            "needs_review": false,
+            "review_reasons": []
+          },
+          {
+            "name_raw": "T?b. Lact?b?cillus",
+            "name_generic": null,
+            "drug_class": "unknown",
+            "purpose": null,
+            "strength": null,
+            "form": "unknown",
+            "frequency_raw": "BD",
+            "frequency_normalized": "Twice daily (morning & night)",
+            "timing_slots": ["morning", "night"],
+            "duration_days": 7,
+            "food_instruction": "unknown",
+            "confidence": 0.58,
+            "needs_review": true,
+            "review_reasons": [
+              "Generic name could not be resolved from raw name.",
+              "Strength is missing or illegible.",
+              "Overall confidence (0.58) is below threshold (0.70).",
+              "Font bleed detected — possible OCR substitution errors."
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
