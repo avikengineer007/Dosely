@@ -24,37 +24,40 @@ from dosely.models import (
 )
 
 
+from typing import Any
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _make_medicine(**kwargs) -> Medicine:
-    defaults = dict(
-        name_raw="Tab. Amoxicillin 500 mg",
-        name_generic="amoxicillin",
-        drug_class=DrugClass.ANTIBIOTIC,
-        purpose="Kills bacteria",
-        strength="500 mg",
-        form=DoseForm.TABLET,
-        frequency_raw="TDS",
-        frequency_normalized="Three times daily",
-        timing_slots=["morning", "afternoon", "night"],
-        duration_days=5,
-        food_instruction=FoodInstruction.AFTER_FOOD,
-        confidence=0.95,
-    )
+def _make_medicine(**kwargs: Any) -> Medicine:
+    defaults: dict[str, Any] = {
+        "name_raw": "Tab. Amoxicillin 500 mg",
+        "name_generic": "amoxicillin",
+        "drug_class": DrugClass.ANTIBIOTIC,
+        "purpose": "Kills bacteria",
+        "strength": "500 mg",
+        "form": DoseForm.TABLET,
+        "frequency_raw": "TDS",
+        "frequency_normalized": "Three times daily",
+        "timing_slots": ["morning", "afternoon", "night"],
+        "duration_days": 5,
+        "food_instruction": FoodInstruction.AFTER_FOOD,
+        "confidence": 0.95,
+    }
     defaults.update(kwargs)
-    return Medicine(**defaults)
+    return Medicine(**defaults)  # type: ignore[arg-type]
 
 
-def _make_prescription(**kwargs) -> Prescription:
-    defaults = dict(
-        prescription_id="rx-unit-test",
-        image_quality=ImageQuality.GOOD,
-        medicines=[_make_medicine()],
-    )
+def _make_prescription(**kwargs: Any) -> Prescription:
+    defaults: dict[str, Any] = {
+        "prescription_id": "rx-unit-test",
+        "image_quality": ImageQuality.GOOD,
+        "medicines": [_make_medicine()],
+    }
     defaults.update(kwargs)
-    return Prescription(**defaults)
+    return Prescription(**defaults)  # type: ignore[arg-type]
 
 
 # ---------------------------------------------------------------------------

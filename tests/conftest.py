@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Generator
 from unittest.mock import MagicMock, patch
 
+import cv2  # type: ignore
 import numpy as np
 import pytest
 
@@ -27,7 +28,6 @@ DATA_DIR = PROJECT_ROOT / "data"
 
 def _make_white_png(width: int = 400, height: int = 200) -> bytes:
     """Create a minimal valid white PNG in-memory using OpenCV."""
-    import cv2
     img = np.ones((height, width), dtype=np.uint8) * 255
     _, buf = cv2.imencode(".png", img)
     return buf.tobytes()
@@ -35,7 +35,6 @@ def _make_white_png(width: int = 400, height: int = 200) -> bytes:
 
 def _make_noisy_gray_png(width: int = 400, height: int = 200) -> bytes:
     """Create a noisy grayscale PNG (simulates a low-quality scan)."""
-    import cv2
     rng = np.random.default_rng(42)
     img = rng.integers(20, 80, size=(height, width), dtype=np.uint8)
     _, buf = cv2.imencode(".png", img)
@@ -44,7 +43,6 @@ def _make_noisy_gray_png(width: int = 400, height: int = 200) -> bytes:
 
 def _make_skewed_text_png(angle_deg: float = 5.0) -> bytes:
     """Create a white PNG with black horizontal lines at a slight angle."""
-    import cv2
     img = np.ones((300, 600), dtype=np.uint8) * 255
     for y in range(30, 290, 40):
         cv2.line(img, (10, y), (590, y + int(590 * np.tan(np.radians(angle_deg)))), 0, 2)

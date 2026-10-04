@@ -126,9 +126,10 @@ def _call_claude(
         model=CLAUDE_MODEL,
         max_tokens=CLAUDE_MAX_TOKENS,
         system=system_prompt,
-        messages=messages,
+        messages=messages,  # type: ignore[arg-type]
     )
-    return response.content[0].text
+    first_block = response.content[0]
+    return getattr(first_block, "text", str(first_block))
 
 
 # ---------------------------------------------------------------------------

@@ -14,6 +14,7 @@ Tests cover:
 
 from __future__ import annotations
 
+import cv2  # type: ignore
 import numpy as np
 import pytest
 
@@ -135,7 +136,6 @@ class TestContrastNormalize:
 
 class TestDeskew:
     def test_white_image_no_change(self, white_png):
-        import cv2
         arr = _bytes_to_array(white_png)
         gray = _to_grayscale(arr)
         out = deskew(gray)
@@ -161,7 +161,6 @@ class TestDeskew:
 
 class TestAssessImageQuality:
     def test_high_variance_is_good(self):
-        import cv2
         rng = np.random.default_rng(42)
         # High-frequency noise has high Laplacian variance -> "good"
         sharp = rng.integers(0, 255, (200, 200), dtype=np.uint8)
@@ -191,7 +190,6 @@ class TestPreprocess:
         assert len(result) > 0
 
     def test_output_is_valid_png(self, white_png):
-        import cv2
         result = preprocess(white_png)
         arr = np.frombuffer(result, dtype=np.uint8)
         img = cv2.imdecode(arr, cv2.IMREAD_GRAYSCALE)

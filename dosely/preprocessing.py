@@ -21,7 +21,7 @@ import logging
 import math
 from typing import Tuple
 
-import cv2
+import cv2  # type: ignore
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -29,14 +29,19 @@ logger = logging.getLogger(__name__)
 # PDF support is optional at import time so the module still loads
 # even if PyMuPDF is not installed (image-only mode).
 try:
-    import fitz  # PyMuPDF
+    import pymupdf as fitz  # type: ignore
     _PYMUPDF_AVAILABLE = True
 except ImportError:
-    _PYMUPDF_AVAILABLE = False
-    logger.warning(
-        "PyMuPDF not installed. PDF input is disabled. "
-        "Install with: pip install pymupdf"
-    )
+    try:
+        import fitz  # type: ignore
+        _PYMUPDF_AVAILABLE = True
+    except ImportError:
+        fitz = None  # type: ignore
+        _PYMUPDF_AVAILABLE = False
+        logger.warning(
+            "PyMuPDF not installed. PDF input is disabled. "
+            "Install with: pip install pymupdf"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -61,7 +66,7 @@ def _is_pdf(data: bytes) -> bool:
 
 def _pdf_to_image_bytes(data: bytes, page_index: int = 0) -> bytes:
     """Rasterise one PDF page to PNG bytes."""
-    if not _PYMUPDF_AVAILABLE:
+    if not _PYMUPDF_AVAILABLE or fitz is None:
         raise RuntimeError(
             "PyMuPDF is required for PDF processing. "
             "Install it with: pip install pymupdf"
