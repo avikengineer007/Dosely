@@ -88,7 +88,7 @@ class MedicationScheduler:
         all_entries: list[ScheduleEntry] = []
 
         for drug in drugs:
-            if drug.frequency_raw is not None:
+            if drug.frequency_raw is not None and drug.frequency_raw.strip():
                 entries = self._from_prescription(drug)
             else:
                 entries = self._from_default(drug)
@@ -105,6 +105,13 @@ class MedicationScheduler:
         check_conflicts(sorted_entries)
 
         return sorted_entries
+
+    def schedule_timeline(self, drugs: list[DrugInput]) -> list[dict]:
+        """
+        Build the daily medication timeline and return as a list of dictionaries:
+        [{time, drug, instruction, source, suggested, warnings, drug_class}, ...]
+        """
+        return [entry.to_dict() for entry in self.schedule(drugs)]
 
     # ------------------------------------------------------------------
     # Private: prescription-driven scheduling

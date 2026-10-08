@@ -87,21 +87,25 @@ _FOOD_OFFSETS: dict[str, int] = {
 
 def _add_minutes(t: time, minutes: int) -> time:
     """Add ``minutes`` (may be negative) to a ``time``, clamped to 00:00–23:59."""
-    dt = datetime(2000, 1, 1, t.hour, t.minute) + timedelta(minutes=minutes)
-    # Clamp to same day
-    if dt.day != 2000:
-        dt = datetime(2000, 1, 1, 0 if dt.hour < 0 else 23, 59)
+    base_dt = datetime(2000, 1, 1, t.hour, t.minute)
+    dt = base_dt + timedelta(minutes=minutes)
+    if dt < datetime(2000, 1, 1, 0, 0):
+        return time(0, 0)
+    if dt > datetime(2000, 1, 1, 23, 59):
+        return time(23, 59)
     return dt.time().replace(second=0, microsecond=0)
+
 
 
 def _time_to_str(t: time) -> str:
     return t.strftime("%H:%M")
 
 
-def _anchor_to_time(anchor: str, cfg: SchedulerConfig) -> Optional[time]:
+def _anchor_to_time(anchor: str, cfg: SchedulerConfig, has_food: bool = False) -> Optional[time]:
     """Resolve a DoseSlot anchor name to a clock time."""
+    if anchor == "morning":
+        return cfg.breakfast_time if has_food else cfg.wake_time
     mapping = {
-        "morning":   cfg.wake_time,
         "breakfast": cfg.breakfast_time,
         "lunch":     cfg.lunch_time,
         "dinner":    cfg.dinner_time,
@@ -115,14 +119,27 @@ def _food_instruction_text(food_relation: Optional[str], anchor: str) -> str:
     """Build the 'take X food' part of the instruction."""
     if not food_relation or food_relation == FOOD_ANY:
         return ""
-    meal = anchor if anchor not in ("morning", "bedtime", "as_needed", "absolute") else ""
-    meal_str = f" {meal}" if meal else ""
-    texts = {
-        FOOD_BEFORE: f"30 minutes before{meal_str} food",
-        FOOD_AFTER:  f"after{meal_str} food",
-        FOOD_WITH:   f"with{meal_str} food",
-        FOOD_EMPTY:  "on an empty stomach",
+    meal_names = {
+        "morning": "breakfast",
+        "breakfast": "breakfast",
+        "lunch": "lunch",
+        "dinner": "dinner",
     }
+    meal = meal_names.get(anchor, "")
+    if meal:
+        texts = {
+            FOOD_BEFORE: f"30 minutes before {meal}",
+            FOOD_AFTER:  f"after {meal}",
+            FOOD_WITH:   f"with {meal}",
+            FOOD_EMPTY:  "on an empty stomach",
+        }
+    else:
+        texts = {
+            FOOD_BEFORE: "30 minutes before food",
+            FOOD_AFTER:  "after food",
+            FOOD_WITH:   "with food",
+            FOOD_EMPTY:  "on an empty stomach",
+        }
     return texts.get(food_relation, "")
 
 
@@ -136,16 +153,27 @@ def _recompute_every_n_hours(
     """
     Regenerate evenly-spaced slots from cfg.wake_time to cfg.sleep_time.
     """
+    if n_hours <= 0:
+        return [(cfg.wake_time, "Take as directed")]
     wake_dt  = datetime(2000, 1, 1, cfg.wake_time.hour,  cfg.wake_time.minute)
     sleep_dt = datetime(2000, 1, 1, cfg.sleep_time.hour, cfg.sleep_time.minute)
-    waking_min = int((sleep_dt - wake_dt).total_seconds() / 60)
-    dose_count = max(1, waking_min // (n_hours * 60))
 
+    count = 0
+    curr = wake_dt
+    while curr <= sleep_dt:
+        count += 1
+        curr += timedelta(hours=n_hours)
+
+    count = max(1, count)
     results = []
-    for i in range(dose_count):
-        t = (wake_dt + timedelta(hours=n_hours * i)).time().replace(second=0, microsecond=0)
-        instr = f"Take every {n_hours} hours (dose {i + 1} of {dose_count})"
+    curr = wake_dt
+    dose_idx = 1
+    while curr <= sleep_dt:
+        t = curr.time().replace(second=0, microsecond=0)
+        instr = f"Take every {n_hours} hours (dose {dose_idx} of {count})"
         results.append((t, instr))
+        dose_idx += 1
+        curr += timedelta(hours=n_hours)
     return results
 
 
@@ -179,6 +207,7 @@ def resolve_slots(
         return _recompute_every_n_hours(every_n_hours, config)
 
     results: list[tuple[time, str]] = []
+    has_food = food_relation in (FOOD_BEFORE, FOOD_AFTER, FOOD_WITH, FOOD_EMPTY)
     food_offset = _FOOD_OFFSETS.get(food_relation or FOOD_ANY, 0)
 
     for slot in slots:
@@ -195,7 +224,7 @@ def resolve_slots(
             results.append((t, instr))
             continue
 
-        base = _anchor_to_time(slot.anchor, config)
+        base = _anchor_to_time(slot.anchor, config, has_food=has_food)
         if base is None:
             results.append((time(0, 0), "Take as needed"))
             continue
@@ -241,19 +270,23 @@ def apply_default_rule(
     Rules
     -----
     antacid_ppi   → 30 min before breakfast, OD
-    analgesic_nsaid → after lunch + after dinner (BD default)
-    antibiotic      → evenly spaced TDS across waking hours
+    analgesic_nsaid → after lunch + after dinner (BD default after food)
+    antibiotic      → evenly spaced intervals across waking hours
     antihistamine   → sedating → bedtime; non-sedating → morning OD
     other/unknown   → morning OD (safest generic fallback)
     """
     dc = drug_class.lower()
     name_lower = drug_name.lower()
 
-    if dc == "antacid_ppi":
+    if dc in ("antacid_ppi", "ppi") or any(
+        p in name_lower for p in ("omeprazole", "pantoprazole", "rabeprazole", "esomeprazole", "lansoprazole")
+    ):
         t = _add_minutes(config.breakfast_time, -30)
         return [(t, "Take 30 minutes before breakfast — on an empty stomach")]
 
-    if dc == "analgesic_nsaid":
+    if dc in ("analgesic_nsaid", "nsaid") or any(
+        n in name_lower for n in ("ibuprofen", "diclofenac", "naproxen", "paracetamol", "aspirin", "aceclofenac")
+    ):
         # Default: after lunch and after dinner (BD after food)
         t_lunch  = _add_minutes(config.lunch_time,  30)
         t_dinner = _add_minutes(config.dinner_time, 30)
@@ -262,15 +295,28 @@ def apply_default_rule(
             (t_dinner, "Take after dinner"),
         ]
 
-    if dc == "antibiotic":
-        # Evenly spaced TDS across waking hours
-        pairs = _recompute_every_n_hours(8, config)   # 8-hour spacing ~ TDS
-        return [(t, f"Take at evenly spaced intervals — {instr}") for t, instr in pairs]
+    if dc in ("antibiotic", "antibiotics") or any(
+        a in name_lower for a in ("amoxicillin", "azithromycin", "ciprofloxacin", "metronidazole", "doxycycline")
+    ):
+        # Evenly spaced intervals across waking hours
+        wake_dt  = datetime(2000, 1, 1, config.wake_time.hour,  config.wake_time.minute)
+        sleep_dt = datetime(2000, 1, 1, config.sleep_time.hour, config.sleep_time.minute)
+        waking_minutes = int((sleep_dt - wake_dt).total_seconds() / 60)
+        t1 = config.wake_time
+        t2 = (wake_dt + timedelta(minutes=waking_minutes // 2)).time().replace(second=0, microsecond=0)
+        t3 = config.sleep_time
+        return [
+            (t1, "Take at evenly spaced intervals across waking hours (dose 1 of 3)"),
+            (t2, "Take at evenly spaced intervals across waking hours (dose 2 of 3)"),
+            (t3, "Take at evenly spaced intervals across waking hours (dose 3 of 3)"),
+        ]
 
-    if dc == "antihistamine":
+    if dc in ("antihistamine", "antihistamines"):
         name_parts = name_lower.split()
-        is_sedating = any(p in _SEDATING_ANTIHISTAMINES for p in name_parts) or \
-                      name_lower in _SEDATING_ANTIHISTAMINES
+        is_sedating = (
+            any(p in _SEDATING_ANTIHISTAMINES for p in name_parts)
+            or any(s in name_lower for s in _SEDATING_ANTIHISTAMINES)
+        )
         if is_sedating:
             return [(config.sleep_time, "Take at bedtime — may cause drowsiness")]
         else:
@@ -278,3 +324,4 @@ def apply_default_rule(
 
     # Catch-all for "other" / "unknown"
     return [(config.wake_time, "Take in the morning as directed")]
+

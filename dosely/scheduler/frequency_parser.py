@@ -74,13 +74,13 @@ class FrequencyResult:
 # ---------------------------------------------------------------------------
 
 _EVERY_N_HOURS_RE = re.compile(
-    r"every\s+(\d+)\s*(?:hours?|hrs?)",
+    r"(?:every\s+(\d+)\s*(?:hours?|hrs?)|^q(\d+)h$)",
     re.IGNORECASE,
 )
 
-# Pattern: digits (including multi-digit) separated by - or /
+# Pattern: digits separated by - or / with optional surrounding whitespace
 _NUMERIC_PATTERN_RE = re.compile(
-    r"^(\d+)[-/](\d+)(?:[-/](\d+))?(?:[-/](\d+))?$",
+    r"^(\d+)\s*[-/]\s*(\d+)(?:\s*[-/]\s*(\d+))?(?:\s*[-/]\s*(\d+))?$",
     re.IGNORECASE,
 )
 
@@ -88,17 +88,21 @@ _NUMERIC_PATTERN_RE = re.compile(
 _ABBREV_MAP: dict[str, str] = {
     # OD variants
     "od": FREQ_OD, "qd": FREQ_OD, "qhs": FREQ_HS,
-    "mane": FREQ_OD, "q24h": FREQ_OD,
+    "mane": FREQ_OD, "q24h": FREQ_OD, "once daily": FREQ_OD,
+    "daily": FREQ_OD, "1 daily": FREQ_OD,
     # BD variants
     "bd": FREQ_BD, "bid": FREQ_BD, "bds": FREQ_BD, "q12h": FREQ_BD,
+    "twice daily": FREQ_BD, "2 times daily": FREQ_BD,
     # TDS variants
     "tds": FREQ_TDS, "tid": FREQ_TDS, "q8h": FREQ_TDS,
+    "thrice daily": FREQ_TDS, "three times daily": FREQ_TDS, "3 times daily": FREQ_TDS,
     # QID variants
     "qid": FREQ_QID, "q6h": FREQ_QID,
+    "four times daily": FREQ_QID, "4 times daily": FREQ_QID,
     # Bedtime
-    "hs": FREQ_HS, "nocte": FREQ_HS,
+    "hs": FREQ_HS, "nocte": FREQ_HS, "bedtime": FREQ_HS, "at bedtime": FREQ_HS,
     # SOS/PRN
-    "sos": FREQ_SOS, "prn": FREQ_PRN if False else FREQ_SOS, "stat": FREQ_SOS,
+    "sos": FREQ_SOS, "prn": FREQ_SOS, "stat": FREQ_SOS, "as needed": FREQ_SOS,
 }
 
 # Slot factory helpers -------------------------------------------------------
@@ -153,14 +157,15 @@ def _parse_every_n_hours(n: int) -> list[DoseSlot]:
         return [_as_needed("every_? hours")]
     wake_dt  = datetime(2000, 1, 1, _DEFAULT_WAKE.hour,  _DEFAULT_WAKE.minute)
     sleep_dt = datetime(2000, 1, 1, _DEFAULT_SLEEP.hour, _DEFAULT_SLEEP.minute)
-    waking_minutes = int((sleep_dt - wake_dt).total_seconds() / 60)
-    dose_count = max(1, waking_minutes // (n * 60))   # cap by waking window
 
     slots = []
-    for i in range(dose_count):
-        t = (wake_dt + timedelta(hours=n * i)).time()
-        slots.append(DoseSlot(anchor="absolute", absolute_time=t,
-                              label=f"dose {i + 1}"))
+    curr = wake_dt
+    dose_idx = 1
+    while curr <= sleep_dt:
+        slots.append(DoseSlot(anchor="absolute", absolute_time=curr.time(),
+                              label=f"dose {dose_idx}"))
+        dose_idx += 1
+        curr += timedelta(hours=n)
     return slots
 
 
@@ -168,22 +173,26 @@ def _parse_every_n_hours(n: int) -> list[DoseSlot]:
 # Numeric pattern parser
 # ---------------------------------------------------------------------------
 
-_PATTERN_ANCHORS = ["morning", "lunch", "dinner", "bedtime"]
-
 def _parse_numeric_pattern(digits: list[int]) -> list[DoseSlot]:
     """
     Convert a list of 0/1 digit values to DoseSlots.
 
-    Position 0 → morning, 1 → lunch, 2 → dinner, 3 → bedtime.
-    Doses > 1 in a slot are represented as a single slot (pharmacist notation
-    sometimes uses 2-0-2 for "two tablets twice daily"; we produce one slot
-    and note the count in the label).
+    For 2 positions: morning, dinner.
+    For 3 positions: morning, lunch, dinner.
+    For 4 positions: morning, lunch, dinner, bedtime.
     """
+    if len(digits) == 2:
+        anchors = ["morning", "dinner"]
+    elif len(digits) == 3:
+        anchors = ["morning", "lunch", "dinner"]
+    else:
+        anchors = ["morning", "lunch", "dinner", "bedtime"]
+
     slots: list[DoseSlot] = []
     for pos, count in enumerate(digits):
         if count == 0:
             continue
-        anchor = _PATTERN_ANCHORS[pos] if pos < len(_PATTERN_ANCHORS) else "bedtime"
+        anchor = anchors[pos] if pos < len(anchors) else "bedtime"
         label  = anchor if count == 1 else f"{anchor} ×{count}"
         slots.append(DoseSlot(anchor=anchor, label=label))
     return slots
@@ -220,19 +229,21 @@ def parse_frequency(raw: str) -> FrequencyResult:
 
     stripped = raw.strip()
 
-    # ---- 1. Abbreviation lookup (whole token) ----------------------------
+    # ---- 1. Abbreviation lookup (whole token or stripped dots) ----------
     key = stripped.lower()
-    if key in _ABBREV_MAP:
-        code  = _ABBREV_MAP[key]
+    clean_key = re.sub(r"\.", "", key).strip()
+    match_key = key if key in _ABBREV_MAP else clean_key
+    if match_key in _ABBREV_MAP:
+        code  = _ABBREV_MAP[match_key]
         slots = _slots_for_code(code)
         dpd   = len(slots) if code != FREQ_SOS else 0
         return FrequencyResult(code=code, slots=slots,
                                doses_per_day=dpd, raw=raw)
 
-    # ---- 2. "every N hours" ---------------------------------------------
-    m = _EVERY_N_HOURS_RE.search(stripped)
+    # ---- 2. "every N hours" / "qNh" ------------------------------------
+    m = _EVERY_N_HOURS_RE.search(clean_key)
     if m:
-        n = int(m.group(1))
+        n = int(m.group(1) or m.group(2))
         slots = _parse_every_n_hours(n)
         return FrequencyResult(
             code=FREQ_EVERY_N_HOURS,
@@ -242,7 +253,7 @@ def parse_frequency(raw: str) -> FrequencyResult:
             every_n_hours=n,
         )
 
-    # ---- 3. Numeric pattern (e.g. "1-0-1", "1-1-1-1") ------------------
+    # ---- 3. Numeric pattern (e.g. "1-0-1", "1 - 0 - 1") ----------------
     pm = _NUMERIC_PATTERN_RE.match(stripped)
     if pm:
         digits = [int(g) for g in pm.groups() if g is not None]

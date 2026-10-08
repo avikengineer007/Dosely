@@ -54,13 +54,12 @@ def _minutes_between(a: str, b: str) -> float | None:
 
 ANTACID_WINDOW_MINUTES: int = 120   # 2-hour window
 
-# Classes that should not be duplicated
-_REVIEW_CLASSES: frozenset[str] = frozenset({
-    "analgesic_nsaid",
+_ANTACID_CLASSES: frozenset[str] = frozenset({
     "antacid_ppi",
-    "antibiotic",
-    "antihistamine",
+    "antacid",
+    "ppi",
 })
+
 
 
 # ---------------------------------------------------------------------------
@@ -85,26 +84,28 @@ def check_conflicts(entries: list[ScheduleEntry]) -> list[ScheduleEntry]:
     # ------------------------------------------------------------------ #
     # 1. Antacid-spacing check                                            #
     # ------------------------------------------------------------------ #
-    antacid_entries = [e for e in entries if e.drug_class == "antacid_ppi"]
-    non_antacid_entries = [e for e in entries if e.drug_class != "antacid_ppi"]
+    antacid_entries = [e for e in entries if (e.drug_class or "").lower() in _ANTACID_CLASSES]
+    non_antacid_entries = [e for e in entries if (e.drug_class or "").lower() not in _ANTACID_CLASSES]
 
     for antacid in antacid_entries:
         for other in non_antacid_entries:
+            if antacid.drug.strip().lower() == other.drug.strip().lower():
+                continue
             gap = _minutes_between(antacid.time, other.time)
             if gap is None:
                 continue
-            if gap < ANTACID_WINDOW_MINUTES:
+            if gap <= ANTACID_WINDOW_MINUTES:
                 msg = (
-                    f"Antacid interaction: {antacid.drug!r} ({antacid.time}) "
-                    f"is within 2 hours of {other.drug!r} ({other.time}). "
+                    f"Antacid interaction: '{antacid.drug}' ({antacid.time}) "
+                    f"is within 2 hours of '{other.drug}' ({other.time}). "
                     "Antacids may reduce absorption of other medicines — "
                     "consider spacing them ≥2 hours apart."
                 )
                 if msg not in antacid.warnings:
                     antacid.warnings.append(msg)
                 other_msg = (
-                    f"Antacid interaction: {other.drug!r} ({other.time}) "
-                    f"is within 2 hours of antacid {antacid.drug!r} ({antacid.time}). "
+                    f"Antacid interaction: '{other.drug}' ({other.time}) "
+                    f"is within 2 hours of antacid '{antacid.drug}' ({antacid.time}). "
                     "Absorption may be reduced — space ≥2 hours from antacid if possible."
                 )
                 if other_msg not in other.warnings:
@@ -115,18 +116,18 @@ def check_conflicts(entries: list[ScheduleEntry]) -> list[ScheduleEntry]:
     # ------------------------------------------------------------------ #
     class_to_entries: dict[str, list[ScheduleEntry]] = {}
     for entry in entries:
-        dc = entry.drug_class
-        if dc in _REVIEW_CLASSES:
+        dc = (entry.drug_class or "").strip().lower()
+        if dc and dc not in ("other", "unknown"):
             class_to_entries.setdefault(dc, []).append(entry)
 
     for dc, group in class_to_entries.items():
         # Deduplicate by drug name to count distinct drugs (not slots)
-        distinct_drugs: dict[str, ScheduleEntry] = {}
+        distinct_drugs: dict[str, str] = {}
         for e in group:
-            distinct_drugs.setdefault(e.drug, e)
+            distinct_drugs.setdefault(e.drug.strip().lower(), e.drug)
 
         if len(distinct_drugs) >= 2:
-            names = ", ".join(distinct_drugs.keys())
+            names = ", ".join(distinct_drugs.values())
             for entry in group:
                 warn = (
                     f"Duplicate drug class '{dc}': {names} are all in the same class. "
@@ -137,3 +138,4 @@ def check_conflicts(entries: list[ScheduleEntry]) -> list[ScheduleEntry]:
                     entry.warnings.append(warn)
 
     return entries
+
