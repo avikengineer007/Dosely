@@ -6,6 +6,8 @@ opencv-python-headless>=4.10.0
 numpy>=1.26.0
 pymupdf>=1.24.0          # PDF support (PyMuPDF)
 python-multipart>=0.0.9  # FastAPI file uploads
+rapidFuzz>=3.9.0          # Fuzzy drug name matching
+gunicorn>=22.0.0          # Production WSGI server
 
 # Dev / test
 pytest>=8.3.0
