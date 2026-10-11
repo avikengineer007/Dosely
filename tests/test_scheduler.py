@@ -677,3 +677,51 @@ class TestDailyTimelineContract:
         # Amoxicillin must be suggested=False and source="prescription"
         assert amox_entry1.source == "prescription"
         assert amox_entry1.suggested is False
+
+
+# ===========================================================================
+# 20. Global Safety Rule 3: Suggestion Disclaimer Verification
+# ===========================================================================
+
+class TestGlobalSafetyRule3SuggestionDisclaimer:
+    """
+    Global Safety Rule 3:
+    Default (suggested) timings must always carry source="default", suggested=true,
+    and show the text 'Suggested, confirm with your doctor or pharmacist'.
+    """
+
+    def test_default_entry_carries_required_disclaimer_text(self):
+        scheduler = MedicationScheduler()
+        drugs = [
+            DrugInput(name="Omeprazole", drug_class="antacid_ppi"),
+            DrugInput(name="Ibuprofen", drug_class="analgesic_nsaid"),
+            DrugInput(name="Amoxicillin", drug_class="antibiotic"),
+            DrugInput(name="Diphenhydramine", drug_class="antihistamine"),
+        ]
+        timeline = scheduler.schedule(drugs)
+        for entry in timeline:
+            assert entry.source == "default"
+            assert entry.suggested is True
+            assert entry.suggestion_text == "Suggested, confirm with your doctor or pharmacist"
+
+    def test_timeline_dict_contains_disclaimer_when_suggested(self):
+        scheduler = MedicationScheduler()
+        drugs = [DrugInput(name="Pantoprazole", drug_class="antacid_ppi")]
+        dicts = scheduler.schedule_timeline(drugs)
+        assert len(dicts) == 1
+        d = dicts[0]
+        assert d["source"] == "default"
+        assert d["suggested"] is True
+        assert d["suggestion_text"] == "Suggested, confirm with your doctor or pharmacist"
+
+    def test_prescription_entry_does_not_carry_suggestion_disclaimer(self):
+        scheduler = MedicationScheduler()
+        drugs = [DrugInput(name="Amoxicillin", drug_class="antibiotic", frequency_raw="OD")]
+        timeline = scheduler.schedule(drugs)
+        assert len(timeline) == 1
+        entry = timeline[0]
+        assert entry.source == "prescription"
+        assert entry.suggested is False
+        assert entry.suggestion_text is None
+        d = entry.to_dict()
+        assert "suggestion_text" not in d

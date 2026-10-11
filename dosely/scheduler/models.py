@@ -134,6 +134,9 @@ class DrugInput:
 # ScheduleEntry — one row in the returned daily timeline
 # ---------------------------------------------------------------------------
 
+DEFAULT_SUGGESTION_TEXT = "Suggested, confirm with your doctor or pharmacist"
+
+
 @dataclass
 class ScheduleEntry:
     """
@@ -146,17 +149,23 @@ class ScheduleEntry:
     ``suggested``   : True only when source == "default".
     ``warnings``    : list of warning strings (may be empty).
     ``drug_class``  : propagated from DrugInput for conflict checking.
+    ``suggestion_text``: "Suggested, confirm with your doctor or pharmacist" when suggested=True.
     """
-    time:        str          # "HH:MM"
-    drug:        str
-    instruction: str
-    source:      str          # "prescription" | "default"
-    suggested:   bool
-    warnings:    list[str] = field(default_factory=list)
-    drug_class:  str = ""
+    time:            str          # "HH:MM"
+    drug:            str
+    instruction:     str
+    source:          str          # "prescription" | "default"
+    suggested:       bool
+    warnings:        list[str] = field(default_factory=list)
+    drug_class:      str = ""
+    suggestion_text: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        if self.suggested and self.suggestion_text is None:
+            self.suggestion_text = DEFAULT_SUGGESTION_TEXT
 
     def to_dict(self) -> dict:
-        return {
+        d = {
             "time":        self.time,
             "drug":        self.drug,
             "instruction": self.instruction,
@@ -165,6 +174,9 @@ class ScheduleEntry:
             "warnings":    list(self.warnings),
             "drug_class":  self.drug_class,
         }
+        if self.suggested:
+            d["suggestion_text"] = self.suggestion_text or DEFAULT_SUGGESTION_TEXT
+        return d
 
     def __getitem__(self, key: str):
         if hasattr(self, key):
@@ -175,4 +187,4 @@ class ScheduleEntry:
         return getattr(self, key, default)
 
     def keys(self):
-        return ["time", "drug", "instruction", "source", "suggested", "warnings", "drug_class"]
+        return ["time", "drug", "instruction", "source", "suggested", "warnings", "drug_class", "suggestion_text"]
