@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Optional
 
@@ -85,6 +85,16 @@ class PrescriptionRepository:
                         snoozed_until TEXT,
                         fired_at TEXT,
                         notification_payload TEXT
+                    );
+
+                    CREATE TABLE IF NOT EXISTS feedback_reports (
+                        id TEXT PRIMARY KEY,
+                        prescription_id TEXT NOT NULL,
+                        drug_name TEXT NOT NULL,
+                        field_name TEXT,
+                        issue_type TEXT NOT NULL,
+                        user_comment TEXT,
+                        created_at TEXT NOT NULL
                     );
                     """
                 )
@@ -442,3 +452,166 @@ class PrescriptionRepository:
             return self.get_reminder(reminder_id)
         finally:
             self._close_conn(conn)
+
+    def delete_prescription(
+        self,
+        prescription_id: str,
+        user_id: Optional[str] = None,
+        storage: Optional[Any] = None,
+    ) -> bool:
+        """
+        Permanently delete a prescription and all related records (doses, reminders, feedback).
+        Also deletes the encrypted image file on disk.
+        """
+        conn = self._get_connection()
+        try:
+            if user_id:
+                cursor = conn.execute(
+                    "SELECT image_path FROM prescriptions WHERE id = ? AND user_id = ?",
+                    (prescription_id, user_id),
+                )
+            else:
+                cursor = conn.execute(
+                    "SELECT image_path FROM prescriptions WHERE id = ?",
+                    (prescription_id,),
+                )
+            row = cursor.fetchone()
+            if not row:
+                return False
+
+            image_path = row["image_path"]
+
+            with conn:
+                conn.execute("DELETE FROM dose_logs WHERE prescription_id = ?", (prescription_id,))
+                conn.execute("DELETE FROM reminders WHERE prescription_id = ?", (prescription_id,))
+                conn.execute("DELETE FROM feedback_reports WHERE prescription_id = ?", (prescription_id,))
+                if user_id:
+                    conn.execute("DELETE FROM prescriptions WHERE id = ? AND user_id = ?", (prescription_id, user_id))
+                else:
+                    conn.execute("DELETE FROM prescriptions WHERE id = ?", (prescription_id,))
+
+            # Remove physical file
+            if storage is not None:
+                storage.delete(image_path)
+            else:
+                p = Path(image_path)
+                if p.exists():
+                    p.unlink()
+
+            return True
+        finally:
+            self._close_conn(conn)
+
+    def delete(
+        self,
+        prescription_id: str,
+        user_id: Optional[str] = None,
+        storage: Optional[Any] = None,
+    ) -> bool:
+        """Alias for delete_prescription."""
+        return self.delete_prescription(prescription_id, user_id=user_id, storage=storage)
+
+    def purge_older_than(
+        self,
+        days: int = 30,
+        storage: Optional[Any] = None,
+    ) -> int:
+        """
+        Permanently purge prescriptions created more than `days` ago,
+        along with disk image files and associated records.
+        """
+        cutoff_dt = datetime.now(timezone.utc) - timedelta(days=days)
+        cutoff_iso = cutoff_dt.isoformat()
+
+        conn = self._get_connection()
+        try:
+            cursor = conn.execute(
+                "SELECT id, image_path FROM prescriptions WHERE created_at < ?",
+                (cutoff_iso,),
+            )
+            rows = cursor.fetchall()
+            if not rows:
+                return 0
+
+            purged_count = len(rows)
+            ids = [r["id"] for r in rows]
+            image_paths = [r["image_path"] for r in rows]
+
+            with conn:
+                placeholders = ",".join("?" for _ in ids)
+                conn.execute(f"DELETE FROM dose_logs WHERE prescription_id IN ({placeholders})", ids)
+                conn.execute(f"DELETE FROM reminders WHERE prescription_id IN ({placeholders})", ids)
+                conn.execute(f"DELETE FROM feedback_reports WHERE prescription_id IN ({placeholders})", ids)
+                conn.execute(f"DELETE FROM prescriptions WHERE id IN ({placeholders})", ids)
+
+            for img_p in image_paths:
+                if storage is not None:
+                    storage.delete(img_p)
+                else:
+                    p = Path(img_p)
+                    if p.exists():
+                        p.unlink()
+
+            return purged_count
+        finally:
+            self._close_conn(conn)
+
+    def log_feedback(
+        self,
+        feedback_id: str,
+        prescription_id: str,
+        drug_name: str,
+        issue_type: str,
+        field_name: Optional[str] = None,
+        user_comment: Optional[str] = None,
+    ) -> dict[str, Any]:
+        """Save user feedback report for medicine card verification."""
+        now_iso = datetime.now(timezone.utc).isoformat()
+        conn = self._get_connection()
+        try:
+            with conn:
+                conn.execute(
+                    """
+                    INSERT INTO feedback_reports (
+                        id, prescription_id, drug_name, field_name, issue_type, user_comment, created_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        feedback_id,
+                        prescription_id,
+                        drug_name,
+                        field_name,
+                        issue_type,
+                        user_comment,
+                        now_iso,
+                    ),
+                )
+            return {
+                "id": feedback_id,
+                "prescription_id": prescription_id,
+                "drug_name": drug_name,
+                "field_name": field_name,
+                "issue_type": issue_type,
+                "user_comment": user_comment,
+                "created_at": now_iso,
+            }
+        finally:
+            self._close_conn(conn)
+
+    def get_feedback(self, prescription_id: Optional[str] = None) -> list[dict[str, Any]]:
+        """Retrieve feedback reports, optionally filtered by prescription."""
+        conn = self._get_connection()
+        try:
+            if prescription_id:
+                cursor = conn.execute(
+                    "SELECT * FROM feedback_reports WHERE prescription_id = ? ORDER BY created_at DESC",
+                    (prescription_id,),
+                )
+            else:
+                cursor = conn.execute(
+                    "SELECT * FROM feedback_reports ORDER BY created_at DESC"
+                )
+            return [dict(r) for r in cursor.fetchall()]
+        finally:
+            self._close_conn(conn)
+

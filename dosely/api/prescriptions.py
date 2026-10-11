@@ -108,6 +108,17 @@ class ConfirmPrescriptionRequest(BaseModel):
     notes: Optional[str] = None
 
 
+class FeedbackRequest(BaseModel):
+    drug_name: str
+    field_name: Optional[str] = None
+    issue_type: str = "incorrect_info"
+    user_comment: Optional[str] = None
+
+
+class AdminPurgeRequest(BaseModel):
+    retention_days: int = Field(default=30, ge=1, le=365)
+
+
 # Max file size: 20 MB
 _MAX_FILE_BYTES = 20 * 1024 * 1024
 _ACCEPTED_MIME_TYPES = {
@@ -595,3 +606,80 @@ async def fire_reminder(
         "disclaimer": "This is not medical advice.",
     }
 
+
+# ---------------------------------------------------------------------------
+# Phase 6: Deletion, Feedback, Admin Purge
+# ---------------------------------------------------------------------------
+
+@router.delete(
+    "/prescriptions/{prescription_id}",
+    summary="Permanently delete a prescription and all associated data",
+    dependencies=[Depends(rate_limit(max_requests=30, window_seconds=60))],
+)
+async def delete_prescription(
+    prescription_id: str,
+    current_user: Annotated[dict[str, Any], Depends(get_current_user)],
+    repo: Annotated[PrescriptionRepository, Depends(get_repo)],
+    storage: Annotated[EncryptedStorage, Depends(get_storage)],
+) -> dict[str, Any]:
+    """Delete prescription, cascade all DB rows and encrypted image file."""
+    user_id = str(current_user.get("sub", "anonymous"))
+    deleted = repo.delete_prescription(prescription_id, user_id=user_id, storage=storage)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Prescription '{prescription_id}' not found",
+        )
+    return {"deleted": True, "prescription_id": prescription_id}
+
+
+@router.post(
+    "/prescriptions/{prescription_id}/feedback",
+    status_code=status.HTTP_201_CREATED,
+    summary="Submit 'this is wrong' feedback for a medicine card (no PII logged)",
+    dependencies=[Depends(rate_limit(max_requests=60, window_seconds=60))],
+)
+async def submit_feedback(
+    prescription_id: str,
+    payload: FeedbackRequest,
+    current_user: Annotated[dict[str, Any], Depends(get_current_user)],
+    repo: Annotated[PrescriptionRepository, Depends(get_repo)],
+) -> dict[str, Any]:
+    """Record field-level feedback without logging any patient-identifying information."""
+    user_id = str(current_user.get("sub", "anonymous"))
+    rec = repo.get(prescription_id, user_id=user_id)
+    if not rec:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Prescription '{prescription_id}' not found",
+        )
+    feedback_id = str(uuid.uuid4())
+    # SAFETY: user_comment is stored as-is but never logged (Rule 5).
+    report = repo.log_feedback(
+        feedback_id=feedback_id,
+        prescription_id=prescription_id,
+        drug_name=payload.drug_name,
+        issue_type=payload.issue_type,
+        field_name=payload.field_name,
+        user_comment=payload.user_comment,
+    )
+    return {"created": True, "feedback": report}
+
+
+@router.post(
+    "/admin/purge",
+    summary="Admin: purge prescription records older than retention_days (default 30)",
+    dependencies=[Depends(rate_limit(max_requests=5, window_seconds=60))],
+)
+async def admin_purge(
+    payload: AdminPurgeRequest,
+    current_user: Annotated[dict[str, Any], Depends(get_current_user)],
+    repo: Annotated[PrescriptionRepository, Depends(get_repo)],
+    storage: Annotated[EncryptedStorage, Depends(get_storage)],
+) -> dict[str, Any]:
+    """Delete all prescriptions (and related data) older than retention_days."""
+    purged = repo.purge_older_than(days=payload.retention_days, storage=storage)
+    return {
+        "purged_count": purged,
+        "retention_days": payload.retention_days,
+    }

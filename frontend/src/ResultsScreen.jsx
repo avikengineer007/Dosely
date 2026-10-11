@@ -27,6 +27,7 @@ export default function ResultsScreen({
   const [reminders, setReminders] = useState([]);
   const [selectedTz, setSelectedTz] = useState("Asia/Kolkata");
   const [actionMessage, setActionMessage] = useState("");
+  const [feedbackState, setFeedbackState] = useState({}); // {drugName: 'idle'|'sending'|'sent'|'error'}
 
   // Load prescription details, schedule, doses, and reminders
   const fetchData = async () => {
@@ -180,6 +181,33 @@ export default function ResultsScreen({
     }
   };
 
+  // Submit 'this is wrong' feedback (Rule 5: no PII logged server-side)
+  const handleSubmitFeedback = async (drugName, fieldName = null) => {
+    setFeedbackState((prev) => ({ ...prev, [drugName]: "sending" }));
+    try {
+      const res = await fetch(`${apiBaseUrl}/prescriptions/${prescriptionId}/feedback`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          drug_name: drugName,
+          field_name: fieldName,
+          issue_type: "incorrect_info",
+          user_comment: null,
+        }),
+      });
+      if (!res.ok) throw new Error("Feedback submission failed");
+      setFeedbackState((prev) => ({ ...prev, [drugName]: "sent" }));
+      setActionMessage(`✓ Feedback recorded for ${drugName}. Thank you!`);
+      setTimeout(() => setActionMessage(""), 4000);
+    } catch (err) {
+      setFeedbackState((prev) => ({ ...prev, [drugName]: "error" }));
+      setError(err.message);
+    }
+  };
+
   if (loading) {
     return (
       <div className="results-loading-container">
@@ -254,6 +282,23 @@ export default function ResultsScreen({
                       <strong>Duration:</strong>{" "}
                       {item.duration_days ? `${item.duration_days} days` : "As directed"}
                     </span>
+                  </div>
+
+                  {/* Phase 6: Feedback button */}
+                  <div className="drug-card-footer">
+                    {feedbackState[item.name_raw] === "sent" ? (
+                      <span className="feedback-sent">✓ Feedback sent</span>
+                    ) : (
+                      <button
+                        className="feedback-btn"
+                        id={`feedback-btn-${idx}`}
+                        disabled={feedbackState[item.name_raw] === "sending"}
+                        onClick={() => handleSubmitFeedback(item.name_raw)}
+                        title="Report incorrect information"
+                      >
+                        {feedbackState[item.name_raw] === "sending" ? "Sending…" : "⚑ This is wrong"}
+                      </button>
+                    )}
                   </div>
                 </div>
               );

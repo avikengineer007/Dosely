@@ -373,3 +373,40 @@
   color: #ffffff;
   border-color: #1d4ed8;
 }
+
+/* Phase 6: feedback button */
+.drug-card-footer {
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.feedback-btn {
+  background: transparent;
+  border: 1px solid #f87171;
+  color: #dc2626;
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.feedback-btn:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #dc2626;
+}
+
+.feedback-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.feedback-sent {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #16a34a;
+}
