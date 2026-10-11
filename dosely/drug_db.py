@@ -1,4 +1,4 @@
-﻿"""
+"""
 dosely/drug_db.py
 =================
 SQLite-backed drug knowledge base loader.
@@ -129,7 +129,7 @@ class DrugDatabase:
         if not path.exists():
             logger.warning("Seed drug file not found: %s — skipping.", path)
             return
-        with path.open(encoding="utf-8") as fh:
+        with path.open(encoding="utf-8-sig") as fh:
             entries = json.load(fh)
         rows = [
             (self._normalise_generic(e["generic"]), e["class"], e["purpose_plain"])
@@ -156,7 +156,7 @@ class DrugDatabase:
         if not path.exists():
             logger.warning("openFDA file not found: %s — skipping.", path)
             return
-        with path.open(encoding="utf-8") as fh:
+        with path.open(encoding="utf-8-sig") as fh:
             data = json.load(fh)
         results = data.get("results", [])
         inserted = 0

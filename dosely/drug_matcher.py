@@ -1,4 +1,4 @@
-﻿"""
+"""
 dosely/drug_matcher.py
 ======================
 Drug name matching and classification engine.
@@ -66,11 +66,9 @@ _KNOWN_CLASSES: frozenset[str] = frozenset({
 # Tokens that commonly appear alongside drug names on prescriptions but are
 # NOT part of the drug name itself (stripped before matching).
 _NOISE_PATTERN = re.compile(
-    r"\b("
-    r"tab\.?|cap\.?|syp\.?|inj\.?|oint\.?|susp\.?|sol\.?|drops?|"   # dose forms
-    r"\d+\s*(?:mg|mcg|ml|g|iu|units?)|"                               # strengths
-    r"od|bd|tds|qid|stat|sos|prn|mane|nocte"                          # frequencies
-    r")\b",
+    r"(?:\b(?:tab|cap|syp|inj|oint|susp|sol|drops?)\.?|"
+    r"\b\d+\s*(?:mg|mcg|ml|g|iu|units?)\b|"
+    r"\b(?:od|bd|tds|qid|stat|sos|prn|mane|nocte)\b)",
     re.IGNORECASE,
 )
 
