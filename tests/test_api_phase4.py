@@ -39,9 +39,13 @@ def test_env(tmp_path: Path):
     repo = PrescriptionRepository(db_path=db_file)
     storage = EncryptedStorage(storage_dir=storage_dir)
 
-    with patch("dosely.api.prescriptions.get_repo", return_value=repo), \
-         patch("dosely.api.prescriptions.get_storage", return_value=storage):
-        yield {"repo": repo, "storage": storage, "dir": storage_dir}
+    from dosely.api.prescriptions import get_repo, get_storage
+    app.dependency_overrides[get_repo] = lambda: repo
+    app.dependency_overrides[get_storage] = lambda: storage
+
+    yield {"repo": repo, "storage": storage, "dir": storage_dir}
+
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture

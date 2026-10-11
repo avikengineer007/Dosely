@@ -23,18 +23,28 @@ class PrescriptionRepository:
         self.db_path = str(db_path)
         if self.db_path != ":memory:":
             Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
+            self._shared_conn: Optional[sqlite3.Connection] = None
+        else:
+            self._shared_conn = sqlite3.connect(":memory:", check_same_thread=False)
+            self._shared_conn.row_factory = sqlite3.Row
         self._init_db()
 
     def _get_connection(self) -> sqlite3.Connection:
+        if self._shared_conn is not None:
+            return self._shared_conn
         conn = sqlite3.connect(self.db_path, check_same_thread=False)
         conn.row_factory = sqlite3.Row
         return conn
+
+    def _close_conn(self, conn: sqlite3.Connection) -> None:
+        if self._shared_conn is None:
+            conn.close()
 
     def _init_db(self) -> None:
         conn = self._get_connection()
         try:
             with conn:
-                conn.execute(
+                conn.executescript(
                     """
                     CREATE TABLE IF NOT EXISTS prescriptions (
                         id TEXT PRIMARY KEY,
@@ -49,11 +59,37 @@ class PrescriptionRepository:
                         confirmed_data TEXT,
                         matched_drugs TEXT,
                         schedule TEXT
-                    )
+                    );
+
+                    CREATE TABLE IF NOT EXISTS dose_logs (
+                        id TEXT PRIMARY KEY,
+                        prescription_id TEXT NOT NULL,
+                        user_id TEXT NOT NULL,
+                        drug_name TEXT NOT NULL,
+                        scheduled_time TEXT NOT NULL,
+                        action TEXT NOT NULL,
+                        action_timestamp TEXT NOT NULL,
+                        snooze_minutes INTEGER,
+                        notes TEXT
+                    );
+
+                    CREATE TABLE IF NOT EXISTS reminders (
+                        id TEXT PRIMARY KEY,
+                        prescription_id TEXT NOT NULL,
+                        user_id TEXT NOT NULL,
+                        drug_name TEXT NOT NULL,
+                        scheduled_time TEXT NOT NULL,
+                        timezone TEXT NOT NULL,
+                        fire_at_timestamp TEXT NOT NULL,
+                        status TEXT NOT NULL,
+                        snoozed_until TEXT,
+                        fired_at TEXT,
+                        notification_payload TEXT
+                    );
                     """
                 )
         finally:
-            conn.close()
+            self._close_conn(conn)
 
     def create(
         self,
@@ -91,7 +127,7 @@ class PrescriptionRepository:
                 )
             return self.get(prescription_id, user_id=user_id)  # type: ignore[return-value]
         finally:
-            conn.close()
+            self._close_conn(conn)
 
     def get(self, prescription_id: str, user_id: Optional[str] = None) -> Optional[dict[str, Any]]:
         """Retrieve prescription by ID, optionally verifying user_id."""
@@ -126,7 +162,7 @@ class PrescriptionRepository:
                 "schedule": json.loads(row["schedule"]) if row["schedule"] else None,
             }
         finally:
-            conn.close()
+            self._close_conn(conn)
 
     def confirm(
         self,
@@ -162,7 +198,7 @@ class PrescriptionRepository:
                     return None
             return self.get(prescription_id, user_id=user_id)
         finally:
-            conn.close()
+            self._close_conn(conn)
 
     def delete(self, prescription_id: str, user_id: Optional[str] = None) -> bool:
         """Delete prescription row."""
@@ -181,4 +217,228 @@ class PrescriptionRepository:
                     )
                 return cursor.rowcount > 0
         finally:
-            conn.close()
+            self._close_conn(conn)
+
+    # ------------------------------------------------------------------
+    # Dose Logging
+    # ------------------------------------------------------------------
+
+    def log_dose(
+        self,
+        log_id: str,
+        prescription_id: str,
+        user_id: str,
+        drug_name: str,
+        scheduled_time: str,
+        action: str,
+        snooze_minutes: Optional[int] = None,
+        notes: Optional[str] = None,
+    ) -> dict[str, Any]:
+        """Record a dose tracking action (taken, skipped, snoozed)."""
+        now_iso = datetime.now(timezone.utc).isoformat()
+        conn = self._get_connection()
+        try:
+            with conn:
+                conn.execute(
+                    """
+                    INSERT INTO dose_logs (
+                        id, prescription_id, user_id, drug_name,
+                        scheduled_time, action, action_timestamp, snooze_minutes, notes
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        log_id,
+                        prescription_id,
+                        user_id,
+                        drug_name,
+                        scheduled_time,
+                        action,
+                        now_iso,
+                        snooze_minutes,
+                        notes,
+                    ),
+                )
+            return {
+                "id": log_id,
+                "prescription_id": prescription_id,
+                "user_id": user_id,
+                "drug_name": drug_name,
+                "scheduled_time": scheduled_time,
+                "action": action,
+                "action_timestamp": now_iso,
+                "snooze_minutes": snooze_minutes,
+                "notes": notes,
+            }
+        finally:
+            self._close_conn(conn)
+
+    def get_dose_logs(
+        self,
+        prescription_id: str,
+        user_id: Optional[str] = None,
+    ) -> list[dict[str, Any]]:
+        """Retrieve dose history for a prescription."""
+        conn = self._get_connection()
+        try:
+            if user_id:
+                cursor = conn.execute(
+                    """
+                    SELECT * FROM dose_logs
+                    WHERE prescription_id = ? AND user_id = ?
+                    ORDER BY action_timestamp DESC
+                    """,
+                    (prescription_id, user_id),
+                )
+            else:
+                cursor = conn.execute(
+                    """
+                    SELECT * FROM dose_logs
+                    WHERE prescription_id = ?
+                    ORDER BY action_timestamp DESC
+                    """,
+                    (prescription_id,),
+                )
+            return [dict(row) for row in cursor.fetchall()]
+        finally:
+            self._close_conn(conn)
+
+    # ------------------------------------------------------------------
+    # Reminders
+    # ------------------------------------------------------------------
+
+    def save_reminders(
+        self,
+        reminders_list: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Insert a batch of scheduled reminders."""
+        conn = self._get_connection()
+        try:
+            with conn:
+                for r in reminders_list:
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO reminders (
+                            id, prescription_id, user_id, drug_name,
+                            scheduled_time, timezone, fire_at_timestamp,
+                            status, snoozed_until, fired_at, notification_payload
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            r["id"],
+                            r["prescription_id"],
+                            r["user_id"],
+                            r["drug_name"],
+                            r["scheduled_time"],
+                            r["timezone"],
+                            r["fire_at_timestamp"],
+                            r.get("status", "scheduled"),
+                            r.get("snoozed_until"),
+                            r.get("fired_at"),
+                            json.dumps(r.get("notification_payload", {})),
+                        ),
+                    )
+            return reminders_list
+        finally:
+            self._close_conn(conn)
+
+    def get_reminders(
+        self,
+        prescription_id: str,
+        user_id: Optional[str] = None,
+    ) -> list[dict[str, Any]]:
+        """Retrieve all scheduled reminders for a prescription."""
+        conn = self._get_connection()
+        try:
+            if user_id:
+                cursor = conn.execute(
+                    """
+                    SELECT * FROM reminders
+                    WHERE prescription_id = ? AND user_id = ?
+                    ORDER BY fire_at_timestamp ASC
+                    """,
+                    (prescription_id, user_id),
+                )
+            else:
+                cursor = conn.execute(
+                    """
+                    SELECT * FROM reminders
+                    WHERE prescription_id = ?
+                    ORDER BY fire_at_timestamp ASC
+                    """,
+                    (prescription_id,),
+                )
+            rows = []
+            for r in cursor.fetchall():
+                d = dict(r)
+                if d.get("notification_payload"):
+                    d["notification_payload"] = json.loads(d["notification_payload"])
+                rows.append(d)
+            return rows
+        finally:
+            self._close_conn(conn)
+
+    def get_reminder(self, reminder_id: str) -> Optional[dict[str, Any]]:
+        conn = self._get_connection()
+        try:
+            cursor = conn.execute(
+                "SELECT * FROM reminders WHERE id = ?",
+                (reminder_id,),
+            )
+            row = cursor.fetchone()
+            if not row:
+                return None
+            d = dict(row)
+            if d.get("notification_payload"):
+                d["notification_payload"] = json.loads(d["notification_payload"])
+            return d
+        finally:
+            self._close_conn(conn)
+
+    def snooze_reminder(
+        self,
+        reminder_id: str,
+        snoozed_until_iso: str,
+    ) -> Optional[dict[str, Any]]:
+        """Update reminder status to snoozed and update fire timestamp."""
+        conn = self._get_connection()
+        try:
+            with conn:
+                cursor = conn.execute(
+                    """
+                    UPDATE reminders
+                    SET status = 'snoozed',
+                        snoozed_until = ?,
+                        fire_at_timestamp = ?
+                    WHERE id = ?
+                    """,
+                    (snoozed_until_iso, snoozed_until_iso, reminder_id),
+                )
+                if cursor.rowcount == 0:
+                    return None
+            return self.get_reminder(reminder_id)
+        finally:
+            self._close_conn(conn)
+
+    def fire_reminder(
+        self,
+        reminder_id: str,
+    ) -> Optional[dict[str, Any]]:
+        """Mark reminder as fired and record delivery timestamp."""
+        now_iso = datetime.now(timezone.utc).isoformat()
+        conn = self._get_connection()
+        try:
+            with conn:
+                cursor = conn.execute(
+                    """
+                    UPDATE reminders
+                    SET status = 'fired',
+                        fired_at = ?
+                    WHERE id = ?
+                    """,
+                    (now_iso, reminder_id),
+                )
+                if cursor.rowcount == 0:
+                    return None
+            return self.get_reminder(reminder_id)
+        finally:
+            self._close_conn(conn)

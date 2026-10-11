@@ -370,3 +370,228 @@ async def get_prescription_schedule(
         "schedule": rec.get("schedule", []),
         "disclaimer": "This is not medical advice.",
     }
+
+
+# ---------------------------------------------------------------------------
+# Phase 5: Dose Tracking & Actions
+# ---------------------------------------------------------------------------
+
+class DoseActionRequest(BaseModel):
+    drug_name: str
+    scheduled_time: str
+    action: str = Field(..., pattern="^(taken|skipped|snoozed)$")
+    snooze_minutes: Optional[int] = None
+    notes: Optional[str] = None
+
+
+@router.post(
+    "/prescriptions/{prescription_id}/doses/log",
+    status_code=status.HTTP_201_CREATED,
+    summary="Record taken, skipped, or snoozed action for a dose",
+    dependencies=[Depends(rate_limit(max_requests=60, window_seconds=60))],
+)
+async def log_dose_action(
+    prescription_id: str,
+    payload: DoseActionRequest,
+    current_user: Annotated[dict[str, Any], Depends(get_current_user)],
+    repo: Annotated[PrescriptionRepository, Depends(get_repo)],
+) -> dict[str, Any]:
+    user_id = str(current_user.get("sub", "anonymous"))
+    rec = repo.get(prescription_id, user_id=user_id)
+    if not rec:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Prescription '{prescription_id}' not found",
+        )
+
+    log_id = str(uuid.uuid4())
+    logged = repo.log_dose(
+        log_id=log_id,
+        prescription_id=prescription_id,
+        user_id=user_id,
+        drug_name=payload.drug_name,
+        scheduled_time=payload.scheduled_time,
+        action=payload.action,
+        snooze_minutes=payload.snooze_minutes,
+        notes=payload.notes,
+    )
+
+    return {
+        "status": "success",
+        "dose_log": logged,
+        "disclaimer": "This is not medical advice.",
+    }
+
+
+@router.get(
+    "/prescriptions/{prescription_id}/doses",
+    summary="Get dose history for prescription",
+    dependencies=[Depends(rate_limit(max_requests=60, window_seconds=60))],
+)
+async def get_dose_logs(
+    prescription_id: str,
+    current_user: Annotated[dict[str, Any], Depends(get_current_user)],
+    repo: Annotated[PrescriptionRepository, Depends(get_repo)],
+) -> dict[str, Any]:
+    user_id = str(current_user.get("sub", "anonymous"))
+    rec = repo.get(prescription_id, user_id=user_id)
+    if not rec:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Prescription '{prescription_id}' not found",
+        )
+
+    logs = repo.get_dose_logs(prescription_id, user_id=user_id)
+    return {
+        "prescription_id": prescription_id,
+        "dose_logs": logs,
+        "disclaimer": "This is not medical advice.",
+    }
+
+
+# ---------------------------------------------------------------------------
+# Phase 5: Reminders Engine Endpoints
+# ---------------------------------------------------------------------------
+
+class GenerateRemindersRequest(BaseModel):
+    timezone: str = "Asia/Kolkata"
+
+
+class SnoozeReminderRequest(BaseModel):
+    snooze_minutes: int = 15
+
+
+@router.post(
+    "/prescriptions/{prescription_id}/reminders/generate",
+    status_code=status.HTTP_201_CREATED,
+    summary="Generate scheduled reminders from confirmed timeline",
+    dependencies=[Depends(rate_limit(max_requests=30, window_seconds=60))],
+)
+async def generate_reminders(
+    prescription_id: str,
+    payload: GenerateRemindersRequest,
+    current_user: Annotated[dict[str, Any], Depends(get_current_user)],
+    repo: Annotated[PrescriptionRepository, Depends(get_repo)],
+) -> dict[str, Any]:
+    from dosely.reminders import ReminderEngine
+
+    user_id = str(current_user.get("sub", "anonymous"))
+    rec = repo.get(prescription_id, user_id=user_id)
+    if not rec:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Prescription '{prescription_id}' not found",
+        )
+
+    if not rec.get("confirmed"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Prescription has not been confirmed. Confirm before generating reminders.",
+        )
+
+    schedule = rec.get("schedule", [])
+    reminders = ReminderEngine.generate_reminders_from_timeline(
+        prescription_id=prescription_id,
+        user_id=user_id,
+        timeline=schedule,
+        tz_name=payload.timezone,
+    )
+
+    repo.save_reminders(reminders)
+
+    return {
+        "prescription_id": prescription_id,
+        "timezone": payload.timezone,
+        "reminders_count": len(reminders),
+        "reminders": reminders,
+        "disclaimer": "This is not medical advice.",
+    }
+
+
+@router.get(
+    "/prescriptions/{prescription_id}/reminders",
+    summary="Get scheduled reminders for prescription",
+    dependencies=[Depends(rate_limit(max_requests=60, window_seconds=60))],
+)
+async def get_reminders(
+    prescription_id: str,
+    current_user: Annotated[dict[str, Any], Depends(get_current_user)],
+    repo: Annotated[PrescriptionRepository, Depends(get_repo)],
+) -> dict[str, Any]:
+    user_id = str(current_user.get("sub", "anonymous"))
+    rec = repo.get(prescription_id, user_id=user_id)
+    if not rec:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Prescription '{prescription_id}' not found",
+        )
+
+    reminders = repo.get_reminders(prescription_id, user_id=user_id)
+    return {
+        "prescription_id": prescription_id,
+        "reminders": reminders,
+        "disclaimer": "This is not medical advice.",
+    }
+
+
+@router.post(
+    "/prescriptions/{prescription_id}/reminders/{reminder_id}/snooze",
+    summary="Snooze a scheduled reminder by N minutes",
+    dependencies=[Depends(rate_limit(max_requests=60, window_seconds=60))],
+)
+async def snooze_reminder(
+    prescription_id: str,
+    reminder_id: str,
+    payload: SnoozeReminderRequest,
+    current_user: Annotated[dict[str, Any], Depends(get_current_user)],
+    repo: Annotated[PrescriptionRepository, Depends(get_repo)],
+) -> dict[str, Any]:
+    from dosely.reminders import ReminderEngine
+
+    rem = repo.get_reminder(reminder_id)
+    if not rem or rem["prescription_id"] != prescription_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Reminder '{reminder_id}' not found",
+        )
+
+    snoozed_until = ReminderEngine.calculate_snooze(
+        rem["fire_at_timestamp"],
+        snooze_minutes=payload.snooze_minutes,
+    )
+
+    updated = repo.snooze_reminder(reminder_id, snoozed_until_iso=snoozed_until)
+    return {
+        "status": "snoozed",
+        "reminder": updated,
+        "disclaimer": "This is not medical advice.",
+    }
+
+
+@router.post(
+    "/prescriptions/{prescription_id}/reminders/{reminder_id}/fire",
+    summary="Simulate / execute reminder firing (Web Push / FCM delivery)",
+    dependencies=[Depends(rate_limit(max_requests=60, window_seconds=60))],
+)
+async def fire_reminder(
+    prescription_id: str,
+    reminder_id: str,
+    current_user: Annotated[dict[str, Any], Depends(get_current_user)],
+    repo: Annotated[PrescriptionRepository, Depends(get_repo)],
+) -> dict[str, Any]:
+    rem = repo.get_reminder(reminder_id)
+    if not rem or rem["prescription_id"] != prescription_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Reminder '{reminder_id}' not found",
+        )
+
+    updated = repo.fire_reminder(reminder_id)
+    return {
+        "status": "fired",
+        "delivered": True,
+        "reminder": updated,
+        "notification": rem.get("notification_payload"),
+        "disclaimer": "This is not medical advice.",
+    }
+

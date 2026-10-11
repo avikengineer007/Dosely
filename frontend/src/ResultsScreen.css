@@ -1,0 +1,375 @@
+.results-screen-root {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.results-header {
+  background: #ffffff;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-row h1 {
+  margin: 0;
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.back-confirm-btn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 0.6rem 1.1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-confirm-btn:hover {
+  background: #e2e8f0;
+}
+
+.disclaimer-banner {
+  margin-top: 1rem;
+  background-color: #eff6ff;
+  border-left: 4px solid #3b82f6;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #1e40af;
+}
+
+.action-toast {
+  margin-top: 0.75rem;
+  background: #dcfce7;
+  border-left: 4px solid #16a34a;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #166534;
+  animation: fadeIn 0.3s;
+}
+
+.results-content {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.drug-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.drug-card-top {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.drug-name {
+  margin: 0;
+  font-size: 1.125rem;
+  color: #1e293b;
+}
+
+.generic-name {
+  color: #64748b;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.drug-class-badge {
+  display: inline-block;
+  margin: 0.5rem 0;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.purpose-box {
+  background: #f8fafc;
+  border-left: 3px solid #64748b;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #334155;
+  margin-bottom: 0.75rem;
+  border-radius: 2px;
+}
+
+.card-details-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  color: #475569;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 0.5rem;
+}
+
+.timeline-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.tz-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tz-controls select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+
+.sync-reminders-btn {
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sync-reminders-btn:hover {
+  background: #0369a1;
+}
+
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.timeline-item.timeline-suggested {
+  border-left: 4px solid #f59e0b;
+  background: #fffdf5;
+}
+
+.timeline-time-badge {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  min-width: 65px;
+}
+
+.timeline-body {
+  flex: 1;
+}
+
+.timeline-drug-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.05rem;
+}
+
+.suggestion-pill {
+  background: #fef3c7;
+  color: #b45309;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.timeline-instruction {
+  margin-top: 0.25rem;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.suggested-disclaimer-text {
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #b45309;
+}
+
+.timeline-warnings {
+  margin-top: 0.5rem;
+}
+
+.warning-item {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  margin-top: 0.25rem;
+}
+
+.timeline-actions-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.btn-action {
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-taken {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.btn-skip {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.btn-snooze {
+  background: #e2e8f0;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+.log-status-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.log-taken {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.log-skipped {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.log-snoozed {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.reminders-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.reminders-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.reminders-table th,
+.reminders-table td {
+  padding: 0.65rem;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.rem-status-chip {
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.rem-scheduled {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.rem-snoozed {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.rem-fired {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  margin-right: 0.35rem;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.btn-fire {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+}
