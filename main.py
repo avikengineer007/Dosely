@@ -17,6 +17,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from dosely.api.prescriptions import router as prescriptions_router
 from dosely.api.router import router
 
 # ---------------------------------------------------------------------------
@@ -31,11 +32,9 @@ logging.basicConfig(
 # App
 # ---------------------------------------------------------------------------
 app = FastAPI(
-    title="Dosely — Prescription Extraction API",
+    title="Matra — Prescription Assistant API",
     description=(
-        "Uploads a prescription image or PDF, extracts medicines with "
-        "dosing schedules, and returns structured JSON validated against "
-        "the Prescription Pydantic model."
+        "Prescription assistant application: upload, confirm, match, and schedule medicines."
     ),
     version="0.1.0",
     docs_url="/docs",
@@ -49,6 +48,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(prescriptions_router)
 app.include_router(router)
 
 
