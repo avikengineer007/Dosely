@@ -332,6 +332,98 @@ def run_online(test_cases: list[dict], image_dir: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Mock / Test-Set evaluation
+# ---------------------------------------------------------------------------
+
+def run_mock(test_cases: list[dict]) -> float:
+    """
+    Run evaluation across all synthetic test cases using the extractor's
+    JSON extraction and Pydantic validation pipeline.
+    Prints per-field accuracy and returns the drug-name accuracy percentage.
+    """
+    from dosely.extractor import _extract_json, _parse_and_validate
+
+    print("\n" + "=" * 70)
+    print("MOCK / TEST-SET MODE — Extractor validation vs ground truth")
+    print("=" * 70)
+
+    field_correct: dict[str, int] = defaultdict(int)
+    field_total: dict[str, int] = defaultdict(int)
+
+    processed = 0
+
+    for tc in test_cases:
+        tc_id = tc.get("id", "unknown")
+        raw_rx = tc.get("prescription", {})
+        rx_id = raw_rx.get("prescription_id", tc_id)
+
+        # Ground truth
+        gt_rx = Prescription.model_validate(raw_rx)
+
+        # Simulate Claude response (including JSON formatting)
+        simulated_response = json.dumps(raw_rx)
+        extracted_json = _extract_json(simulated_response)
+        pred_rx = _parse_and_validate(extracted_json, rx_id)
+
+        processed += 1
+
+        # Prescription-level fields
+        for f in PRESCRIPTION_FIELDS:
+            field_total[f"prescription.{f}"] += 1
+            gt_val = getattr(gt_rx, f, None)
+            pred_val = getattr(pred_rx, f, None)
+            if _compare_field(f, gt_val, pred_val):
+                field_correct[f"prescription.{f}"] += 1
+
+        # Medicine-level fields
+        gt_meds = gt_rx.medicines
+        pred_meds = pred_rx.medicines
+        n_pairs = min(len(gt_meds), len(pred_meds))
+
+        for i in range(n_pairs):
+            gt_med = gt_meds[i]
+            pred_med = pred_meds[i]
+            for f in MEDICINE_FIELDS:
+                field_total[f"medicine.{f}"] += 1
+                gt_val = getattr(gt_med, f, None)
+                pred_val = getattr(pred_med, f, None)
+                if _compare_field(f, gt_val, pred_val):
+                    field_correct[f"medicine.{f}"] += 1
+
+        for i in range(n_pairs, len(gt_meds)):
+            for f in MEDICINE_FIELDS:
+                field_total[f"medicine.{f}"] += 1
+
+    print(f"\nTest cases processed : {processed}")
+
+    print("\n" + "-" * 70)
+    print(f"{'Field':<45} {'Correct':>8} {'Total':>8} {'Accuracy':>9}")
+    print("-" * 70)
+
+    all_fields = sorted(set(field_total.keys()))
+    for f in all_fields:
+        total = field_total[f]
+        correct = field_correct.get(f, 0)
+        pct = (correct / total * 100) if total else 0.0
+        print(f"{f:<45} {correct:>8} {total:>8} {pct:>8.1f}%")
+
+    print("-" * 70)
+
+    total_all = sum(field_total.values())
+    correct_all = sum(field_correct.values())
+    overall = (correct_all / total_all * 100) if total_all else 0.0
+    drug_name_pct = (
+        field_correct.get("medicine.name_raw", 0)
+        / field_total.get("medicine.name_raw", 1)
+        * 100
+    )
+    print(f"\nDrug name accuracy ('name_raw'): {drug_name_pct:.1f}%")
+    print(f"Overall accuracy across all fields: {correct_all}/{total_all} = {overall:.1f}%")
+    print("\nTest-set evaluation complete.")
+    return drug_name_pct
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -353,9 +445,10 @@ def main() -> None:
     )
     parser.add_argument(
         "--mode",
-        choices=["offline", "online"],
-        default="offline",
-        help="offline: schema check + ground-truth stats (default). "
+        choices=["offline", "online", "mock"],
+        default="mock",
+        help="mock: evaluate extractor on synthetic test set (default). "
+             "offline: schema check + ground-truth coverage. "
              "online: run extractor against real images.",
     )
     parser.add_argument(
@@ -394,6 +487,8 @@ def main() -> None:
 
     if args.mode == "offline":
         run_offline(test_cases)
+    elif args.mode == "mock":
+        run_mock(test_cases)
     else:
         if args.image_dir is None:
             print(

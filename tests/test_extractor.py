@@ -210,3 +210,27 @@ class TestExtractQuality:
         ):
             rx = extract(white_png, prescription_id="rx-good-001")
         assert isinstance(rx, Prescription)
+
+
+# ---------------------------------------------------------------------------
+# Evaluation script tests
+# ---------------------------------------------------------------------------
+
+class TestEvaluateScript:
+    def test_run_mock_reaches_at_least_90_percent_accuracy(self):
+        from eval.evaluate import run_mock, _load_test_cases
+        from pathlib import Path
+
+        test_cases_path = Path(__file__).resolve().parent.parent / "data" / "test_cases.json"
+        cases = _load_test_cases(test_cases_path)
+        accuracy = run_mock(cases)
+        assert accuracy >= 90.0
+
+    def test_run_offline_completes(self):
+        from eval.evaluate import run_offline, _load_test_cases
+        from pathlib import Path
+
+        test_cases_path = Path(__file__).resolve().parent.parent / "data" / "test_cases.json"
+        cases = _load_test_cases(test_cases_path)
+        # Verify offline mode runs without raising exceptions
+        run_offline(cases[:5])

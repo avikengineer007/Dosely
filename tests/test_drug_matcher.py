@@ -1,4 +1,4 @@
-﻿"""
+"""
 tests/test_drug_matcher.py
 ==========================
 Comprehensive test suite for DrugMatcher and DrugDatabase.
@@ -514,3 +514,57 @@ class TestMatchResultDict:
         # Score should be a float with at most 4 decimal places
         assert isinstance(d["match_score"], float)
         assert round(d["match_score"], 4) == d["match_score"]
+
+
+# ===========================================================================
+# 16. Phase 2 Exit Check — all test set medicines resolve or marked unknown
+# ===========================================================================
+
+class TestPhase2ExitCheck:
+    def test_every_drug_in_test_set_resolves_or_unknown(self, matcher: DrugMatcher) -> None:
+        """
+        Phase 2 Exit Check:
+        Every drug in the 40 test cases must resolve to a valid drug class
+        or be explicitly marked as 'unknown' with needs_review=True.
+        """
+        test_cases_path = Path(__file__).resolve().parent.parent / "data" / "test_cases.json"
+        with open(test_cases_path, encoding="utf-8") as f:
+            test_cases = json.load(f)["test_cases"]
+
+        valid_classes = {
+            "analgesic_nsaid",
+            "antacid_ppi",
+            "antibiotic",
+            "antihistamine",
+            "other",
+            "unknown",
+        }
+
+        total_tested = 0
+        for tc in test_cases:
+            tc_id = tc["id"]
+            for med in tc["prescription"]["medicines"]:
+                total_tested += 1
+                name_raw = med["name_raw"]
+                result = matcher.match(name_raw)
+
+                # Must resolve to a recognised class or explicitly 'unknown'
+                assert result.drug_class in valid_classes, (
+                    f"[{tc_id}] Drug '{name_raw}' returned invalid class '{result.drug_class}'"
+                )
+
+                if result.drug_class == "unknown":
+                    assert result.generic is None
+                    assert result.needs_review is True
+                    assert result.match_score == 0.0
+                    assert len(result.review_reasons) > 0
+                elif result.drug_class == "other":
+                    assert result.needs_review is True
+                else:
+                    assert result.generic is not None
+                    assert result.purpose_plain is not None
+                    assert len(result.purpose_plain) > 0
+                    # Must be a short, non-alarming sentence
+                    assert len(result.purpose_plain.split()) <= 20
+
+        assert total_tested == 50, f"Expected 50 medicines across 40 test cases, got {total_tested}"
