@@ -244,10 +244,9 @@ def extract(
 
     logger.info("[%s] Calling Claude (%s) ...", rx_id, CLAUDE_MODEL)
     try:
-        raw_response = _call_claude(client, messages, system_prompt)
-        logger.debug("[%s] Raw response:\n%s", rx_id, raw_response[:500])
+        claude_response = _call_claude(client, messages, system_prompt)
     except anthropic.APIError as exc:
-        logger.exception("[%s] Claude API error: %s", rx_id, exc)
+        logger.exception("[%s] Claude API error: %s", rx_id, exc.__class__.__name__)
         return _make_error_prescription(rx_id, quality, f"API error: {exc}")
 
     # ---------------------------------------------------------------
@@ -255,7 +254,7 @@ def extract(
     # ---------------------------------------------------------------
     first_error_msg = ""
     try:
-        json_str = _extract_json(raw_response)
+        json_str = _extract_json(claude_response)
         prescription = _parse_and_validate(json_str, rx_id)
         logger.info("[%s] Extraction succeeded on first attempt.", rx_id)
         return prescription
@@ -263,15 +262,15 @@ def extract(
     except (json.JSONDecodeError, ValidationError) as exc:
         first_error_msg = str(exc)
         logger.warning(
-            "[%s] First validation failed: %s. Retrying ...",
+            "[%s] First validation failed (%s). Retrying ...",
             rx_id,
-            first_error_msg[:200],
+            exc.__class__.__name__,
         )
 
     # ---------------------------------------------------------------
     # Step 4: Retry — append assistant response + correction request
     # ---------------------------------------------------------------
-    messages.append({"role": "assistant", "content": raw_response})
+    messages.append({"role": "assistant", "content": claude_response})
     messages.append(
         {
             "role": "user",
@@ -281,9 +280,8 @@ def extract(
 
     try:
         retry_response = _call_claude(client, messages, system_prompt)
-        logger.debug("[%s] Retry response:\n%s", rx_id, retry_response[:500])
     except anthropic.APIError as exc:
-        logger.exception("[%s] Claude API error on retry: %s", rx_id, exc)
+        logger.exception("[%s] Claude API error on retry: %s", rx_id, exc.__class__.__name__)
         return _make_error_prescription(
             rx_id, quality, f"API error on retry: {exc}"
         )
@@ -299,8 +297,8 @@ def extract(
 
     except (json.JSONDecodeError, ValidationError) as second_error:
         logger.error(
-            "[%s] Second validation failed: %s. Returning error prescription.",
+            "[%s] Second validation failed (%s). Returning error prescription.",
             rx_id,
-            str(second_error)[:200],
+            second_error.__class__.__name__,
         )
         return _make_error_prescription(rx_id, quality, str(second_error))

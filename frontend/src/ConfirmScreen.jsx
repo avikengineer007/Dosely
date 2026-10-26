@@ -50,17 +50,21 @@ export default function ConfirmScreen({
           id: `med-${idx}`,
           name_raw: m.name_raw || "",
           name_generic: m.name_generic || "",
+          suggested_generic: m.suggested_generic || null,
+          suggested_class: m.suggested_class || null,
+          lasa_warning: m.lasa_warning || null,
           strength: m.strength || "",
           form: m.form || "unknown",
           frequency_raw: m.frequency_raw || "",
           duration_days: m.duration_days || "",
           food_instruction: m.food_instruction || "unknown",
           confidence: m.confidence || 0,
-          needs_review: Boolean(m.needs_review),
+          needs_review: Boolean(m.needs_review || m.suggested_generic),
           review_reasons: m.review_reasons || [],
           // Review state
           user_accepted: false,
           user_edited: false,
+          suggestion_choice: null,
         }));
 
         setMedicines(initialMeds);
@@ -247,6 +251,51 @@ export default function ConfirmScreen({
                           <li key={i}>{r}</li>
                         ))}
                       </ul>
+                    </div>
+                  )}
+
+                  {/* Did you mean suggestion box */}
+                  {med.suggested_generic && (
+                    <div className="suggestion-box" style={{ background: "#fffbe6", border: "1px solid #ffe58f", padding: "12px", borderRadius: "8px", margin: "12px 0" }}>
+                      <p style={{ margin: "0 0 6px 0", fontWeight: 600, color: "#d46b08" }}>
+                        Did you mean: <span style={{ textDecoration: "underline" }}>{med.suggested_generic}</span>?
+                      </p>
+                      {med.lasa_warning && (
+                        <p style={{ margin: "0 0 8px 0", fontSize: "13px", color: "#cf1322", fontWeight: 500 }}>
+                          ⚠️ {med.lasa_warning}
+                        </p>
+                      )}
+                      <div style={{ display: "flex", gap: "10px", marginTop: "8px", flexWrap: "wrap" }}>
+                        <button
+                          type="button"
+                          className="btn-suggestion"
+                          style={{ background: "#1890ff", color: "#fff", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer", fontWeight: 500 }}
+                          onClick={() => {
+                            handleFieldChange(med.id, "name_generic", med.suggested_generic);
+                            handleFieldChange(med.id, "suggestion_choice", "picked");
+                            handleFieldChange(med.id, "user_accepted", true);
+                          }}
+                        >
+                          ✓ Pick "{med.suggested_generic}"
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-suggestion-secondary"
+                          style={{ background: "#f5f5f5", color: "#555", border: "1px solid #d9d9d9", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}
+                          onClick={() => {
+                            handleFieldChange(med.id, "name_generic", "unknown");
+                            handleFieldChange(med.id, "suggestion_choice", "unknown");
+                            handleFieldChange(med.id, "user_accepted", true);
+                          }}
+                        >
+                          Mark Unknown
+                        </button>
+                      </div>
+                      {med.suggestion_choice && (
+                        <div style={{ marginTop: "6px", fontSize: "12px", color: "#52c41a", fontWeight: 500 }}>
+                          {med.suggestion_choice === "picked" ? `✓ Selected: ${med.suggested_generic}` : "✓ Marked as Unknown (no default timing will be applied)"}
+                        </div>
+                      )}
                     </div>
                   )}
 

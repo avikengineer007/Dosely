@@ -147,29 +147,42 @@ class TestBrandMatch:
 
 
 # ===========================================================================
-# 3. Misspellings / OCR corruption (fuzzy)
+# 3. Misspellings / OCR corruption (fuzzy suggestions)
 # ===========================================================================
 
 class TestFuzzyMisspellings:
     def test_amoxicillin_typo(self, matcher: DrugMatcher) -> None:
         # "amoxicilin" — one l missing
         r = matcher.match("amoxicilin")
-        assert_known(r, "amoxicillin", "antibiotic")
-        assert r.match_type == "fuzzy"
+        assert r.match_type == "fuzzy_suggestion"
+        assert r.needs_review is True
+        assert r.generic is None
+        assert r.suggested_generic == "amoxicillin"
+        assert r.suggested_class == "antibiotic"
 
     def test_paracetamol_ocr_corruption(self, matcher: DrugMatcher) -> None:
         # OCR often corrupts 'a' -> 'o'
         r = matcher.match("poracetamol")
-        assert_known(r, "paracetamol", "analgesic_nsaid")
-        assert r.match_type == "fuzzy"
+        assert r.match_type == "fuzzy_suggestion"
+        assert r.needs_review is True
+        assert r.generic is None
+        assert r.suggested_generic == "paracetamol"
+        assert r.suggested_class == "analgesic_nsaid"
 
     def test_ibuprofen_transposition(self, matcher: DrugMatcher) -> None:
+        # ibuporfen scored 88.9 (< 90 threshold) -> unknown without guessing
         r = matcher.match("ibuporfen")
-        assert_known(r, "ibuprofen", "analgesic_nsaid")
+        assert r.needs_review is True
+        assert r.generic is None
+        assert r.match_type == "unknown"
 
     def test_cetirizine_misspelling(self, matcher: DrugMatcher) -> None:
         r = matcher.match("cetrizine")
-        assert_known(r, "cetirizine", "antihistamine")
+        assert r.match_type == "fuzzy_suggestion"
+        assert r.needs_review is True
+        assert r.generic is None
+        assert r.suggested_generic == "cetirizine"
+        assert r.suggested_class == "antihistamine"
 
     def test_ciprofloxacin_truncated(self, matcher: DrugMatcher) -> None:
         r = matcher.match("ciprofloxacin")
@@ -177,7 +190,11 @@ class TestFuzzyMisspellings:
 
     def test_pantoprazole_slight_typo(self, matcher: DrugMatcher) -> None:
         r = matcher.match("pantoprazol")
-        assert_known(r, "pantoprazole", "antacid_ppi")
+        assert r.match_type == "fuzzy_suggestion"
+        assert r.needs_review is True
+        assert r.generic is None
+        assert r.suggested_generic == "pantoprazole"
+        assert r.suggested_class == "antacid_ppi"
 
 
 # ===========================================================================
@@ -553,11 +570,16 @@ class TestPhase2ExitCheck:
                     f"[{tc_id}] Drug '{name_raw}' returned invalid class '{result.drug_class}'"
                 )
 
-                if result.drug_class == "unknown":
+                if result.match_type == "unknown":
                     assert result.generic is None
                     assert result.needs_review is True
                     assert result.match_score == 0.0
                     assert len(result.review_reasons) > 0
+                elif result.match_type == "fuzzy_suggestion":
+                    assert result.generic is None
+                    assert result.needs_review is True
+                    assert result.suggested_generic is not None
+                    assert result.match_score >= 0.90
                 elif result.drug_class == "other":
                     assert result.needs_review is True
                 else:

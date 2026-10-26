@@ -137,6 +137,19 @@ class Medicine(BaseModel):
         description="Additional verbatim instructions.",
     )
 
+    suggested_generic: Optional[str] = Field(
+        default=None,
+        description="Fuzzy suggestion generic name if unconfirmed.",
+    )
+    suggested_class: Optional[str] = Field(
+        default=None,
+        description="Fuzzy suggestion drug class if unconfirmed.",
+    )
+    lasa_warning: Optional[str] = Field(
+        default=None,
+        description="Warning for look-alike/sound-alike drug pair.",
+    )
+
     # Quality signals
     confidence: Annotated[float, Field(ge=0.0, le=1.0)] = Field(
         ...,

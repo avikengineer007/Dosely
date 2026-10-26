@@ -322,6 +322,9 @@ def apply_default_rule(
         else:
             return [(config.wake_time, "Take in the morning")]
 
-    # Catch-all for "other" / "unknown"
+    if dc == "unknown":
+        return []
+
+    # Catch-all for "other"
     return [(config.wake_time, "Take in the morning as directed")]
 

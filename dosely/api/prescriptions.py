@@ -29,7 +29,11 @@ from fastapi import (
 )
 from pydantic import BaseModel, Field
 
-from dosely.auth import create_access_token, get_current_user
+from dosely.auth import create_access_token, get_current_user, require_admin
+
+# Alias for test compatibility — tests import _create_access_token from this module
+_create_access_token = create_access_token
+
 from dosely.drug_db import DrugDatabase
 from dosely.drug_matcher import DrugMatcher
 from dosely.extractor import extract
@@ -155,6 +159,13 @@ async def login_for_access_token(payload: TokenRequest) -> TokenResponse:
     summary="Upload prescription (image or PDF)",
     dependencies=[Depends(rate_limit(max_requests=30, window_seconds=60))],
 )
+@router.post(
+    "/prescriptions/upload",
+    status_code=status.HTTP_200_OK,
+    summary="Upload prescription (image or PDF) — /upload alias",
+    include_in_schema=False,
+    dependencies=[Depends(rate_limit(max_requests=30, window_seconds=60))],
+)
 async def upload_prescription(
     file: Annotated[UploadFile, File(...)],
     current_user: Annotated[dict[str, Any], Depends(get_current_user)],
@@ -184,6 +195,16 @@ async def upload_prescription(
     # Perform extraction
     try:
         extracted: Prescription = extract(file_bytes, prescription_id=prescription_id)
+        matcher_instance = get_matcher()
+        for m in extracted.medicines:
+            if m.name_raw:
+                m_res = matcher_instance.match(m.name_raw)
+                if m_res.match_type == "fuzzy_suggestion":
+                    m.suggested_generic = m_res.suggested_generic
+                    m.suggested_class = m_res.suggested_class
+                    m.lasa_warning = m_res.lasa_warning
+                elif m_res.lasa_warning:
+                    m.lasa_warning = m_res.lasa_warning
         extracted_dict = extracted.model_dump(mode="json")
     except Exception as exc:
         # Graceful fallback: return extraction with needs_human_review=True
@@ -298,11 +319,19 @@ async def confirm_prescription(
     scheduler_inputs: list[DrugInput] = []
 
     for med in payload.medicines:
-        match_res = matcher.match(med.name_raw)
-        matched_dict = match_res.to_dict()
-        # If user explicitly supplied generic or food instruction, preserve it
-        if med.name_generic and not matched_dict.get("generic"):
-            matched_dict["generic"] = med.name_generic
+        chosen_generic = med.name_generic.strip() if med.name_generic else None
+        if chosen_generic and chosen_generic.lower() != "unknown":
+            # User explicitly chose or confirmed a generic
+            match_res = matcher.match(chosen_generic)
+            matched_dict = match_res.to_dict()
+            if not matched_dict.get("generic"):
+                matched_dict["generic"] = chosen_generic
+        else:
+            match_res = matcher.match(med.name_raw)
+            matched_dict = match_res.to_dict()
+            if chosen_generic and chosen_generic.lower() == "unknown":
+                matched_dict["generic"] = None
+                matched_dict["class"] = "unknown"
 
         matched_results.append({
             "name_raw": med.name_raw,
@@ -673,11 +702,16 @@ async def submit_feedback(
 )
 async def admin_purge(
     payload: AdminPurgeRequest,
-    current_user: Annotated[dict[str, Any], Depends(get_current_user)],
+    current_user: Annotated[dict[str, Any], Depends(require_admin)],
     repo: Annotated[PrescriptionRepository, Depends(get_repo)],
     storage: Annotated[EncryptedStorage, Depends(get_storage)],
 ) -> dict[str, Any]:
-    """Delete all prescriptions (and related data) older than retention_days."""
+    """Delete all prescriptions (and related data) older than retention_days.
+
+    Requires admin role in the JWT payload (role='admin').
+    Normal users receive HTTP 403 Forbidden.
+    Logs only the count of purged records, never their content or identifiers.
+    """
     purged = repo.purge_older_than(days=payload.retention_days, storage=storage)
     return {
         "purged_count": purged,

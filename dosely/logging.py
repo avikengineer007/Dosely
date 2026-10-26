@@ -14,7 +14,11 @@ from typing import Any
 
 # Patterns that look like drug names with strengths or dosages
 _SENSITIVE_PATTERNS = [
-    re.compile(r"\b(?:\d+\s*(?:mg|mcg|ml|g|iu))\b", re.IGNORECASE),
+    # '<Word> <dosage>': Morphine 10mg, Amoxicillin 500 mg — MUST run before bare dosage
+    re.compile(r"\b[A-Za-z][A-Za-z0-9-]+\s+\d+\s*(?:mg|mcg|ml|g|iu)\b", re.IGNORECASE),
+    # Bare dosage amounts: 500mg, 10 mcg, 5 ml, etc.
+    re.compile(r"\b\d+\s*(?:mg|mcg|ml|g|iu)\b", re.IGNORECASE),
+    # Patient / prescriber identifiers
     re.compile(r"\b(?:patient|doctor|dr\.)\s+[A-Za-z]+", re.IGNORECASE),
 ]
 
@@ -70,13 +74,32 @@ class StructuredJsonFormatter(logging.Formatter):
 
 
 def setup_secure_logging() -> None:
-    """Configure secure, non-PII root logger."""
+    """
+    Configure secure, non-PII logging.
+
+    Attaches a HealthDataRedactionFilter to:
+    - root logger (catches everything)
+    - dosely namespace logger
+    - uvicorn, uvicorn.access, uvicorn.error
+    - fastapi
+    """
+    redaction_filter = HealthDataRedactionFilter()
+
     handler = logging.StreamHandler()
     handler.setFormatter(StructuredJsonFormatter())
-    handler.addFilter(HealthDataRedactionFilter())
+    handler.addFilter(redaction_filter)
 
-    root = logging.getLogger("dosely")
-    root.setLevel(logging.INFO)
-    # Avoid duplicate handlers
+    # Apply to root logger so all child loggers inherit it
+    root = logging.getLogger()
+    root.addFilter(redaction_filter)
     if not any(isinstance(h, logging.StreamHandler) for h in root.handlers):
         root.addHandler(handler)
+
+    # Also apply directly to well-known loggers
+    for name in ("dosely", "uvicorn", "uvicorn.access", "uvicorn.error", "fastapi"):
+        named_logger = logging.getLogger(name)
+        # Avoid duplicate filter instances
+        if not any(isinstance(f, HealthDataRedactionFilter) for f in named_logger.filters):
+            named_logger.addFilter(redaction_filter)
+        if named_logger.level == logging.NOTSET:
+            named_logger.setLevel(logging.INFO)

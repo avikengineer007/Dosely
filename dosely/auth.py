@@ -115,3 +115,18 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return decode_access_token(credentials.credentials)
+
+
+async def require_admin(
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    """FastAPI dependency that requires the user to have role='admin' in their JWT.
+
+    Raises HTTP 403 Forbidden if the role claim is absent or not 'admin'.
+    """
+    if current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin role required for this operation.",
+        )
+    return current_user

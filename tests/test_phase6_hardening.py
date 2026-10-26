@@ -62,7 +62,7 @@ def test_env(tmp_path: Path):
 
 @pytest.fixture
 def auth_headers() -> dict[str, str]:
-    token = create_access_token(data={"sub": "test_user_p6"})
+    token = create_access_token(data={"sub": "test_user_p6", "role": "admin"})
     return {"Authorization": f"Bearer {token}"}
 
 

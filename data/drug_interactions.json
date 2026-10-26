@@ -1,0 +1,156 @@
+[
+  {
+    "drug_a": "aspirin",
+    "drug_b": "ibuprofen",
+    "severity": "moderate",
+    "mechanism": "Both are NSAIDs; concurrent use increases bleeding risk and may reduce aspirin's antiplatelet effect.",
+    "plain_english": "Taking aspirin and ibuprofen together increases the risk of stomach bleeding. Avoid combining them unless your doctor specifically advises it."
+  },
+  {
+    "drug_a": "aspirin",
+    "drug_b": "naproxen",
+    "severity": "moderate",
+    "mechanism": "Concurrent NSAID use; additive GI bleeding and ulceration risk.",
+    "plain_english": "Using aspirin and naproxen together can irritate your stomach lining and increase bleeding risk. Consult your doctor before taking both."
+  },
+  {
+    "drug_a": "aspirin",
+    "drug_b": "diclofenac",
+    "severity": "moderate",
+    "mechanism": "Additive antiplatelet and GI bleeding effects.",
+    "plain_english": "Aspirin and diclofenac together can increase the chance of stomach bleeding. Use only if your doctor recommends it."
+  },
+  {
+    "drug_a": "ibuprofen",
+    "drug_b": "diclofenac",
+    "severity": "moderate",
+    "mechanism": "Additive NSAID toxicity: GI bleeding, renal impairment.",
+    "plain_english": "Combining two pain-relief anti-inflammatory medicines like ibuprofen and diclofenac raises the risk of stomach and kidney problems."
+  },
+  {
+    "drug_a": "ibuprofen",
+    "drug_b": "naproxen",
+    "severity": "moderate",
+    "mechanism": "Two NSAIDs: additive GI and renal toxicity.",
+    "plain_english": "Taking ibuprofen and naproxen at the same time provides no extra benefit but doubles the risk of stomach bleeding and kidney strain."
+  },
+  {
+    "drug_a": "metformin",
+    "drug_b": "ibuprofen",
+    "severity": "minor",
+    "mechanism": "NSAIDs can reduce renal blood flow, decreasing metformin excretion and raising lactic acidosis risk.",
+    "plain_english": "Ibuprofen may affect how your kidneys clear metformin. Short-term use is usually fine, but monitor for any unusual fatigue or stomach pain."
+  },
+  {
+    "drug_a": "metformin",
+    "drug_b": "diclofenac",
+    "severity": "minor",
+    "mechanism": "NSAID-related reduction in renal clearance of metformin.",
+    "plain_english": "Diclofenac can slow down how your body removes metformin. Let your doctor know if you feel unusually tired or nauseous."
+  },
+  {
+    "drug_a": "azithromycin",
+    "drug_b": "omeprazole",
+    "severity": "minor",
+    "mechanism": "Omeprazole may slightly increase azithromycin plasma levels via CYP3A4 inhibition.",
+    "plain_english": "Omeprazole may cause a small increase in azithromycin levels. This is usually harmless, but report any new irregular heartbeat to your doctor."
+  },
+  {
+    "drug_a": "clarithromycin",
+    "drug_b": "omeprazole",
+    "severity": "minor",
+    "mechanism": "Mutual CYP3A4 inhibition; both drugs increase each other's plasma levels.",
+    "plain_english": "Clarithromycin and omeprazole can each raise the level of the other in your blood. This is generally manageable — your doctor may have prescribed them together intentionally."
+  },
+  {
+    "drug_a": "ciprofloxacin",
+    "drug_b": "aluminium hydroxide",
+    "severity": "moderate",
+    "mechanism": "Antacids containing aluminium or magnesium bind ciprofloxacin in the gut, reducing antibiotic absorption by up to 90%.",
+    "plain_english": "Antacids can stop your body from absorbing ciprofloxacin properly. Take ciprofloxacin at least 2 hours before or 6 hours after any antacid."
+  },
+  {
+    "drug_a": "ciprofloxacin",
+    "drug_b": "magnesium hydroxide",
+    "severity": "moderate",
+    "mechanism": "Chelation of ciprofloxacin by divalent cations reduces absorption.",
+    "plain_english": "Magnesium-based antacids block ciprofloxacin from being absorbed. Separate doses by at least 2 hours."
+  },
+  {
+    "drug_a": "doxycycline",
+    "drug_b": "aluminium hydroxide",
+    "severity": "moderate",
+    "mechanism": "Divalent/trivalent cations chelate tetracyclines, reducing absorption.",
+    "plain_english": "Antacids reduce the absorption of doxycycline. Take doxycycline 2 hours before or 6 hours after antacid use."
+  },
+  {
+    "drug_a": "doxycycline",
+    "drug_b": "magnesium hydroxide",
+    "severity": "moderate",
+    "mechanism": "Chelation reduces doxycycline bioavailability.",
+    "plain_english": "Magnesium antacids can block doxycycline from working. Separate doses by at least 2 hours."
+  },
+  {
+    "drug_a": "tramadol",
+    "drug_b": "cetirizine",
+    "severity": "minor",
+    "mechanism": "Additive CNS depression; combined sedation may be stronger than expected.",
+    "plain_english": "Tramadol and cetirizine can both cause drowsiness. Together, you may feel more tired or light-headed than usual — avoid driving."
+  },
+  {
+    "drug_a": "tramadol",
+    "drug_b": "chlorpheniramine",
+    "severity": "moderate",
+    "mechanism": "Additive CNS depression and increased seizure risk.",
+    "plain_english": "Tramadol and chlorpheniramine together can cause significant drowsiness and, rarely, increase seizure risk. Avoid driving or operating machinery."
+  },
+  {
+    "drug_a": "tramadol",
+    "drug_b": "levocetirizine",
+    "severity": "minor",
+    "mechanism": "Additive CNS sedation.",
+    "plain_english": "Both medicines can cause drowsiness — the effect may be stronger when used together. Take care when driving."
+  },
+  {
+    "drug_a": "codeine",
+    "drug_b": "cetirizine",
+    "severity": "minor",
+    "mechanism": "Additive CNS depression.",
+    "plain_english": "Codeine and cetirizine both cause drowsiness. Do not drive or operate heavy machinery while taking them together."
+  },
+  {
+    "drug_a": "amoxicillin",
+    "drug_b": "methotrexate",
+    "severity": "major",
+    "mechanism": "Amoxicillin reduces methotrexate renal clearance, risking toxicity.",
+    "plain_english": "Amoxicillin can cause methotrexate levels to build up dangerously in your body. Tell your doctor immediately if both are prescribed."
+  },
+  {
+    "drug_a": "metformin",
+    "drug_b": "alcohol",
+    "severity": "moderate",
+    "mechanism": "Alcohol increases lactic acidosis risk with metformin.",
+    "plain_english": "Drinking alcohol while taking metformin increases the risk of a serious condition called lactic acidosis. Avoid alcohol or limit it strictly."
+  },
+  {
+    "drug_a": "aspirin",
+    "drug_b": "warfarin",
+    "severity": "major",
+    "mechanism": "Additive anticoagulation and antiplatelet effect; major bleeding risk.",
+    "plain_english": "Aspirin with warfarin greatly increases the risk of serious bleeding. Only take them together if your doctor specifically prescribes it."
+  },
+  {
+    "drug_a": "omeprazole",
+    "drug_b": "clopidogrel",
+    "severity": "moderate",
+    "mechanism": "Omeprazole inhibits CYP2C19 and reduces conversion of clopidogrel to its active form.",
+    "plain_english": "Omeprazole may reduce how well clopidogrel works to prevent blood clots. If you are on clopidogrel, ask your doctor about a different antacid."
+  },
+  {
+    "drug_a": "ibuprofen",
+    "drug_b": "methotrexate",
+    "severity": "major",
+    "mechanism": "NSAIDs reduce methotrexate renal clearance, risking haematological toxicity.",
+    "plain_english": "Ibuprofen can cause methotrexate to accumulate to dangerous levels. Do not combine these without close medical supervision."
+  }
+]

@@ -161,6 +161,16 @@ class MedicationScheduler:
 
         All entries produced here carry source="default", suggested=True.
         """
+        if drug.drug_class == "unknown":
+            return [ScheduleEntry(
+                time="as needed",
+                drug=drug.name,
+                instruction="Unresolved medicine — no default timing applied; consult doctor or pharmacist",
+                source="default",
+                suggested=True,
+                drug_class="unknown",
+            )]
+
         time_instrs = apply_default_rule(
             drug.drug_class,
             drug.name,

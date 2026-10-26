@@ -49,6 +49,9 @@ import json
 import logging
 import os
 import sys
+from dotenv import load_dotenv
+
+load_dotenv()
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -460,8 +463,8 @@ def main() -> None:
     parser.add_argument(
         "--image-dir",
         type=Path,
-        default=None,
-        help="[online mode] Directory containing prescription images. "
+        default=PROJECT_ROOT / "data" / "test_images",
+        help="[online mode] Directory containing prescription images (default: data/test_images). "
              "Files must be named <prescription_id>.<ext>.",
     )
     parser.add_argument(
@@ -490,17 +493,16 @@ def main() -> None:
     elif args.mode == "mock":
         run_mock(test_cases)
     else:
-        if args.image_dir is None:
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            print("ANTHROPIC_API_KEY is not set. Skipping online evaluation cleanly (CI mode).")
+            sys.exit(0)
+        image_dir = args.image_dir or (PROJECT_ROOT / "data" / "test_images")
+        if not image_dir.is_dir():
             print(
-                "ERROR: --image-dir is required for online mode.", file=sys.stderr
+                f"ERROR: image directory not found: {image_dir}", file=sys.stderr
             )
             sys.exit(1)
-        if not args.image_dir.is_dir():
-            print(
-                f"ERROR: image directory not found: {args.image_dir}", file=sys.stderr
-            )
-            sys.exit(1)
-        run_online(test_cases, args.image_dir)
+        run_online(test_cases, image_dir)
 
 
 if __name__ == "__main__":
