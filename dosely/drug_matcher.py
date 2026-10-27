@@ -18,11 +18,15 @@ MatchResult fields
     match_type        : str          — "exact_generic" | "exact_brand" | "fuzzy_suggestion" | "unknown"
     suggested_generic : str | None   — fuzzy suggestion generic
     suggested_class   : str | None   — fuzzy suggestion class
-    suggested_purpose : str | None   — fuzzy suggestion purpose
     review_reasons    : list[str]    — machine-generated review notes
     lasa_warning      : str | None   — look-alike / sound-alike warning
+    ingredients       : list[dict]   — EVERY active ingredient ({generic, drug_class,
+                                       purpose_plain, strength}); 1 entry for single drugs,
+                                       N for combinations; [] when unresolved/fuzzy
 
-Matching logic
+Combination products (Combiflam, Pan D, Augmentin, ...) resolve to ALL of their ingredients;
+the first ingredient is never used as a stand-in for the product. needs_review is True when
+any ingredient is outside the four MVP classes, with a note naming that ingredient.
 --------------
     1. Normalise input (strip, lower-case, collapse whitespace, remove noise tokens).
     2. Exact match against generics table (auto-resolves with needs_review=False if known class).
@@ -41,6 +45,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -49,6 +54,7 @@ from typing import Optional
 from rapidfuzz import fuzz, process as rf_process
 
 from dosely.drug_db import DrugDatabase
+from dosely.synonyms import split_ingredients
 
 logger = logging.getLogger(__name__)
 
@@ -126,9 +132,12 @@ class MatchResult:
     suggested_purpose: Optional[str] = None
     review_reasons:    list[str] = field(default_factory=list)
     lasa_warning:      Optional[str] = None
+    ingredients:       list[dict] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
+            "ingredients":       [dict(i) for i in self.ingredients],
+            "contains":          " + ".join(i["generic"] for i in self.ingredients),
             "generic":           self.generic,
             "class":             self.drug_class,
             "purpose_plain":     self.purpose_plain,
@@ -168,11 +177,11 @@ class DrugMatcher:
         self._ambiguity_gap   = ambiguity_gap
 
         # Pre-load all generics for fast lookup
-        self._all_generics: list[tuple[str, str, str]] = db.get_all_generics()
+        self._all_generics = db.get_all_generics()
         self._generic_names:  list[str] = [g[0] for g in self._all_generics]
-        self._generic_lookup: dict[str, tuple[str, str]] = {
-            g[0]: (g[1], g[2]) for g in self._all_generics
-        }  # generic -> (drug_class, purpose_plain)
+        self._generic_lookup: dict[str, tuple[str, str, bool]] = {
+            g[0]: (g[1], g[2], bool(g[3]) if len(g) > 3 else False) for g in self._all_generics
+        }  # generic -> (drug_class, purpose_plain, clinically_reviewed)
 
         # Pre-load LASA pairs
         self._lasa_pairs: list[tuple[str, str]] = []
@@ -198,14 +207,32 @@ class DrugMatcher:
 
         cleaned = self._clean(drug_name)
 
-        # ---- Step 1: exact generic match --------------------------------
-        if cleaned in self._generic_lookup:
-            return self._build_exact_result(cleaned, "exact_generic", 100.0)
+        syn = self._db.synonyms
+        canon = syn.canonical(cleaned)
 
-        # ---- Step 2: exact brand match ----------------------------------
-        brand_generic = self._db.get_by_brand(cleaned)
-        if brand_generic and brand_generic in self._generic_lookup:
-            return self._build_exact_result(brand_generic, "exact_brand", 100.0)
+        # ---- Step 1: exact generic match (after synonym canonicalisation) -
+        if canon in self._generic_lookup:
+            combo = syn.combination_ingredients(canon)
+            if combo:
+                ings = [self._db.get_ingredient_info(c) for c in combo]
+                if all(ings):
+                    return self._build_combo_result(
+                        ings, "exact_generic", display=canon, seed=self._generic_lookup[canon]
+                    )
+            return self._build_exact_result(canon, "exact_generic", 100.0)
+
+        # ---- Step 2: exact brand match (ALL ingredients) ------------------
+        brand_ings = self._db.get_brand_ingredients(cleaned)
+        if brand_ings:
+            return self._build_combo_result(brand_ings, "exact_brand")
+
+        # ---- Step 2b: explicit combination written out ("a + b", "a/b") --
+        parts = split_ingredients(cleaned)
+        if len(parts) > 1:
+            ings = [self._db.get_ingredient_info(p) for p in parts]
+            names = [i["generic"] for i in ings if i]
+            if all(ings) and len(set(names)) == len(names):
+                return self._build_combo_result(ings, "exact_generic")
 
         # ---- Step 3: fuzzy match (suggestion only) ----------------------
         return self._fuzzy_match(cleaned, drug_name)
@@ -288,7 +315,8 @@ class DrugMatcher:
             return self._unknown_result(reasons, lasa_warning=lasa_alert)
 
         # --- Accepted fuzzy suggestion ---
-        suggested_class, suggested_purpose = self._generic_lookup[best_name]
+        lookup = self._generic_lookup[best_name]
+        suggested_class, suggested_purpose = lookup[0], lookup[1]
         reasons = [f"Fuzzy match suggestion: did you mean '{best_name}'?"]
         if lasa_alert:
             reasons.append(lasa_alert)
@@ -312,12 +340,32 @@ class DrugMatcher:
     def _build_exact_result(
         self, generic: str, match_type: str, raw_score: float
     ) -> MatchResult:
-        """Build a MatchResult for an exact generic or brand match."""
-        drug_class, purpose_plain = self._generic_lookup[generic]
+        """Build a MatchResult for an exact single-ingredient generic match."""
+        lookup_entry = self._generic_lookup[generic]
+        drug_class, purpose_plain = lookup_entry[0], lookup_entry[1]
+        clinically_reviewed = lookup_entry[2] if len(lookup_entry) > 2 else False
+
         normalised_score = raw_score / 100.0 if raw_score > 1.0 else raw_score
 
         is_known_class = drug_class in _KNOWN_CLASSES
-        needs_review   = not is_known_class    # "other" always needs review
+        needs_review   = not is_known_class    # non-MVP always needs review
+
+        reasons: list[str] = []
+        if not is_known_class:
+            if drug_class == "opioid_analgesic":
+                reasons.append(
+                    f"Ingredient '{generic}' is an opioid analgesic and requires clinical review."
+                )
+            else:
+                reasons.append(
+                    f"Ingredient '{generic}' (class '{drug_class}') is outside the supported "
+                    f"drug classes and requires confirmation."
+                )
+
+        require_review = os.getenv("REQUIRE_CLINICAL_REVIEW", "").strip().lower() in ("true", "1", "yes")
+        if require_review and not clinically_reviewed:
+            needs_review = True
+            reasons.append("Requires clinical review by a licensed pharmacist before use.")
 
         return MatchResult(
             generic           = generic,
@@ -329,8 +377,68 @@ class DrugMatcher:
             suggested_generic = None,
             suggested_class   = None,
             suggested_purpose = None,
-            review_reasons    = ["Drug class 'other' requires confirmation."] if needs_review else [],
+            review_reasons    = reasons,
             lasa_warning      = None,
+            ingredients       = [{
+                "generic": generic, "drug_class": drug_class,
+                "purpose_plain": purpose_plain, "strength": None,
+                "clinically_reviewed": clinically_reviewed,
+            }],
+        )
+
+    def _build_combo_result(
+        self,
+        ingredients: list[dict],
+        match_type: str,
+        display: Optional[str] = None,
+        seed: Optional[tuple[str, str, bool]] = None,
+    ) -> MatchResult:
+        """
+        Build a MatchResult carrying EVERY ingredient (1..N).
+
+        needs_review is True when any ingredient is outside the four MVP classes or
+        unreviewed when REQUIRE_CLINICAL_REVIEW is active.
+        """
+        ings = [dict(i) for i in ingredients]
+        names = [i["generic"] for i in ings]
+        generic = display or self._db.display_name(names)
+
+        require_review = os.getenv("REQUIRE_CLINICAL_REVIEW", "").strip().lower() in ("true", "1", "yes")
+
+        reasons: list[str] = []
+        for i in ings:
+            if i["drug_class"] not in _KNOWN_CLASSES:
+                if i["drug_class"] == "opioid_analgesic":
+                    reasons.append(
+                        f"Ingredient '{i['generic']}' is an opioid analgesic and requires clinical review."
+                    )
+                else:
+                    reasons.append(
+                        f"Ingredient '{i['generic']}' (class '{i['drug_class']}') is outside the "
+                        f"supported drug classes and requires confirmation."
+                    )
+            if require_review and not i.get("clinically_reviewed", False):
+                reasons.append(
+                    f"Ingredient '{i['generic']}' requires clinical review by a licensed pharmacist before use."
+                )
+
+        if seed is not None:
+            drug_class, purpose = seed[0], seed[1]
+        elif len(ings) == 1:
+            drug_class, purpose = ings[0]["drug_class"], ings[0]["purpose_plain"]
+        else:
+            drug_class = ings[0]["drug_class"]
+            purpose = "; ".join(i["purpose_plain"] for i in ings if i["purpose_plain"]) or None
+
+        return MatchResult(
+            generic           = generic,
+            drug_class        = drug_class,
+            purpose_plain     = purpose,
+            match_score       = 1.0,
+            needs_review      = bool(reasons),
+            match_type        = match_type,
+            review_reasons    = reasons,
+            ingredients       = ings,
         )
 
     @staticmethod

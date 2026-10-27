@@ -176,6 +176,26 @@ def _make_error_prescription(
     )
 
 
+def _run_offline_fallback(
+    png_bytes: bytes,
+    rx_id: str,
+    quality: str,
+    exc_type: str,
+) -> Prescription:
+    """Run local offline handwriting recognition when Claude is unreachable."""
+    from dosely.offline_ocr import extract_offline_medicines
+    offline_items = extract_offline_medicines(png_bytes)
+    if offline_items:
+        return Prescription(
+            prescription_id=rx_id,
+            image_quality=ImageQuality(quality),
+            medicines=offline_items,
+            needs_human_review=True,
+            review_summary=["Transcribed using local offline handwriting recognition engine."],
+        )
+    return _make_error_prescription(rx_id, quality, f"API error: {exc_type}")
+
+
 # ---------------------------------------------------------------------------
 # Public extraction function
 # ---------------------------------------------------------------------------
@@ -214,14 +234,13 @@ def extract(
     try:
         png_bytes, quality = preprocess_and_assess(data, pdf_page=pdf_page)
     except Exception as exc:
-        logger.exception("[%s] Preprocessing failed: %s", rx_id, exc)
-        return _make_error_prescription(rx_id, "poor", f"Preprocessing error: {exc}")
+        logger.exception("[%s] Preprocessing failed", rx_id)
+        return _make_error_prescription(rx_id, "poor", f"Preprocessing error: {exc.__class__.__name__}")
 
     logger.info("[%s] Image quality assessed as '%s'.", rx_id, quality)
-    client = _get_client()
 
     # ---------------------------------------------------------------
-    # Step 2: Initial Claude call
+    # Step 2: Initial Claude call (with automatic offline fallback)
     # ---------------------------------------------------------------
     image_block = _build_image_content(png_bytes)
     messages: list[dict[str, Any]] = [
@@ -242,12 +261,12 @@ def extract(
         }
     ]
 
-    logger.info("[%s] Calling Claude (%s) ...", rx_id, CLAUDE_MODEL)
     try:
+        client = _get_client()
+        logger.info("[%s] Calling Claude (%s) ...", rx_id, CLAUDE_MODEL)
         claude_response = _call_claude(client, messages, system_prompt)
-    except anthropic.APIError as exc:
-        logger.exception("[%s] Claude API error: %s", rx_id, exc.__class__.__name__)
-        return _make_error_prescription(rx_id, quality, f"API error: {exc}")
+    except Exception as exc:
+        return _run_offline_fallback(png_bytes, rx_id, quality, exc.__class__.__name__)
 
     # ---------------------------------------------------------------
     # Step 3: Parse + validate (attempt 1)
@@ -281,9 +300,9 @@ def extract(
     try:
         retry_response = _call_claude(client, messages, system_prompt)
     except anthropic.APIError as exc:
-        logger.exception("[%s] Claude API error on retry: %s", rx_id, exc.__class__.__name__)
+        logger.exception("[%s] Claude API error on retry", rx_id)
         return _make_error_prescription(
-            rx_id, quality, f"API error on retry: {exc}"
+            rx_id, quality, f"API error on retry: {exc.__class__.__name__}"
         )
 
     # ---------------------------------------------------------------

@@ -26,6 +26,7 @@ from fastapi.responses import JSONResponse
 
 from dosely.extractor import extract
 from dosely.models import Prescription
+from dosely.upload_validator import validate_and_sanitize_upload
 
 logger = logging.getLogger(__name__)
 
@@ -62,14 +63,15 @@ def _validate_upload(upload: UploadFile) -> None:
 
 
 async def _read_safe(upload: UploadFile) -> bytes:
-    """Read upload content, enforcing the size limit."""
+    """Read upload content, enforcing size limit and content-based validation."""
     data = await upload.read(_MAX_FILE_BYTES + 1)
     if len(data) > _MAX_FILE_BYTES:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail=f"File exceeds the {_MAX_FILE_BYTES // (1024 * 1024)} MB limit.",
         )
-    return data
+    clean_bytes, _ = validate_and_sanitize_upload(data, upload.content_type or "")
+    return clean_bytes
 
 
 # ---------------------------------------------------------------------------
@@ -122,10 +124,10 @@ async def extract_prescription(
     try:
         prescription: Prescription = await loop.run_in_executor(None, fn)
     except Exception as exc:
-        logger.exception("Unexpected error during extraction: %s", exc)
+        logger.exception("Unexpected error during extraction")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Extraction error: {exc}",
+            detail="Extraction failed due to an internal error.",
         ) from exc
 
     return prescription
@@ -158,7 +160,7 @@ async def extract_batch(
     for f in files:
         _validate_upload(f)
 
-    async def _process_one(upload: UploadFile) -> dict:
+    async def _process_one(idx: int, upload: UploadFile) -> dict:
         data = await _read_safe(upload)
         loop = asyncio.get_event_loop()
         fn = partial(extract, data, None, pdf_page)
@@ -166,12 +168,12 @@ async def extract_batch(
             rx: Prescription = await loop.run_in_executor(None, fn)
             return rx.model_dump(mode="json")
         except Exception as exc:
-            logger.exception("Batch extraction error for %s: %s", upload.filename, exc)
+            logger.exception("Batch extraction error for item %d", idx)
             return {
-                "error": str(exc),
-                "filename": upload.filename,
+                "error": f"Extraction failed: {exc.__class__.__name__}",
+                "item_index": idx,
                 "needs_human_review": True,
             }
 
-    results = await asyncio.gather(*[_process_one(f) for f in files])
+    results = await asyncio.gather(*[_process_one(i, f) for i, f in enumerate(files)])
     return JSONResponse(content=list(results))

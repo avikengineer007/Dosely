@@ -31,7 +31,7 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 SEED_DRUGS_PATH = DATA_DIR / "seed_drugs.json"
 INDIAN_BRANDS_PATH = DATA_DIR / "indian_brands.csv"
 
-VALID_CLASSES = {"analgesic_nsaid", "antacid_ppi", "antibiotic", "antihistamine", "other"}
+VALID_CLASSES = {"analgesic_nsaid", "antacid_ppi", "antibiotic", "antihistamine", "other", "opioid_analgesic"}
 MVP_CLASSES = {"analgesic_nsaid", "antacid_ppi", "antibiotic", "antihistamine"}
 
 
@@ -130,11 +130,11 @@ def test_non_mvp_drugs_have_other_class_and_needs_review():
         g = entry["generic"].strip().lower()
         cls = entry["class"].strip()
         if cls not in MVP_CLASSES:
-            assert cls == "other", f"Non-MVP drug '{g}' must have class='other', got '{cls}'"
+            assert cls in ("other", "opioid_analgesic"), f"Non-MVP drug '{g}' must have class 'other' or 'opioid_analgesic', got '{cls}'"
             result = matcher.match(g)
             if result.match_type in ("exact_generic", "exact_brand"):
                 if not result.needs_review:
-                    violations.append(f"'{g}': class='other' but needs_review=False")
+                    violations.append(f"'{g}': non-MVP class '{cls}' but needs_review=False")
 
     assert not violations, "\n".join(violations)
 

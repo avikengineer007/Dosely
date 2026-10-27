@@ -30,10 +30,11 @@ PURGE_INTERVAL_HOURS: float = float(os.environ.get("PURGE_INTERVAL_HOURS", "24")
 # JWT / Auth settings
 # ---------------------------------------------------------------------------
 
-JWT_SECRET_KEY: str = os.environ.get(
-    "JWT_SECRET_KEY",
-    "dosely-dev-secret-change-in-production",  # CHANGE in production
-)
+def get_jwt_secret_key() -> str:
+    from dosely.storage import init_secrets
+    return init_secrets()[1]
+
+
 JWT_ALGORITHM: str = os.environ.get("JWT_ALGORITHM", "HS256")
 JWT_EXPIRE_MINUTES: int = int(os.environ.get("JWT_EXPIRE_MINUTES", "60"))
 

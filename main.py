@@ -19,6 +19,7 @@ from dosely.logging import setup_secure_logging
 setup_secure_logging()
 
 import contextlib
+import json
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -36,6 +37,7 @@ from starlette.responses import HTMLResponse, Response
 
 LANDING_PAGE_PATH = Path(__file__).resolve().parent / "dosely.html"
 APP_PAGE_PATH = Path(__file__).resolve().parent / "frontend" / "app.html"
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -48,12 +50,19 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
+        # Permissions-Policy:
+        # App route allows camera for prescription upload; other routes deny all sensitive capabilities
+        if path.startswith("/app"):
+            response.headers["Permissions-Policy"] = "camera=(self), microphone=(), geolocation=(), payment=()"
+        else:
+            response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()"
+
         # Content-Security-Policy:
-        # Route "/" allows cdnjs (scripts), googleapis (styles), gstatic (fonts)
-        if path == "/":
+        # Route "/" loads local same-origin three.min.js with 'self' (no cdnjs.cloudflare.com)
+        if path == "/" or path.startswith("/static"):
             response.headers["Content-Security-Policy"] = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
+                "script-src 'self' 'unsafe-inline'; "
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
                 "font-src 'self' https://fonts.gstatic.com; "
                 "img-src 'self' data:; "
@@ -66,7 +75,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 "script-src 'self'; "
                 "style-src 'self' 'unsafe-inline'; "
                 "font-src 'self'; "
-                "img-src 'self' data:; "
+                "img-src 'self' data: blob:; "
                 "connect-src 'self'"
             )
         return response
@@ -114,6 +123,35 @@ app.add_middleware(
 
 app.include_router(prescriptions_router)
 app.include_router(router)
+
+from starlette.staticfiles import StaticFiles
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+from fastapi.exceptions import RequestValidationError
+import logging
+
+_api_logger = logging.getLogger("dosely.api")
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Sanitized 422 handler:
+    Logs and returns only error loc and type.
+    Never includes msg, input, or ctx which could leak submitted health data or PII.
+    """
+    clean_errors = []
+    for err in exc.errors():
+        clean_errors.append({
+            "loc": list(err.get("loc", [])),
+            "type": str(err.get("type", "validation_error")),
+        })
+    _api_logger.warning("Validation error on %s: %s", request.url.path, clean_errors)
+    return Response(
+        content=json.dumps({"detail": clean_errors}),
+        status_code=422,
+        media_type="application/json",
+    )
 
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)

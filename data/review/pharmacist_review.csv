@@ -1,0 +1,414 @@
+﻿generic,class,purpose_plain,source,reviewed_by,reviewed_on,clinically_reviewed
+ibuprofen,analgesic_nsaid,"Relieves pain, fever, and swelling.",NLEM 2022 / openFDA,,,false
+paracetamol,analgesic_nsaid,Reduces fever and eases mild to moderate pain.,NLEM 2022 / openFDA,,,false
+diclofenac,analgesic_nsaid,Eases pain and reduces inflammation in joints and muscles.,NLEM 2022 / openFDA,,,false
+naproxen,analgesic_nsaid,"Relieves pain, swelling, and stiffness.",NLEM 2022 / openFDA,,,false
+aspirin,analgesic_nsaid,Relieves pain and reduces fever; also thins the blood at low doses.,NLEM 2022 / openFDA,,,false
+celecoxib,analgesic_nsaid,Reduces pain and inflammation with less stomach irritation.,NLEM 2022 / openFDA,,,false
+etoricoxib,analgesic_nsaid,Eases joint pain and inflammation in arthritis.,NLEM 2022 / openFDA,,,false
+mefenamic acid,analgesic_nsaid,"Relieves mild to moderate pain, including period pain.",NLEM 2022 / openFDA,,,false
+ketorolac,analgesic_nsaid,Provides short-term relief of moderate to severe pain.,NLEM 2022 / openFDA,,,false
+tramadol,opioid_analgesic,Treats moderate to severe pain when other pain relievers are not enough.,NLEM 2022 / openFDA,,,false
+morphine,opioid_analgesic,Manages severe pain when standard pain relievers are not sufficient.,NLEM 2022 / openFDA,,,false
+codeine,opioid_analgesic,Relieves mild to moderate pain and suppresses cough.,NLEM 2022 / openFDA,,,false
+indomethacin,analgesic_nsaid,Reduces inflammation and pain in joints and muscles.,NLEM 2022 / openFDA,,,false
+piroxicam,analgesic_nsaid,Eases arthritis pain and reduces swelling in joints.,NLEM 2022 / openFDA,,,false
+aceclofenac,analgesic_nsaid,Relieves pain and inflammation in arthritis and musculoskeletal conditions.,NLEM 2022 / openFDA,,,false
+nimesulide,analgesic_nsaid,Reduces pain and inflammation with a relatively quick onset.,NLEM 2022 / openFDA,,,false
+flurbiprofen,analgesic_nsaid,Treats pain and inflammation in joints and soft tissues.,NLEM 2022 / openFDA,,,false
+meloxicam,analgesic_nsaid,Eases joint pain in osteoarthritis and rheumatoid arthritis.,NLEM 2022 / openFDA,,,false
+ketoprofen,analgesic_nsaid,Relieves pain and reduces inflammation in joints and muscles.,NLEM 2022 / openFDA,,,false
+sulindac,analgesic_nsaid,Treats pain and swelling in arthritis and related conditions.,NLEM 2022 / openFDA,,,false
+oxaprozin,analgesic_nsaid,Eases osteoarthritis and rheumatoid arthritis pain.,NLEM 2022 / openFDA,,,false
+etodolac,analgesic_nsaid,Relieves pain and inflammation in arthritis.,NLEM 2022 / openFDA,,,false
+diflunisal,analgesic_nsaid,Treats mild to moderate pain and reduces fever.,NLEM 2022 / openFDA,,,false
+parecoxib,analgesic_nsaid,Provides short-term pain relief after surgery with minimal stomach side effects.,NLEM 2022 / openFDA,,,false
+omeprazole,antacid_ppi,Reduces stomach acid to treat heartburn and ulcers.,NLEM 2022 / openFDA,,,false
+pantoprazole,antacid_ppi,Lowers stomach acid to heal acid reflux and stomach ulcers.,NLEM 2022 / openFDA,,,false
+esomeprazole,antacid_ppi,Controls excess stomach acid and relieves heartburn.,NLEM 2022 / openFDA,,,false
+rabeprazole,antacid_ppi,Reduces acid in the stomach to treat reflux and ulcers.,NLEM 2022 / openFDA,,,false
+lansoprazole,antacid_ppi,Decreases stomach acid to protect the stomach lining.,NLEM 2022 / openFDA,,,false
+dexlansoprazole,antacid_ppi,Controls acid reflux by reducing stomach acid production.,NLEM 2022 / openFDA,,,false
+ranitidine,antacid_ppi,Reduces stomach acid to relieve indigestion and heartburn.,NLEM 2022 / openFDA,,,false
+famotidine,antacid_ppi,Decreases stomach acid for heartburn and acid reflux relief.,NLEM 2022 / openFDA,,,false
+aluminium hydroxide,antacid_ppi,Neutralises excess stomach acid to ease indigestion quickly.,NLEM 2022 / openFDA,,,false
+magnesium hydroxide,antacid_ppi,Quickly neutralises stomach acid and relieves indigestion.,NLEM 2022 / openFDA,,,false
+sodium bicarbonate,antacid_ppi,Temporarily neutralises stomach acid for rapid heartburn relief.,NLEM 2022 / openFDA,,,false
+sucralfate,antacid_ppi,Coats and protects the stomach lining to help ulcers heal.,NLEM 2022 / openFDA,,,false
+cimetidine,antacid_ppi,Reduces stomach acid production to relieve heartburn and ulcers.,NLEM 2022 / openFDA,,,false
+nizatidine,antacid_ppi,Lowers stomach acid for heartburn and stomach ulcer treatment.,NLEM 2022 / openFDA,,,false
+calcium carbonate,antacid_ppi,Quickly neutralises stomach acid and provides calcium supplementation.,NLEM 2022 / openFDA,,,false
+domperidone,other,Relieves nausea and helps food move normally through the stomach.,NLEM 2022 / openFDA,,,false
+metoclopramide,antacid_ppi,Reduces nausea and helps the stomach empty more quickly.,NLEM 2022 / openFDA,,,false
+amoxicillin,antibiotic,Kills bacteria to treat common infections.,NLEM 2022 / openFDA,,,false
+amoxicillin clavulanate,antibiotic,"Kills a broader range of bacteria, including resistant ones.",NLEM 2022 / openFDA,,,false
+azithromycin,antibiotic,Treats bacterial infections including chest and throat infections.,NLEM 2022 / openFDA,,,false
+clarithromycin,antibiotic,"Fights bacterial infections of the lungs, sinuses, and skin.",NLEM 2022 / openFDA,,,false
+ciprofloxacin,antibiotic,Treats urinary tract and other bacterial infections.,NLEM 2022 / openFDA,,,false
+levofloxacin,antibiotic,"Kills bacteria causing chest, urinary, and skin infections.",NLEM 2022 / openFDA,,,false
+doxycycline,antibiotic,Treats bacterial infections including acne and chest infections.,NLEM 2022 / openFDA,,,false
+metronidazole,antibiotic,Clears bacterial and parasitic infections in the gut and elsewhere.,NLEM 2022 / openFDA,,,false
+cefixime,antibiotic,"Treats bacterial infections of the ear, throat, and urinary tract.",NLEM 2022 / openFDA,,,false
+cefuroxime,antibiotic,Fights a wide range of bacterial infections.,NLEM 2022 / openFDA,,,false
+cephalexin,antibiotic,"Treats skin, bone, and respiratory tract bacterial infections.",NLEM 2022 / openFDA,,,false
+clindamycin,antibiotic,"Fights bacterial infections, including serious skin infections.",NLEM 2022 / openFDA,,,false
+trimethoprim sulfamethoxazole,antibiotic,Treats urinary tract and respiratory bacterial infections.,NLEM 2022 / openFDA,,,false
+nitrofurantoin,antibiotic,Treats and prevents bacterial urinary tract infections.,NLEM 2022 / openFDA,,,false
+penicillin v,antibiotic,Treats common bacterial infections such as strep throat.,NLEM 2022 / openFDA,,,false
+erythromycin,antibiotic,Fights bacterial infections in patients allergic to penicillin.,NLEM 2022 / openFDA,,,false
+tetracycline,antibiotic,Treats acne and various bacterial infections.,NLEM 2022 / openFDA,,,false
+minocycline,antibiotic,"Treats acne, skin infections, and certain bacterial illnesses.",NLEM 2022 / openFDA,,,false
+ofloxacin,antibiotic,"Kills bacteria causing eye, ear, and urinary tract infections.",NLEM 2022 / openFDA,,,false
+norfloxacin,antibiotic,Treats urinary tract and gastrointestinal bacterial infections.,NLEM 2022 / openFDA,,,false
+moxifloxacin,antibiotic,Treats chest infections and bacterial conjunctivitis.,NLEM 2022 / openFDA,,,false
+ceftriaxone,antibiotic,Used by injection to treat serious bacterial infections.,NLEM 2022 / openFDA,,,false
+cefpodoxime,antibiotic,"Treats respiratory tract, urinary, and skin bacterial infections.",NLEM 2022 / openFDA,,,false
+cefadroxil,antibiotic,"Treats skin, throat, and urinary tract bacterial infections.",NLEM 2022 / openFDA,,,false
+cefazolin,antibiotic,"Prevents and treats bacterial infections, often used around surgery.",NLEM 2022 / openFDA,,,false
+cefdinir,antibiotic,"Treats ear, sinus, throat, and skin bacterial infections.",NLEM 2022 / openFDA,,,false
+vancomycin,antibiotic,Treats serious bacterial infections resistant to other antibiotics.,NLEM 2022 / openFDA,,,false
+linezolid,antibiotic,Treats drug-resistant bacterial infections including MRSA.,NLEM 2022 / openFDA,,,false
+rifampicin,antibiotic,Treats tuberculosis and other serious bacterial infections.,NLEM 2022 / openFDA,,,false
+isoniazid,antibiotic,Treats and prevents tuberculosis infection.,NLEM 2022 / openFDA,,,false
+pyrazinamide,antibiotic,Used in combination to treat active tuberculosis.,NLEM 2022 / openFDA,,,false
+ethambutol,antibiotic,Used alongside other medicines to treat tuberculosis.,NLEM 2022 / openFDA,,,false
+tinidazole,antibiotic,Treats gut and genital infections caused by bacteria and parasites.,NLEM 2022 / openFDA,,,false
+flucloxacillin,antibiotic,Treats skin and soft tissue infections caused by staphylococci.,NLEM 2022 / openFDA,,,false
+cetirizine,antihistamine,"Relieves allergy symptoms like sneezing, runny nose, and itchy eyes.",NLEM 2022 / openFDA,,,false
+loratadine,antihistamine,Eases allergy symptoms without causing significant drowsiness.,NLEM 2022 / openFDA,,,false
+fexofenadine,antihistamine,Relieves hay fever and allergy symptoms without drowsiness.,NLEM 2022 / openFDA,,,false
+desloratadine,antihistamine,Controls allergy symptoms including hives and nasal congestion.,NLEM 2022 / openFDA,,,false
+levocetirizine,antihistamine,"Relieves sneezing, itching, and other allergy symptoms.",NLEM 2022 / openFDA,,,false
+diphenhydramine,antihistamine,Relieves allergy symptoms and helps with sleep.,NLEM 2022 / openFDA,,,false
+chlorpheniramine,antihistamine,"Eases sneezing, runny nose, and allergic reactions.",NLEM 2022 / openFDA,,,false
+azelastine,antihistamine,Relieves nasal allergy symptoms when sprayed in the nose.,NLEM 2022 / openFDA,,,false
+bilastine,antihistamine,Relieves allergy symptoms including hives and hay fever.,NLEM 2022 / openFDA,,,false
+rupatadine,antihistamine,Eases allergic rhinitis and hives symptoms.,NLEM 2022 / openFDA,,,false
+mizolastine,antihistamine,"Treats hay fever, hives, and other allergic conditions.",NLEM 2022 / openFDA,,,false
+olopatadine,antihistamine,Relieves eye itching and redness caused by allergies.,NLEM 2022 / openFDA,,,false
+ebastine,antihistamine,Treats hay fever and hives with minimal drowsiness.,NLEM 2022 / openFDA,,,false
+ketotifen,antihistamine,Prevents asthma and allergic reactions over the long term.,NLEM 2022 / openFDA,,,false
+promethazine,antihistamine,Relieves allergy symptoms and prevents motion sickness.,NLEM 2022 / openFDA,,,false
+meclizine,antihistamine,Prevents nausea and dizziness from motion sickness.,NLEM 2022 / openFDA,,,false
+doxylamine,antihistamine,Relieves allergy symptoms and helps with sleep.,NLEM 2022 / openFDA,,,false
+cyproheptadine,antihistamine,Relieves allergy symptoms and may stimulate appetite.,NLEM 2022 / openFDA,,,false
+trimeprazine,antihistamine,Relieves itching and runny nose due to allergies.,NLEM 2022 / openFDA,,,false
+metformin,other,Helps control blood sugar levels in type 2 diabetes.,NLEM 2022 / openFDA,,,false
+methotrexate,other,Modulates immune and inflammatory activity in certain chronic conditions.,NLEM 2022 / openFDA,,,false
+atorvastatin,other,Lowers cholesterol to reduce the risk of heart disease.,NLEM 2022 / openFDA,,,false
+amlodipine,other,Relaxes blood vessels to lower blood pressure and treat chest pain.,NLEM 2022 / openFDA,,,false
+losartan,other,Lowers blood pressure by relaxing blood vessels.,NLEM 2022 / openFDA,,,false
+glibenclamide,other,Stimulates the pancreas to release insulin and lower blood sugar.,NLEM 2022 / openFDA,,,false
+levothyroxine,other,Replaces thyroid hormone when the thyroid does not produce enough.,NLEM 2022 / openFDA,,,false
+warfarin,other,Thins the blood to prevent harmful clots from forming.,NLEM 2022 / openFDA,,,false
+prednisolone,other,Reduces inflammation and suppresses overactive immune responses.,NLEM 2022 / openFDA,,,false
+salbutamol,other,Opens the airways quickly to relieve breathlessness and wheezing.,NLEM 2022 / openFDA,,,false
+fluoxetine,other,Treats depression and anxiety by balancing brain chemicals.,NLEM 2022 / openFDA,,,false
+sertraline,other,"Helps manage depression, anxiety, and related conditions.",NLEM 2022 / openFDA,,,false
+simvastatin,other,Lowers blood cholesterol to reduce the risk of heart problems.,NLEM 2022 / openFDA,,,false
+rosuvastatin,other,Reduces bad cholesterol and lowers the risk of heart disease.,NLEM 2022 / openFDA,,,false
+pravastatin,other,Lowers cholesterol and helps prevent heart attacks and strokes.,NLEM 2022 / openFDA,,,false
+lovastatin,other,Reduces high cholesterol to lower the risk of heart disease.,NLEM 2022 / openFDA,,,false
+fluvastatin,other,Lowers cholesterol levels to protect the heart.,NLEM 2022 / openFDA,,,false
+pitavastatin,other,Treats high cholesterol and reduces cardiovascular risk.,NLEM 2022 / openFDA,,,false
+enalapril,other,Lowers blood pressure and helps protect the heart and kidneys.,NLEM 2022 / openFDA,,,false
+lisinopril,other,Reduces blood pressure and is used in heart failure treatment.,NLEM 2022 / openFDA,,,false
+ramipril,other,Lowers blood pressure and reduces the risk of heart attack and stroke.,NLEM 2022 / openFDA,,,false
+perindopril,other,Treats high blood pressure and reduces the risk of heart disease.,NLEM 2022 / openFDA,,,false
+telmisartan,other,Lowers blood pressure by blocking a chemical that tightens blood vessels.,NLEM 2022 / openFDA,,,false
+valsartan,other,Reduces blood pressure and is used in heart failure.,NLEM 2022 / openFDA,,,false
+candesartan,other,Lowers blood pressure and protects the heart and kidneys.,NLEM 2022 / openFDA,,,false
+olmesartan,other,Controls high blood pressure to reduce the risk of stroke.,NLEM 2022 / openFDA,,,false
+irbesartan,other,Lowers blood pressure and protects kidneys in diabetes.,NLEM 2022 / openFDA,,,false
+bisoprolol,other,Slows the heart rate and reduces blood pressure.,NLEM 2022 / openFDA,,,false
+metoprolol,other,Lowers blood pressure and heart rate; used in heart conditions.,NLEM 2022 / openFDA,,,false
+atenolol,other,Reduces blood pressure and controls heart rate.,NLEM 2022 / openFDA,,,false
+carvedilol,other,Treats heart failure and high blood pressure.,NLEM 2022 / openFDA,,,false
+propranolol,other,Slows the heart rate and reduces blood pressure.,NLEM 2022 / openFDA,,,false
+nebivolol,other,Lowers blood pressure and reduces strain on the heart.,NLEM 2022 / openFDA,,,false
+hydrochlorothiazide,other,Removes excess fluid from the body to lower blood pressure.,NLEM 2022 / openFDA,,,false
+furosemide,other,Helps the body remove excess fluid to treat fluid retention.,NLEM 2022 / openFDA,,,false
+spironolactone,other,Removes excess fluid and treats heart failure and high blood pressure.,NLEM 2022 / openFDA,,,false
+torsemide,other,Treats fluid build-up in heart failure and kidney disease.,NLEM 2022 / openFDA,,,false
+indapamide,other,Lowers blood pressure and reduces fluid retention.,NLEM 2022 / openFDA,,,false
+chlorthalidone,other,Reduces blood pressure and swelling from fluid retention.,NLEM 2022 / openFDA,,,false
+nifedipine,other,Relaxes blood vessels to lower blood pressure and relieve chest pain.,NLEM 2022 / openFDA,,,false
+diltiazem,other,Lowers blood pressure and heart rate; treats chest pain.,NLEM 2022 / openFDA,,,false
+verapamil,other,Controls heart rhythm and lowers blood pressure.,NLEM 2022 / openFDA,,,false
+felodipine,other,Relaxes blood vessels to treat high blood pressure.,NLEM 2022 / openFDA,,,false
+isradipine,other,Lowers blood pressure by relaxing blood vessel walls.,NLEM 2022 / openFDA,,,false
+nitroglycerine,other,Relieves chest pain by widening blood vessels to the heart.,NLEM 2022 / openFDA,,,false
+isosorbide mononitrate,other,Prevents and relieves chest pain by relaxing blood vessels.,NLEM 2022 / openFDA,,,false
+isosorbide dinitrate,other,Treats and prevents angina chest pain.,NLEM 2022 / openFDA,,,false
+digoxin,other,Strengthens the heartbeat and controls heart rate in certain conditions.,NLEM 2022 / openFDA,,,false
+amiodarone,other,Controls abnormal heart rhythms when other medicines have not worked.,NLEM 2022 / openFDA,,,false
+clopidogrel,other,Prevents blood clots and reduces the risk of heart attack and stroke.,NLEM 2022 / openFDA,,,false
+aspirin low dose,other,Used at low doses to thin the blood and prevent heart attacks.,NLEM 2022 / openFDA,,,false
+heparin,other,Prevents and treats dangerous blood clots.,NLEM 2022 / openFDA,,,false
+enoxaparin,other,Prevents blood clots after surgery and in other high-risk situations.,NLEM 2022 / openFDA,,,false
+rivaroxaban,other,Prevents blood clots and reduces the risk of stroke.,NLEM 2022 / openFDA,,,false
+apixaban,other,Reduces the risk of stroke and blood clots.,NLEM 2022 / openFDA,,,false
+dabigatran,other,"Prevents blood clots, especially in patients with irregular heartbeat.",NLEM 2022 / openFDA,,,false
+glipizide,other,Lowers blood sugar in type 2 diabetes by stimulating insulin release.,NLEM 2022 / openFDA,,,false
+gliclazide,other,Helps control blood sugar levels in type 2 diabetes.,NLEM 2022 / openFDA,,,false
+glimepiride,other,Stimulates insulin release to lower blood sugar in type 2 diabetes.,NLEM 2022 / openFDA,,,false
+pioglitazone,other,Improves the body's response to insulin in type 2 diabetes.,NLEM 2022 / openFDA,,,false
+sitagliptin,other,Helps control blood sugar levels in type 2 diabetes.,NLEM 2022 / openFDA,,,false
+vildagliptin,other,Lowers blood sugar in type 2 diabetes by boosting insulin activity.,NLEM 2022 / openFDA,,,false
+dapagliflozin,other,Lowers blood sugar and may protect the heart and kidneys in diabetes.,NLEM 2022 / openFDA,,,false
+empagliflozin,other,Controls blood sugar and reduces cardiovascular risk in type 2 diabetes.,NLEM 2022 / openFDA,,,false
+canagliflozin,other,Lowers blood sugar and reduces the risk of heart and kidney disease.,NLEM 2022 / openFDA,,,false
+liraglutide,other,Controls blood sugar and supports weight loss in type 2 diabetes.,NLEM 2022 / openFDA,,,false
+insulin regular,other,"Lowers blood sugar quickly, used to manage diabetes.",NLEM 2022 / openFDA,,,false
+insulin glargine,other,Provides long-acting blood sugar control for diabetes.,NLEM 2022 / openFDA,,,false
+insulin isophane,other,Controls blood sugar with an intermediate duration of action.,NLEM 2022 / openFDA,,,false
+carbimazole,other,Reduces the production of thyroid hormone in an overactive thyroid.,NLEM 2022 / openFDA,,,false
+propylthiouracil,other,Treats an overactive thyroid gland.,NLEM 2022 / openFDA,,,false
+dexamethasone,other,Reduces severe inflammation and suppresses immune reactions.,NLEM 2022 / openFDA,,,false
+methylprednisolone,other,Treats inflammation and immune system disorders.,NLEM 2022 / openFDA,,,false
+hydrocortisone,other,Replaces cortisol when the body cannot produce enough on its own.,NLEM 2022 / openFDA,,,false
+betamethasone,other,Reduces skin inflammation and is used in severe allergic reactions.,NLEM 2022 / openFDA,,,false
+beclomethasone,other,Reduces airway inflammation when inhaled to prevent asthma symptoms.,NLEM 2022 / openFDA,,,false
+budesonide,other,Controls asthma and nasal allergy symptoms by reducing inflammation.,NLEM 2022 / openFDA,,,false
+fluticasone,other,Prevents asthma attacks and eases nasal allergy symptoms.,NLEM 2022 / openFDA,,,false
+mometasone,other,Controls nasal allergy symptoms and asthma when inhaled.,NLEM 2022 / openFDA,,,false
+formoterol,other,Opens the airways for an extended period to ease breathing in asthma.,NLEM 2022 / openFDA,,,false
+salmeterol,other,Keeps airways open for up to 12 hours to prevent asthma symptoms.,NLEM 2022 / openFDA,,,false
+ipratropium,other,Relaxes the airways to relieve breathing difficulty in lung disease.,NLEM 2022 / openFDA,,,false
+tiotropium,other,Opens the airways to improve breathing in COPD.,NLEM 2022 / openFDA,,,false
+montelukast,other,Prevents asthma attacks and relieves hay fever symptoms.,NLEM 2022 / openFDA,,,false
+theophylline,other,Opens the airways to help treat asthma and COPD.,NLEM 2022 / openFDA,,,false
+aminophylline,other,Relaxes the airways to relieve asthma and breathing difficulty.,NLEM 2022 / openFDA,,,false
+paroxetine,other,"Treats depression, anxiety disorders, and panic attacks.",NLEM 2022 / openFDA,,,false
+escitalopram,other,Treats depression and anxiety by balancing serotonin in the brain.,NLEM 2022 / openFDA,,,false
+citalopram,other,Helps treat depression and certain anxiety disorders.,NLEM 2022 / openFDA,,,false
+venlafaxine,other,Treats depression and anxiety disorders.,NLEM 2022 / openFDA,,,false
+duloxetine,other,"Treats depression, anxiety, and certain types of chronic pain.",NLEM 2022 / openFDA,,,false
+mirtazapine,other,Treats depression and may improve sleep and appetite.,NLEM 2022 / openFDA,,,false
+amitriptyline,other,Treats depression and is also used for nerve pain and migraine prevention.,NLEM 2022 / openFDA,,,false
+nortriptyline,other,Treats depression and is sometimes used for nerve pain.,NLEM 2022 / openFDA,,,false
+clomipramine,other,Treats obsessive-compulsive disorder and depression.,NLEM 2022 / openFDA,,,false
+alprazolam,other,Reduces anxiety and panic disorder symptoms quickly.,NLEM 2022 / openFDA,,,false
+clonazepam,other,Treats seizures and panic disorder.,NLEM 2022 / openFDA,,,false
+diazepam,other,"Relieves anxiety, muscle spasms, and seizures.",NLEM 2022 / openFDA,,,false
+lorazepam,other,Reduces anxiety and is used before medical procedures.,NLEM 2022 / openFDA,,,false
+zolpidem,other,Helps with short-term sleep difficulties.,NLEM 2022 / openFDA,,,false
+zopiclone,other,Provides short-term relief of insomnia.,NLEM 2022 / openFDA,,,false
+quetiapine,other,"Treats schizophrenia, bipolar disorder, and depression.",NLEM 2022 / openFDA,,,false
+olanzapine,other,Treats schizophrenia and episodes of bipolar disorder.,NLEM 2022 / openFDA,,,false
+risperidone,other,Manages symptoms of schizophrenia and bipolar disorder.,NLEM 2022 / openFDA,,,false
+haloperidol,other,Treats psychosis and severe behavioural disturbances.,NLEM 2022 / openFDA,,,false
+lithium carbonate,other,Stabilises mood in bipolar disorder.,NLEM 2022 / openFDA,,,false
+valproic acid,other,Controls seizures and stabilises mood in bipolar disorder.,NLEM 2022 / openFDA,,,false
+sodium valproate,other,Prevents seizures and is used in bipolar disorder.,NLEM 2022 / openFDA,,,false
+carbamazepine,other,Controls seizures and treats certain types of nerve pain.,NLEM 2022 / openFDA,,,false
+phenytoin,other,Prevents and controls seizures.,NLEM 2022 / openFDA,,,false
+levetiracetam,other,Controls several types of seizures in epilepsy.,NLEM 2022 / openFDA,,,false
+lamotrigine,other,Prevents seizures and stabilises mood in bipolar disorder.,NLEM 2022 / openFDA,,,false
+topiramate,other,Controls seizures and is used for migraine prevention.,NLEM 2022 / openFDA,,,false
+gabapentin,other,Treats nerve pain and controls certain types of seizures.,NLEM 2022 / openFDA,,,false
+pregabalin,other,Relieves nerve pain and controls certain seizures.,NLEM 2022 / openFDA,,,false
+phenobarbital,other,Controls seizures and is used for short-term anxiety relief.,NLEM 2022 / openFDA,,,false
+donepezil,other,Helps manage symptoms of Alzheimer's disease.,NLEM 2022 / openFDA,,,false
+memantine,other,Helps slow the progression of Alzheimer's disease symptoms.,NLEM 2022 / openFDA,,,false
+rivastigmine,other,Treats mild to moderate Alzheimer's and Parkinson's disease dementia.,NLEM 2022 / openFDA,,,false
+levodopa carbidopa,other,Treats Parkinson's disease by replacing dopamine in the brain.,NLEM 2022 / openFDA,,,false
+pramipexole,other,Treats Parkinson's disease and restless legs syndrome.,NLEM 2022 / openFDA,,,false
+ropinirole,other,Manages Parkinson's disease and restless legs syndrome.,NLEM 2022 / openFDA,,,false
+ondansetron,other,Prevents nausea and vomiting caused by medicines or surgery.,NLEM 2022 / openFDA,,,false
+granisetron,other,Prevents nausea and vomiting during chemotherapy.,NLEM 2022 / openFDA,,,false
+dexamethasone antiemetic,other,Prevents nausea during chemotherapy when given as an antiemetic.,NLEM 2022 / openFDA,,,false
+folic acid,other,Supports healthy red blood cells and prevents neural tube defects in pregnancy.,NLEM 2022 / openFDA,,,false
+iron sulfate,other,Treats iron deficiency anaemia.,NLEM 2022 / openFDA,,,false
+ferrous gluconate,other,Supplements iron to treat or prevent iron deficiency.,NLEM 2022 / openFDA,,,false
+cyanocobalamin,other,Treats vitamin B12 deficiency anaemia.,NLEM 2022 / openFDA,,,false
+hydroxocobalamin,other,Replaces vitamin B12 when the body cannot absorb it properly.,NLEM 2022 / openFDA,,,false
+calcium gluconate,other,Supplements calcium and treats low calcium levels in the blood.,NLEM 2022 / openFDA,,,false
+cholecalciferol,other,Supplements vitamin D3 for bone health and immunity.,NLEM 2022 / openFDA,,,false
+ergocalciferol,other,Treats vitamin D deficiency and supports calcium absorption.,NLEM 2022 / openFDA,,,false
+zinc sulfate,other,Supplements zinc and helps treat diarrhoea in children.,NLEM 2022 / openFDA,,,false
+potassium chloride,other,Replaces potassium when blood levels are too low.,NLEM 2022 / openFDA,,,false
+magnesium sulfate,other,Treats low magnesium levels and is used in eclampsia during pregnancy.,NLEM 2022 / openFDA,,,false
+oral rehydration salts,other,Replaces fluid and minerals lost during diarrhoea and vomiting.,NLEM 2022 / openFDA,,,false
+albendazole,other,Kills intestinal worms and treats other parasitic infections.,NLEM 2022 / openFDA,,,false
+mebendazole,other,Treats common intestinal worm infections.,NLEM 2022 / openFDA,,,false
+ivermectin,other,Treats parasitic infections including river blindness and strongyloidiasis.,NLEM 2022 / openFDA,,,false
+praziquantel,other,Treats tapeworm and other parasitic worm infections.,NLEM 2022 / openFDA,,,false
+chloroquine,other,Treats and prevents malaria and certain autoimmune conditions.,NLEM 2022 / openFDA,,,false
+hydroxychloroquine,other,Treats malaria and autoimmune conditions such as rheumatoid arthritis.,NLEM 2022 / openFDA,,,false
+artemether lumefantrine,other,Treats malaria by killing the malaria parasite.,NLEM 2022 / openFDA,,,false
+quinine,other,Treats severe malaria and leg cramps.,NLEM 2022 / openFDA,,,false
+doxycycline malaria,other,Prevents malaria when taken before and during travel to at-risk areas.,NLEM 2022 / openFDA,,,false
+aciclovir,other,Treats herpes virus infections including cold sores and shingles.,NLEM 2022 / openFDA,,,false
+valaciclovir,other,Treats and suppresses herpes virus infections.,NLEM 2022 / openFDA,,,false
+oseltamivir,other,Treats influenza by stopping the virus from spreading in the body.,NLEM 2022 / openFDA,,,false
+fluconazole,other,Treats fungal infections including thrush and yeast infections.,NLEM 2022 / openFDA,,,false
+itraconazole,other,"Treats serious fungal infections of the skin, nails, and internal organs.",NLEM 2022 / openFDA,,,false
+terbinafine,other,"Treats fungal infections of the skin, hair, and nails.",NLEM 2022 / openFDA,,,false
+clotrimazole,other,Treats fungal skin infections including athlete's foot and thrush.,NLEM 2022 / openFDA,,,false
+miconazole,other,"Clears fungal infections of the skin, mouth, and genitals.",NLEM 2022 / openFDA,,,false
+nystatin,other,Treats candida fungal infections of the mouth and gut.,NLEM 2022 / openFDA,,,false
+ketoconazole,other,Treats skin and scalp fungal infections.,NLEM 2022 / openFDA,,,false
+griseofulvin,other,"Treats fungal infections of the skin, hair, and nails.",NLEM 2022 / openFDA,,,false
+diphtheria tetanus pertussis vaccine,other,"Prevents diphtheria, tetanus, and whooping cough through immunisation.",NLEM 2022 / openFDA,,,false
+oral polio vaccine,other,Protects against polio virus infection.,NLEM 2022 / openFDA,,,false
+hepatitis b vaccine,other,Prevents hepatitis B viral infection.,NLEM 2022 / openFDA,,,false
+measles rubella vaccine,other,Protects against measles and rubella infections.,NLEM 2022 / openFDA,,,false
+bcg vaccine,other,"Protects against severe tuberculosis, especially in newborns.",NLEM 2022 / openFDA,,,false
+tamoxifen,other,Used in long-term treatment of certain hormone-related conditions.,NLEM 2022 / openFDA,,,false
+anastrozole,other,Lowers hormone levels to manage certain hormone-sensitive conditions.,NLEM 2022 / openFDA,,,false
+letrozole,other,Regulates hormone levels in the management of specific endocrine conditions.,NLEM 2022 / openFDA,,,false
+capecitabine,other,Slows the growth of rapidly dividing cells in specialized therapies.,NLEM 2022 / openFDA,,,false
+imatinib,other,Inhibits targeted enzymes in specialized long-term medical treatments.,NLEM 2022 / openFDA,,,false
+cyclophosphamide,other,Modulates immune response and cell division in specialized medical treatments.,NLEM 2022 / openFDA,,,false
+dexrazoxane,other,Helps protect heart tissue during specialized medication therapies.,NLEM 2022 / openFDA,,,false
+ondansetron chemo,other,Prevents severe nausea and vomiting associated with specialized medical treatments.,NLEM 2022 / openFDA,,,false
+filgrastim,other,Stimulates the bone marrow to produce more white blood cells.,NLEM 2022 / openFDA,,,false
+erythropoietin,other,Stimulates red blood cell production in anaemia of chronic kidney disease.,NLEM 2022 / openFDA,,,false
+sildenafil,other,Treats erectile dysfunction and pulmonary arterial hypertension.,NLEM 2022 / openFDA,,,false
+tadalafil,other,Treats erectile dysfunction and benign prostatic hyperplasia.,NLEM 2022 / openFDA,,,false
+finasteride,other,Treats enlarged prostate and male pattern baldness.,NLEM 2022 / openFDA,,,false
+tamsulosin,other,Relaxes the prostate and bladder to ease urinary symptoms.,NLEM 2022 / openFDA,,,false
+solifenacin,other,Reduces bladder overactivity and urgency to urinate.,NLEM 2022 / openFDA,,,false
+oxybutynin,other,Treats overactive bladder and reduces urinary urgency.,NLEM 2022 / openFDA,,,false
+tolterodine,other,Controls overactive bladder symptoms such as urgency and frequency.,NLEM 2022 / openFDA,,,false
+desmopressin,other,Controls bedwetting and diabetes insipidus.,NLEM 2022 / openFDA,,,false
+misoprostol,other,Protects the stomach lining and is used in obstetric care.,NLEM 2022 / openFDA,,,false
+oxytocin,other,Induces labour and helps control bleeding after childbirth.,NLEM 2022 / openFDA,,,false
+ergometrine,other,Controls postpartum haemorrhage and uterine bleeding.,NLEM 2022 / openFDA,,,false
+progesterone,other,Supports pregnancy and is used in hormonal conditions.,NLEM 2022 / openFDA,,,false
+medroxyprogesterone,other,Treats hormonal conditions and is used as a contraceptive.,NLEM 2022 / openFDA,,,false
+norethisterone,other,Delays periods and is used in contraception and hormonal conditions.,NLEM 2022 / openFDA,,,false
+combined oral contraceptive,other,Prevents pregnancy through hormonal control.,NLEM 2022 / openFDA,,,false
+levonorgestrel,other,Prevents pregnancy when taken after unprotected sex.,NLEM 2022 / openFDA,,,false
+clomifene,other,Stimulates ovulation to help women become pregnant.,NLEM 2022 / openFDA,,,false
+allopurinol,other,Lowers uric acid levels to prevent gout attacks.,NLEM 2022 / openFDA,,,false
+colchicine,other,Relieves the pain of acute gout attacks.,NLEM 2022 / openFDA,,,false
+febuxostat,other,Reduces uric acid levels to prevent gout.,NLEM 2022 / openFDA,,,false
+bisphosphonate alendronate,other,Strengthens bones and reduces the risk of fractures in osteoporosis.,NLEM 2022 / openFDA,,,false
+alendronate,other,Treats osteoporosis by slowing bone loss and increasing bone density.,NLEM 2022 / openFDA,,,false
+risedronate,other,Prevents bone loss and reduces fracture risk in osteoporosis.,NLEM 2022 / openFDA,,,false
+ibandronate,other,Treats and prevents osteoporosis in post-menopausal women.,NLEM 2022 / openFDA,,,false
+denosumab,other,Strengthens bones and reduces fracture risk in osteoporosis.,NLEM 2022 / openFDA,,,false
+calcitonin,other,Treats osteoporosis and Paget's disease of bone.,NLEM 2022 / openFDA,,,false
+lactulose,other,Softens stools to treat constipation.,NLEM 2022 / openFDA,,,false
+ispaghula husk,other,Adds bulk to stools to relieve constipation.,NLEM 2022 / openFDA,,,false
+bisacodyl,other,Stimulates the bowel to relieve short-term constipation.,NLEM 2022 / openFDA,,,false
+senna,other,Treats constipation by stimulating bowel movement.,NLEM 2022 / openFDA,,,false
+loperamide,other,Controls diarrhoea by slowing bowel movement.,NLEM 2022 / openFDA,,,false
+zinc oxide topical,other,Protects and soothes irritated or damaged skin.,NLEM 2022 / openFDA,,,false
+calamine,other,Relieves itching and soothes minor skin irritations.,NLEM 2022 / openFDA,,,false
+mupirocin,other,Treats bacterial skin infections including impetigo.,NLEM 2022 / openFDA,,,false
+silver sulfadiazine,other,Prevents and treats infection in burn wounds.,NLEM 2022 / openFDA,,,false
+acyclovir topical,other,Treats cold sores and herpes skin infections when applied directly.,NLEM 2022 / openFDA,,,false
+tretinoin,other,Treats acne and improves skin appearance.,NLEM 2022 / openFDA,,,false
+benzoyl peroxide,other,Kills acne-causing bacteria on the skin surface.,NLEM 2022 / openFDA,,,false
+adapalene,other,Treats acne by reducing inflammation and unclogging pores.,NLEM 2022 / openFDA,,,false
+minoxidil,other,Stimulates hair growth in male and female pattern baldness.,NLEM 2022 / openFDA,,,false
+latanoprost,other,Lowers pressure inside the eye to treat glaucoma.,NLEM 2022 / openFDA,,,false
+timolol eye drops,other,Reduces eye pressure in glaucoma.,NLEM 2022 / openFDA,,,false
+pilocarpine,other,Reduces eye pressure in glaucoma and treats dry mouth.,NLEM 2022 / openFDA,,,false
+dexamethasone eye,other,Reduces eye inflammation when applied as drops or ointment.,NLEM 2022 / openFDA,,,false
+ciprofloxacin eye drops,other,Treats bacterial eye infections with antibiotic drops.,NLEM 2022 / openFDA,,,false
+chloramphenicol eye,other,Treats bacterial conjunctivitis and other eye infections.,NLEM 2022 / openFDA,,,false
+artificial tears,other,Lubricates dry eyes to relieve irritation and discomfort.,NLEM 2022 / openFDA,,,false
+gentamicin,other,"Treats serious bacterial infections, often given by injection.",NLEM 2022 / openFDA,,,false
+tobramycin,other,"Treats bacterial infections, including in the eye and lung.",NLEM 2022 / openFDA,,,false
+amikacin,other,Treats serious bacterial infections resistant to other antibiotics.,NLEM 2022 / openFDA,,,false
+piperacillin tazobactam,other,Treats serious hospital-acquired bacterial infections.,NLEM 2022 / openFDA,,,false
+meropenem,other,Treats life-threatening bacterial infections with broad-spectrum coverage.,NLEM 2022 / openFDA,,,false
+imipenem cilastatin,other,Treats serious bacterial infections in hospital settings.,NLEM 2022 / openFDA,,,false
+colistin,other,Treats infections caused by highly resistant bacteria.,NLEM 2022 / openFDA,,,false
+rifaximin,other,Treats traveller's diarrhoea and reduces gut bacteria in liver disease.,NLEM 2022 / openFDA,,,false
+neomycin,other,Treats skin infections and is used to prepare the bowel for surgery.,NLEM 2022 / openFDA,,,false
+bacitracin,other,Treats minor bacterial skin infections and wounds.,NLEM 2022 / openFDA,,,false
+polymyxin b,other,Treats serious gram-negative bacterial infections.,NLEM 2022 / openFDA,,,false
+sodium cromoglycate,other,Prevents asthma and allergic rhinitis symptoms.,NLEM 2022 / openFDA,,,false
+ipratropium bromide,other,Relieves acute breathlessness in asthma and COPD.,NLEM 2022 / openFDA,,,false
+salbutamol inhaler,other,Opens the airways quickly during an asthma attack.,NLEM 2022 / openFDA,,,false
+terbutaline,other,Opens the airways to relieve asthma symptoms.,NLEM 2022 / openFDA,,,false
+doxofylline,other,Relaxes the airways to treat asthma and COPD.,NLEM 2022 / openFDA,,,false
+bromhexine,other,Loosens and thins mucus to make it easier to cough up.,NLEM 2022 / openFDA,,,false
+ambroxol,other,Thins mucus in the airways to ease breathing.,NLEM 2022 / openFDA,,,false
+guaifenesin,other,Thins and loosens mucus to relieve chest congestion.,NLEM 2022 / openFDA,,,false
+dextromethorphan,other,"Suppresses dry cough, especially at night.",NLEM 2022 / openFDA,,,false
+pseudoephedrine,other,Relieves nasal congestion by shrinking swollen blood vessels.,NLEM 2022 / openFDA,,,false
+xylometazoline,other,Decongests the nose quickly when applied as nasal drops.,NLEM 2022 / openFDA,,,false
+oxymetazoline,other,Relieves nasal stuffiness quickly for up to 12 hours.,NLEM 2022 / openFDA,,,false
+ipratropium nasal,other,Reduces a runny nose by drying up nasal secretions.,NLEM 2022 / openFDA,,,false
+nifedipine extended release,other,Provides prolonged blood pressure lowering and chest pain prevention.,NLEM 2022 / openFDA,,,false
+amlodipine besylate,other,Lowers blood pressure and prevents chest pain.,NLEM 2022 / openFDA,,,false
+prazosin,other,Lowers blood pressure and relieves urinary problems in enlarged prostate.,NLEM 2022 / openFDA,,,false
+doxazosin,other,Lowers blood pressure and relieves symptoms of enlarged prostate.,NLEM 2022 / openFDA,,,false
+clonidine,other,Lowers blood pressure and is used for certain pain conditions.,NLEM 2022 / openFDA,,,false
+methyldopa,other,"Controls blood pressure, especially during pregnancy.",NLEM 2022 / openFDA,,,false
+hydralazine,other,Lowers blood pressure by relaxing blood vessel walls.,NLEM 2022 / openFDA,,,false
+nitroprusside,other,Rapidly lowers dangerously high blood pressure in emergencies.,NLEM 2022 / openFDA,,,false
+atenolol tenormin,other,Controls blood pressure and heart rate.,NLEM 2022 / openFDA,,,false
+ivabradine,other,Reduces the heart rate in heart failure and stable angina.,NLEM 2022 / openFDA,,,false
+sacubitril valsartan,other,Treats heart failure by relaxing blood vessels and reducing fluid.,NLEM 2022 / openFDA,,,false
+eplerenone,other,Reduces fluid retention after heart attack and in heart failure.,NLEM 2022 / openFDA,,,false
+labetalol,other,Lowers blood pressure and is used for hypertensive emergencies.,NLEM 2022 / openFDA,,,false
+nicardipine,other,Lowers blood pressure and is used for angina.,NLEM 2022 / openFDA,,,false
+lercanidipine,other,Controls high blood pressure with once-daily dosing.,NLEM 2022 / openFDA,,,false
+mannitol,other,Reduces brain and eye pressure in acute emergencies.,NLEM 2022 / openFDA,,,false
+acetazolamide,other,Reduces eye pressure in glaucoma and prevents altitude sickness.,NLEM 2022 / openFDA,,,false
+desmopressin acetate,other,Treats bedwetting and water balance disorders.,NLEM 2022 / openFDA,,,false
+bromocriptine,other,"Treats Parkinson's disease, prolactin excess, and diabetes.",NLEM 2022 / openFDA,,,false
+cabergoline,other,Treats certain hormone imbalances and regulates pituitary hormone production.,NLEM 2022 / openFDA,,,false
+melatonin,other,Helps regulate sleep patterns and jet lag.,NLEM 2022 / openFDA,,,false
+sumatriptan,other,Relieves migraine headaches and associated symptoms.,NLEM 2022 / openFDA,,,false
+rizatriptan,other,Treats acute migraine attacks quickly.,NLEM 2022 / openFDA,,,false
+naratriptan,other,Relieves migraine with a longer-lasting but slower onset of action.,NLEM 2022 / openFDA,,,false
+flunarizine,other,Prevents migraine attacks and treats vertigo.,NLEM 2022 / openFDA,,,false
+betahistine,other,"Reduces vertigo, tinnitus, and hearing loss in Meniere's disease.",NLEM 2022 / openFDA,,,false
+clonazepam seizure,other,Prevents and controls seizures in epilepsy.,NLEM 2022 / openFDA,,,false
+vigabatrin,other,Treats difficult-to-control epilepsy.,NLEM 2022 / openFDA,,,false
+oxcarbazepine,other,Controls seizures in epilepsy.,NLEM 2022 / openFDA,,,false
+lacosamide,other,Helps control seizures in partial-onset epilepsy.,NLEM 2022 / openFDA,,,false
+zonisamide,other,Treats partial seizures in epilepsy.,NLEM 2022 / openFDA,,,false
+baclofen,other,Relieves muscle spasm and spasticity from neurological conditions.,NLEM 2022 / openFDA,,,false
+tizanidine,other,Reduces muscle spasms and stiffness.,NLEM 2022 / openFDA,,,false
+cyclobenzaprine,other,Relieves muscle spasm and associated pain.,NLEM 2022 / openFDA,,,false
+orphenadrine,other,Treats muscle pain and stiffness.,NLEM 2022 / openFDA,,,false
+pyridostigmine,other,Improves muscle strength in myasthenia gravis.,NLEM 2022 / openFDA,,,false
+azathioprine,other,Suppresses the immune system in autoimmune conditions and after transplants.,NLEM 2022 / openFDA,,,false
+ciclosporin,other,Prevents organ rejection after transplant and treats autoimmune diseases.,NLEM 2022 / openFDA,,,false
+mycophenolate,other,Prevents organ rejection in transplant patients.,NLEM 2022 / openFDA,,,false
+tacrolimus,other,Prevents rejection of transplanted organs.,NLEM 2022 / openFDA,,,false
+sulfasalazine,other,Treats inflammatory bowel disease and rheumatoid arthritis.,NLEM 2022 / openFDA,,,false
+mesalazine,other,Reduces inflammation in inflammatory bowel disease.,NLEM 2022 / openFDA,,,false
+infliximab,other,"Treats Crohn's disease, rheumatoid arthritis, and other inflammatory conditions.",NLEM 2022 / openFDA,,,false
+adalimumab,other,Reduces inflammation in rheumatoid arthritis and related conditions.,NLEM 2022 / openFDA,,,false
+etanercept,other,Treats rheumatoid arthritis and psoriasis by blocking inflammation.,NLEM 2022 / openFDA,,,false
+hydroxychloroquine rheumatoid,other,Reduces inflammation in rheumatoid arthritis and lupus.,NLEM 2022 / openFDA,,,false
+d-penicillamine,other,Reduces joint damage in rheumatoid arthritis and treats Wilson's disease.,NLEM 2022 / openFDA,,,false
+colchicine gout,other,Relieves gout attack pain and prevents recurrent attacks.,NLEM 2022 / openFDA,,,false
+indomethacin gout,other,Relieves acute gout attacks through anti-inflammatory action.,NLEM 2022 / openFDA,,,false
+sodium stibogluconate,other,"Treats leishmaniasis, a parasitic infection.",NLEM 2022 / openFDA,,,false
+amphotericin b,other,Treats serious and life-threatening fungal infections.,NLEM 2022 / openFDA,,,false
+voriconazole,other,Treats invasive fungal infections in immunocompromised patients.,NLEM 2022 / openFDA,,,false
+posaconazole,other,Prevents and treats serious invasive fungal infections.,NLEM 2022 / openFDA,,,false
+caspofungin,other,Treats serious fungal infections when other antifungals have failed.,NLEM 2022 / openFDA,,,false
+dolutegravir,other,Suppresses viral replication as part of combination antiviral therapy.,NLEM 2022 / openFDA,,,false
+tenofovir,other,Suppresses viral replication and helps protect liver health in antiviral therapy.,NLEM 2022 / openFDA,,,false
+lamivudine,other,Helps control viral replication as part of targeted antiviral treatment.,NLEM 2022 / openFDA,,,false
+efavirenz,other,Inhibits viral activity as part of combination antiviral therapy.,NLEM 2022 / openFDA,,,false
+lopinavir ritonavir,other,Helps control viral levels by inhibiting specific viral enzymes in combination therapy.,NLEM 2022 / openFDA,,,false
+zidovudine,other,Slows viral multiplication and helps prevent vertical transmission during pregnancy.,NLEM 2022 / openFDA,,,false
+sofosbuvir,other,Treats hepatitis C viral infection.,NLEM 2022 / openFDA,,,false
+ribavirin,other,Treats hepatitis C and certain other viral infections.,NLEM 2022 / openFDA,,,false
+entecavir,other,Treats chronic hepatitis B infection.,NLEM 2022 / openFDA,,,false
+adefovir,other,Treats chronic hepatitis B infection.,NLEM 2022 / openFDA,,,false
+clavulanic acid,antibiotic,Is combined with amoxicillin so that it keeps working against resistant bacteria.,NLEM 2022 / openFDA,,,false
+trimethoprim,antibiotic,Treats urinary tract and other bacterial infections.,NLEM 2022 / openFDA,,,false
+sulfamethoxazole,antibiotic,"Treats urinary tract and respiratory bacterial infections, usually together with trimethoprim.",NLEM 2022 / openFDA,,,false
+phenylephrine,other,Relieves a blocked nose caused by colds and allergies.,NLEM 2022 / openFDA,,,false
+serratiopeptidase,other,Used together with pain relievers to ease swelling after injury or surgery.,NLEM 2022 / openFDA,,,false
+ornidazole,other,Treats certain gut and gynaecological infections caused by protozoa and anaerobic bacteria.,NLEM 2022 / openFDA,,,false
+levosalbutamol,other,Opens the airways to ease breathing in asthma and similar conditions.,NLEM 2022 / openFDA,,,false
+caffeine,other,Is added to some pain relievers to help them work and to ease tiredness.,NLEM 2022 / openFDA,,,false
+fentanyl,opioid_analgesic,Manages severe persistent pain when continuous relief is required.,NLEM 2022 / openFDA,,,false
+oxycodone,opioid_analgesic,Relieves moderate to severe pain when non-opioid medicines are inadequate.,NLEM 2022 / openFDA,,,false
+tapentadol,opioid_analgesic,Treats moderate to severe acute pain and neuropathic discomfort.,NLEM 2022 / openFDA,,,false
+buprenorphine,opioid_analgesic,Manages chronic severe pain and supports specialized therapies.,NLEM 2022 / openFDA,,,false

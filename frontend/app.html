@@ -49,7 +49,7 @@
     }
     main {
       flex: 1;
-      max-width: 960px;
+      max-width: 1100px;
       margin: 40px auto;
       padding: 0 20px;
       width: 100%;
@@ -102,12 +102,13 @@
       <div id="upload-zone" style="border:2px dashed var(--border);border-radius:8px;padding:40px;text-align:center;margin:24px 0">
         <p style="margin:0 0 12px">Drag and drop prescription image here, or click to upload</p>
         <input type="file" id="file-input" style="display:none" accept="image/*,application/pdf">
-        <button class="btn" onclick="document.getElementById('file-input').click()">Select File</button>
+        <label for="file-input" class="btn" id="select-file-label" style="cursor:pointer">Select File</label>
       </div>
     </div>
   </main>
   <footer>
     Dosely is not medical advice. Always follow your doctor's instructions.
   </footer>
+  <script src="/static/app.js"></script>
 </body>
 </html>

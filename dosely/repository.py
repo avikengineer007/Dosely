@@ -539,10 +539,10 @@ class PrescriptionRepository:
 
             with conn:
                 placeholders = ",".join("?" for _ in ids)
-                conn.execute(f"DELETE FROM dose_logs WHERE prescription_id IN ({placeholders})", ids)
-                conn.execute(f"DELETE FROM reminders WHERE prescription_id IN ({placeholders})", ids)
-                conn.execute(f"DELETE FROM feedback_reports WHERE prescription_id IN ({placeholders})", ids)
-                conn.execute(f"DELETE FROM prescriptions WHERE id IN ({placeholders})", ids)
+                conn.execute(f"DELETE FROM dose_logs WHERE prescription_id IN ({placeholders})", ids)  # nosec: B608
+                conn.execute(f"DELETE FROM reminders WHERE prescription_id IN ({placeholders})", ids)  # nosec: B608
+                conn.execute(f"DELETE FROM feedback_reports WHERE prescription_id IN ({placeholders})", ids)  # nosec: B608
+                conn.execute(f"DELETE FROM prescriptions WHERE id IN ({placeholders})", ids)  # nosec: B608
 
             for img_p in image_paths:
                 if storage is not None:

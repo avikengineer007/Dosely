@@ -50,6 +50,7 @@ export default function ConfirmScreen({
           id: `med-${idx}`,
           name_raw: m.name_raw || "",
           name_generic: m.name_generic || "",
+          ingredients: m.ingredients || [],
           suggested_generic: m.suggested_generic || null,
           suggested_class: m.suggested_class || null,
           lasa_warning: m.lasa_warning || null,
@@ -59,7 +60,7 @@ export default function ConfirmScreen({
           duration_days: m.duration_days || "",
           food_instruction: m.food_instruction || "unknown",
           confidence: m.confidence || 0,
-          needs_review: Boolean(m.needs_review || m.suggested_generic),
+          needs_review: Boolean(m.needs_review || m.suggested_generic || (m.ingredients && m.ingredients.length > 1)),
           review_reasons: m.review_reasons || [],
           // Review state
           user_accepted: false,
@@ -241,6 +242,18 @@ export default function ConfirmScreen({
                       Confidence: {Math.round(med.confidence * 100)}%
                     </span>
                   </div>
+
+                  {/* Combination product ingredients notice */}
+                  {med.ingredients && med.ingredients.length > 1 && (
+                    <div className="combination-box" style={{ background: "#e6f7ff", border: "1px solid #91d5ff", padding: "10px 12px", borderRadius: "8px", margin: "10px 0" }}>
+                      <p style={{ margin: 0, fontWeight: 600, color: "#0050b3" }}>
+                        Contains: {med.ingredients.map(i => i.generic || i).join(" + ")}
+                      </p>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#595959" }}>
+                        Please review each active ingredient before confirming.
+                      </p>
+                    </div>
+                  )}
 
                   {/* Amber alert reasons */}
                   {isFlagged && (

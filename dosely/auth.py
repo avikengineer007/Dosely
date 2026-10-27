@@ -19,9 +19,14 @@ from typing import Any, Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "matra-dev-secret-key-change-in-prod-32bytes-min")
+from dosely.storage import init_secrets
+
 ALGORITHM: str = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
+
+
+def _get_secret_key() -> str:
+    return init_secrets()[1]
 
 security_bearer = HTTPBearer(auto_error=False)
 
@@ -55,7 +60,7 @@ def create_access_token(
     payload_b64 = _b64encode(json.dumps(to_encode, separators=(",", ":")).encode("utf-8"))
 
     signing_input = f"{header_b64}.{payload_b64}".encode("utf-8")
-    signature = hmac.new(SECRET_KEY.encode("utf-8"), signing_input, hashlib.sha256).digest()
+    signature = hmac.new(_get_secret_key().encode("utf-8"), signing_input, hashlib.sha256).digest()
     sig_b64 = _b64encode(signature)
 
     return f"{header_b64}.{payload_b64}.{sig_b64}"
@@ -73,7 +78,7 @@ def decode_access_token(token: str) -> dict[str, Any]:
 
     header_b64, payload_b64, sig_b64 = parts
     signing_input = f"{header_b64}.{payload_b64}".encode("utf-8")
-    expected_sig = hmac.new(SECRET_KEY.encode("utf-8"), signing_input, hashlib.sha256).digest()
+    expected_sig = hmac.new(_get_secret_key().encode("utf-8"), signing_input, hashlib.sha256).digest()
     expected_sig_b64 = _b64encode(expected_sig)
 
     if not hmac.compare_digest(sig_b64, expected_sig_b64):

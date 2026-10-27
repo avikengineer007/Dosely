@@ -87,11 +87,11 @@ class MedicationScheduler:
         """
         all_entries: list[ScheduleEntry] = []
 
-        for drug in drugs:
+        for line_id, drug in enumerate(drugs):
             if drug.frequency_raw is not None and drug.frequency_raw.strip():
-                entries = self._from_prescription(drug)
+                entries = self._from_prescription(drug, line_id=line_id)
             else:
-                entries = self._from_default(drug)
+                entries = self._from_default(drug, line_id=line_id)
             all_entries.extend(entries)
 
         # Sort: timed entries by HH:MM, as-needed at the end
@@ -117,9 +117,12 @@ class MedicationScheduler:
     # Private: prescription-driven scheduling
     # ------------------------------------------------------------------
 
-    def _from_prescription(self, drug: DrugInput) -> list[ScheduleEntry]:
+    def _from_prescription(self, drug: DrugInput, line_id: Optional[int] = None) -> list[ScheduleEntry]:
         """Schedule a drug whose frequency_raw is present."""
         freq: FrequencyResult = parse_frequency(drug.frequency_raw)  # type: ignore[arg-type]
+
+        ing_names = [i["generic"] for i in drug.ingredients] if drug.ingredients else []
+        ing_classes = {i["generic"]: i.get("drug_class", "unknown") for i in drug.ingredients} if drug.ingredients else {}
 
         if freq.code in (FREQ_SOS, FREQ_UNKNOWN):
             return [ScheduleEntry(
@@ -130,6 +133,9 @@ class MedicationScheduler:
                 source="prescription",
                 suggested=False,
                 drug_class=drug.drug_class,
+                ingredients=ing_names,
+                ingredient_classes=ing_classes,
+                line_id=line_id,
             )]
 
         time_instrs = resolve_slots(
@@ -147,6 +153,9 @@ class MedicationScheduler:
                 source="prescription",
                 suggested=False,
                 drug_class=drug.drug_class,
+                ingredients=ing_names,
+                ingredient_classes=ing_classes,
+                line_id=line_id,
             )
             for t, instr in time_instrs
         ]
@@ -155,13 +164,19 @@ class MedicationScheduler:
     # Private: default-rule scheduling
     # ------------------------------------------------------------------
 
-    def _from_default(self, drug: DrugInput) -> list[ScheduleEntry]:
+    def _from_default(self, drug: DrugInput, line_id: Optional[int] = None) -> list[ScheduleEntry]:
         """
         Schedule a drug using built-in class-based default rules.
 
+        For combination products, apply the most conservative timing rule once.
         All entries produced here carry source="default", suggested=True.
         """
-        if drug.drug_class == "unknown":
+        ing_names = [i["generic"] for i in drug.ingredients] if drug.ingredients else []
+        ing_classes = {i["generic"]: i.get("drug_class", "unknown") for i in drug.ingredients} if drug.ingredients else {}
+
+        # If any ingredient is unknown or product class is unknown, no default timing
+        has_unknown_ing = any(i.get("drug_class") == "unknown" for i in drug.ingredients) if drug.ingredients else False
+        if drug.drug_class == "unknown" or has_unknown_ing:
             return [ScheduleEntry(
                 time="as needed",
                 drug=drug.name,
@@ -169,10 +184,26 @@ class MedicationScheduler:
                 source="default",
                 suggested=True,
                 drug_class="unknown",
+                ingredients=ing_names,
+                ingredient_classes=ing_classes,
+                line_id=line_id,
             )]
 
+        # Determine most conservative class among ingredients
+        classes = [i.get("drug_class", "").lower() for i in drug.ingredients] if drug.ingredients else [drug.drug_class.lower()]
+        if any(c in ("analgesic_nsaid", "nsaid") for c in classes):
+            chosen_class = "analgesic_nsaid"
+        elif any(c in ("antibiotic", "antibiotics") for c in classes):
+            chosen_class = "antibiotic"
+        elif any(c in ("antihistamine", "antihistamines") for c in classes):
+            chosen_class = "antihistamine"
+        elif any(c in ("antacid_ppi", "ppi", "antacid") for c in classes):
+            chosen_class = "antacid_ppi"
+        else:
+            chosen_class = drug.drug_class
+
         time_instrs = apply_default_rule(
-            drug.drug_class,
+            chosen_class,
             drug.name,
             self._config,
         )
@@ -185,18 +216,23 @@ class MedicationScheduler:
                 instruction=instr,
                 source="default",
                 suggested=True,
-                drug_class=drug.drug_class,
+                drug_class=chosen_class,
+                ingredients=ing_names,
+                ingredient_classes=ing_classes,
+                line_id=line_id,
             ))
 
         if not entries:
-            # Should never happen; safety net
             entries.append(ScheduleEntry(
-                time=self._fmt(self._config.wake_time),
+                time="as needed",
                 drug=drug.name,
-                instruction="Take as directed by your doctor",
+                instruction="Unresolved medicine — no default timing applied; consult doctor or pharmacist",
                 source="default",
                 suggested=True,
-                drug_class=drug.drug_class,
+                drug_class=chosen_class,
+                ingredients=ing_names,
+                ingredient_classes=ing_classes,
+                line_id=line_id,
             ))
 
         return entries

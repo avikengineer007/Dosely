@@ -278,14 +278,9 @@ def apply_default_rule(
     dc = drug_class.lower()
     name_lower = drug_name.lower()
 
-    if dc in ("antacid_ppi", "ppi") or any(
-        p in name_lower for p in ("omeprazole", "pantoprazole", "rabeprazole", "esomeprazole", "lansoprazole")
-    ):
-        t = _add_minutes(config.breakfast_time, -30)
-        return [(t, "Take 30 minutes before breakfast — on an empty stomach")]
-
-    if dc in ("analgesic_nsaid", "nsaid") or any(
-        n in name_lower for n in ("ibuprofen", "diclofenac", "naproxen", "paracetamol", "aspirin", "aceclofenac")
+    if dc in ("analgesic_nsaid", "nsaid") or (
+        dc not in ("antacid_ppi", "ppi", "antibiotic", "antibiotics", "antihistamine", "antihistamines")
+        and any(n in name_lower for n in ("ibuprofen", "diclofenac", "naproxen", "paracetamol", "aspirin", "aceclofenac"))
     ):
         # Default: after lunch and after dinner (BD after food)
         t_lunch  = _add_minutes(config.lunch_time,  30)
@@ -295,8 +290,16 @@ def apply_default_rule(
             (t_dinner, "Take after dinner"),
         ]
 
-    if dc in ("antibiotic", "antibiotics") or any(
-        a in name_lower for a in ("amoxicillin", "azithromycin", "ciprofloxacin", "metronidazole", "doxycycline")
+    if dc in ("antacid_ppi", "ppi") or (
+        dc not in ("antibiotic", "antibiotics", "antihistamine", "antihistamines")
+        and any(p in name_lower for p in ("omeprazole", "pantoprazole", "rabeprazole", "esomeprazole", "lansoprazole"))
+    ):
+        t = _add_minutes(config.breakfast_time, -30)
+        return [(t, "Take 30 minutes before breakfast — on an empty stomach")]
+
+    if dc in ("antibiotic", "antibiotics") or (
+        dc not in ("antihistamine", "antihistamines")
+        and any(a in name_lower for a in ("amoxicillin", "azithromycin", "ciprofloxacin", "metronidazole", "doxycycline"))
     ):
         # Evenly spaced intervals across waking hours
         wake_dt  = datetime(2000, 1, 1, config.wake_time.hour,  config.wake_time.minute)
@@ -322,9 +325,9 @@ def apply_default_rule(
         else:
             return [(config.wake_time, "Take in the morning")]
 
-    if dc == "unknown":
+    if dc in ("unknown", "other", "opioid_analgesic"):
         return []
 
-    # Catch-all for "other"
-    return [(config.wake_time, "Take in the morning as directed")]
+    # Catch-all: no default timing for unsupported classes
+    return []
 

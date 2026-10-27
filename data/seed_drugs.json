@@ -1,405 +1,2067 @@
 [
-  {"generic": "ibuprofen",                    "class": "analgesic_nsaid",  "purpose_plain": "Relieves pain, fever, and swelling."},
-  {"generic": "paracetamol",                  "class": "analgesic_nsaid",  "purpose_plain": "Reduces fever and eases mild to moderate pain."},
-  {"generic": "acetaminophen",                "class": "analgesic_nsaid",  "purpose_plain": "Reduces fever and eases mild to moderate pain."},
-  {"generic": "diclofenac",                   "class": "analgesic_nsaid",  "purpose_plain": "Eases pain and reduces inflammation in joints and muscles."},
-  {"generic": "naproxen",                     "class": "analgesic_nsaid",  "purpose_plain": "Relieves pain, swelling, and stiffness."},
-  {"generic": "aspirin",                      "class": "analgesic_nsaid",  "purpose_plain": "Relieves pain and reduces fever; also thins the blood at low doses."},
-  {"generic": "celecoxib",                    "class": "analgesic_nsaid",  "purpose_plain": "Reduces pain and inflammation with less stomach irritation."},
-  {"generic": "etoricoxib",                   "class": "analgesic_nsaid",  "purpose_plain": "Eases joint pain and inflammation in arthritis."},
-  {"generic": "mefenamic acid",               "class": "analgesic_nsaid",  "purpose_plain": "Relieves mild to moderate pain, including period pain."},
-  {"generic": "ketorolac",                    "class": "analgesic_nsaid",  "purpose_plain": "Provides short-term relief of moderate to severe pain."},
-  {"generic": "tramadol",                     "class": "analgesic_nsaid",  "purpose_plain": "Treats moderate to severe pain when other pain relievers are not enough."},
-  {"generic": "morphine",                     "class": "analgesic_nsaid",  "purpose_plain": "Manages severe pain, including cancer-related pain."},
-  {"generic": "codeine",                      "class": "analgesic_nsaid",  "purpose_plain": "Relieves mild to moderate pain and suppresses cough."},
-  {"generic": "indomethacin",                 "class": "analgesic_nsaid",  "purpose_plain": "Reduces inflammation and pain in joints and muscles."},
-  {"generic": "piroxicam",                    "class": "analgesic_nsaid",  "purpose_plain": "Eases arthritis pain and reduces swelling in joints."},
-  {"generic": "aceclofenac",                  "class": "analgesic_nsaid",  "purpose_plain": "Relieves pain and inflammation in arthritis and musculoskeletal conditions."},
-  {"generic": "nimesulide",                   "class": "analgesic_nsaid",  "purpose_plain": "Reduces pain and inflammation with a relatively quick onset."},
-  {"generic": "flurbiprofen",                 "class": "analgesic_nsaid",  "purpose_plain": "Treats pain and inflammation in joints and soft tissues."},
-  {"generic": "meloxicam",                    "class": "analgesic_nsaid",  "purpose_plain": "Eases joint pain in osteoarthritis and rheumatoid arthritis."},
-  {"generic": "ketoprofen",                   "class": "analgesic_nsaid",  "purpose_plain": "Relieves pain and reduces inflammation in joints and muscles."},
-  {"generic": "sulindac",                     "class": "analgesic_nsaid",  "purpose_plain": "Treats pain and swelling in arthritis and related conditions."},
-  {"generic": "oxaprozin",                    "class": "analgesic_nsaid",  "purpose_plain": "Eases osteoarthritis and rheumatoid arthritis pain."},
-  {"generic": "etodolac",                     "class": "analgesic_nsaid",  "purpose_plain": "Relieves pain and inflammation in arthritis."},
-  {"generic": "diflunisal",                   "class": "analgesic_nsaid",  "purpose_plain": "Treats mild to moderate pain and reduces fever."},
-  {"generic": "parecoxib",                    "class": "analgesic_nsaid",  "purpose_plain": "Provides short-term pain relief after surgery with minimal stomach side effects."},
-  {"generic": "omeprazole",                   "class": "antacid_ppi",      "purpose_plain": "Reduces stomach acid to treat heartburn and ulcers."},
-  {"generic": "pantoprazole",                 "class": "antacid_ppi",      "purpose_plain": "Lowers stomach acid to heal acid reflux and stomach ulcers."},
-  {"generic": "esomeprazole",                 "class": "antacid_ppi",      "purpose_plain": "Controls excess stomach acid and relieves heartburn."},
-  {"generic": "rabeprazole",                  "class": "antacid_ppi",      "purpose_plain": "Reduces acid in the stomach to treat reflux and ulcers."},
-  {"generic": "lansoprazole",                 "class": "antacid_ppi",      "purpose_plain": "Decreases stomach acid to protect the stomach lining."},
-  {"generic": "dexlansoprazole",              "class": "antacid_ppi",      "purpose_plain": "Controls acid reflux by reducing stomach acid production."},
-  {"generic": "ranitidine",                   "class": "antacid_ppi",      "purpose_plain": "Reduces stomach acid to relieve indigestion and heartburn."},
-  {"generic": "famotidine",                   "class": "antacid_ppi",      "purpose_plain": "Decreases stomach acid for heartburn and acid reflux relief."},
-  {"generic": "aluminium hydroxide",          "class": "antacid_ppi",      "purpose_plain": "Neutralises excess stomach acid to ease indigestion quickly."},
-  {"generic": "magnesium hydroxide",          "class": "antacid_ppi",      "purpose_plain": "Quickly neutralises stomach acid and relieves indigestion."},
-  {"generic": "sodium bicarbonate",           "class": "antacid_ppi",      "purpose_plain": "Temporarily neutralises stomach acid for rapid heartburn relief."},
-  {"generic": "sucralfate",                   "class": "antacid_ppi",      "purpose_plain": "Coats and protects the stomach lining to help ulcers heal."},
-  {"generic": "cimetidine",                   "class": "antacid_ppi",      "purpose_plain": "Reduces stomach acid production to relieve heartburn and ulcers."},
-  {"generic": "nizatidine",                   "class": "antacid_ppi",      "purpose_plain": "Lowers stomach acid for heartburn and stomach ulcer treatment."},
-  {"generic": "calcium carbonate",            "class": "antacid_ppi",      "purpose_plain": "Quickly neutralises stomach acid and provides calcium supplementation."},
-  {"generic": "domperidone",                  "class": "antacid_ppi",      "purpose_plain": "Relieves nausea and helps food move normally through the stomach."},
-  {"generic": "metoclopramide",               "class": "antacid_ppi",      "purpose_plain": "Reduces nausea and helps the stomach empty more quickly."},
-  {"generic": "amoxicillin",                  "class": "antibiotic",       "purpose_plain": "Kills bacteria to treat common infections."},
-  {"generic": "amoxicillin clavulanate",      "class": "antibiotic",       "purpose_plain": "Kills a broader range of bacteria, including resistant ones."},
-  {"generic": "azithromycin",                 "class": "antibiotic",       "purpose_plain": "Treats bacterial infections including chest and throat infections."},
-  {"generic": "clarithromycin",               "class": "antibiotic",       "purpose_plain": "Fights bacterial infections of the lungs, sinuses, and skin."},
-  {"generic": "ciprofloxacin",                "class": "antibiotic",       "purpose_plain": "Treats urinary tract and other bacterial infections."},
-  {"generic": "levofloxacin",                 "class": "antibiotic",       "purpose_plain": "Kills bacteria causing chest, urinary, and skin infections."},
-  {"generic": "doxycycline",                  "class": "antibiotic",       "purpose_plain": "Treats bacterial infections including acne and chest infections."},
-  {"generic": "metronidazole",                "class": "antibiotic",       "purpose_plain": "Clears bacterial and parasitic infections in the gut and elsewhere."},
-  {"generic": "cefixime",                     "class": "antibiotic",       "purpose_plain": "Treats bacterial infections of the ear, throat, and urinary tract."},
-  {"generic": "cefuroxime",                   "class": "antibiotic",       "purpose_plain": "Fights a wide range of bacterial infections."},
-  {"generic": "cephalexin",                   "class": "antibiotic",       "purpose_plain": "Treats skin, bone, and respiratory tract bacterial infections."},
-  {"generic": "clindamycin",                  "class": "antibiotic",       "purpose_plain": "Fights bacterial infections, including serious skin infections."},
-  {"generic": "trimethoprim sulfamethoxazole","class": "antibiotic",       "purpose_plain": "Treats urinary tract and respiratory bacterial infections."},
-  {"generic": "nitrofurantoin",               "class": "antibiotic",       "purpose_plain": "Treats and prevents bacterial urinary tract infections."},
-  {"generic": "penicillin v",                 "class": "antibiotic",       "purpose_plain": "Treats common bacterial infections such as strep throat."},
-  {"generic": "erythromycin",                 "class": "antibiotic",       "purpose_plain": "Fights bacterial infections in patients allergic to penicillin."},
-  {"generic": "tetracycline",                 "class": "antibiotic",       "purpose_plain": "Treats acne and various bacterial infections."},
-  {"generic": "minocycline",                  "class": "antibiotic",       "purpose_plain": "Treats acne, skin infections, and certain bacterial illnesses."},
-  {"generic": "ofloxacin",                    "class": "antibiotic",       "purpose_plain": "Kills bacteria causing eye, ear, and urinary tract infections."},
-  {"generic": "norfloxacin",                  "class": "antibiotic",       "purpose_plain": "Treats urinary tract and gastrointestinal bacterial infections."},
-  {"generic": "moxifloxacin",                 "class": "antibiotic",       "purpose_plain": "Treats chest infections and bacterial conjunctivitis."},
-  {"generic": "ceftriaxone",                  "class": "antibiotic",       "purpose_plain": "Used by injection to treat serious bacterial infections."},
-  {"generic": "cefpodoxime",                  "class": "antibiotic",       "purpose_plain": "Treats respiratory tract, urinary, and skin bacterial infections."},
-  {"generic": "cefadroxil",                   "class": "antibiotic",       "purpose_plain": "Treats skin, throat, and urinary tract bacterial infections."},
-  {"generic": "cefazolin",                    "class": "antibiotic",       "purpose_plain": "Prevents and treats bacterial infections, often used around surgery."},
-  {"generic": "cefdinir",                     "class": "antibiotic",       "purpose_plain": "Treats ear, sinus, throat, and skin bacterial infections."},
-  {"generic": "vancomycin",                   "class": "antibiotic",       "purpose_plain": "Treats serious bacterial infections resistant to other antibiotics."},
-  {"generic": "linezolid",                    "class": "antibiotic",       "purpose_plain": "Treats drug-resistant bacterial infections including MRSA."},
-  {"generic": "rifampicin",                   "class": "antibiotic",       "purpose_plain": "Treats tuberculosis and other serious bacterial infections."},
-  {"generic": "isoniazid",                    "class": "antibiotic",       "purpose_plain": "Treats and prevents tuberculosis infection."},
-  {"generic": "pyrazinamide",                 "class": "antibiotic",       "purpose_plain": "Used in combination to treat active tuberculosis."},
-  {"generic": "ethambutol",                   "class": "antibiotic",       "purpose_plain": "Used alongside other medicines to treat tuberculosis."},
-  {"generic": "tinidazole",                   "class": "antibiotic",       "purpose_plain": "Treats gut and genital infections caused by bacteria and parasites."},
-  {"generic": "flucloxacillin",               "class": "antibiotic",       "purpose_plain": "Treats skin and soft tissue infections caused by staphylococci."},
-  {"generic": "cetirizine",                   "class": "antihistamine",    "purpose_plain": "Relieves allergy symptoms like sneezing, runny nose, and itchy eyes."},
-  {"generic": "loratadine",                   "class": "antihistamine",    "purpose_plain": "Eases allergy symptoms without causing significant drowsiness."},
-  {"generic": "fexofenadine",                 "class": "antihistamine",    "purpose_plain": "Relieves hay fever and allergy symptoms without drowsiness."},
-  {"generic": "desloratadine",                "class": "antihistamine",    "purpose_plain": "Controls allergy symptoms including hives and nasal congestion."},
-  {"generic": "levocetirizine",               "class": "antihistamine",    "purpose_plain": "Relieves sneezing, itching, and other allergy symptoms."},
-  {"generic": "diphenhydramine",              "class": "antihistamine",    "purpose_plain": "Relieves allergy symptoms and helps with sleep."},
-  {"generic": "chlorpheniramine",             "class": "antihistamine",    "purpose_plain": "Eases sneezing, runny nose, and allergic reactions."},
-  {"generic": "azelastine",                   "class": "antihistamine",    "purpose_plain": "Relieves nasal allergy symptoms when sprayed in the nose."},
-  {"generic": "bilastine",                    "class": "antihistamine",    "purpose_plain": "Relieves allergy symptoms including hives and hay fever."},
-  {"generic": "rupatadine",                   "class": "antihistamine",    "purpose_plain": "Eases allergic rhinitis and hives symptoms."},
-  {"generic": "mizolastine",                  "class": "antihistamine",    "purpose_plain": "Treats hay fever, hives, and other allergic conditions."},
-  {"generic": "olopatadine",                  "class": "antihistamine",    "purpose_plain": "Relieves eye itching and redness caused by allergies."},
-  {"generic": "ebastine",                     "class": "antihistamine",    "purpose_plain": "Treats hay fever and hives with minimal drowsiness."},
-  {"generic": "ketotifen",                    "class": "antihistamine",    "purpose_plain": "Prevents asthma and allergic reactions over the long term."},
-  {"generic": "promethazine",                 "class": "antihistamine",    "purpose_plain": "Relieves allergy symptoms and prevents motion sickness."},
-  {"generic": "meclizine",                    "class": "antihistamine",    "purpose_plain": "Prevents nausea and dizziness from motion sickness."},
-  {"generic": "doxylamine",                   "class": "antihistamine",    "purpose_plain": "Relieves allergy symptoms and helps with sleep."},
-  {"generic": "cyproheptadine",               "class": "antihistamine",    "purpose_plain": "Relieves allergy symptoms and may stimulate appetite."},
-  {"generic": "trimeprazine",                 "class": "antihistamine",    "purpose_plain": "Relieves itching and runny nose due to allergies."},
-  {"generic": "metformin",                    "class": "other",            "purpose_plain": "Helps control blood sugar levels in type 2 diabetes."},
-  {"generic": "methotrexate",                 "class": "other",            "purpose_plain": "Used to treat certain cancers and autoimmune conditions."},
-  {"generic": "atorvastatin",                 "class": "other",            "purpose_plain": "Lowers cholesterol to reduce the risk of heart disease."},
-  {"generic": "amlodipine",                   "class": "other",            "purpose_plain": "Relaxes blood vessels to lower blood pressure and treat chest pain."},
-  {"generic": "losartan",                     "class": "other",            "purpose_plain": "Lowers blood pressure by relaxing blood vessels."},
-  {"generic": "glibenclamide",                "class": "other",            "purpose_plain": "Stimulates the pancreas to release insulin and lower blood sugar."},
-  {"generic": "levothyroxine",                "class": "other",            "purpose_plain": "Replaces thyroid hormone when the thyroid does not produce enough."},
-  {"generic": "warfarin",                     "class": "other",            "purpose_plain": "Thins the blood to prevent harmful clots from forming."},
-  {"generic": "prednisolone",                 "class": "other",            "purpose_plain": "Reduces inflammation and suppresses overactive immune responses."},
-  {"generic": "salbutamol",                   "class": "other",            "purpose_plain": "Opens the airways quickly to relieve breathlessness and wheezing."},
-  {"generic": "fluoxetine",                   "class": "other",            "purpose_plain": "Treats depression and anxiety by balancing brain chemicals."},
-  {"generic": "sertraline",                   "class": "other",            "purpose_plain": "Helps manage depression, anxiety, and related conditions."},
-  {"generic": "simvastatin",                  "class": "other",            "purpose_plain": "Lowers blood cholesterol to reduce the risk of heart problems."},
-  {"generic": "rosuvastatin",                 "class": "other",            "purpose_plain": "Reduces bad cholesterol and lowers the risk of heart disease."},
-  {"generic": "pravastatin",                  "class": "other",            "purpose_plain": "Lowers cholesterol and helps prevent heart attacks and strokes."},
-  {"generic": "lovastatin",                   "class": "other",            "purpose_plain": "Reduces high cholesterol to lower the risk of heart disease."},
-  {"generic": "fluvastatin",                  "class": "other",            "purpose_plain": "Lowers cholesterol levels to protect the heart."},
-  {"generic": "pitavastatin",                 "class": "other",            "purpose_plain": "Treats high cholesterol and reduces cardiovascular risk."},
-  {"generic": "enalapril",                    "class": "other",            "purpose_plain": "Lowers blood pressure and helps protect the heart and kidneys."},
-  {"generic": "lisinopril",                   "class": "other",            "purpose_plain": "Reduces blood pressure and is used in heart failure treatment."},
-  {"generic": "ramipril",                     "class": "other",            "purpose_plain": "Lowers blood pressure and reduces the risk of heart attack and stroke."},
-  {"generic": "perindopril",                  "class": "other",            "purpose_plain": "Treats high blood pressure and reduces the risk of heart disease."},
-  {"generic": "telmisartan",                  "class": "other",            "purpose_plain": "Lowers blood pressure by blocking a chemical that tightens blood vessels."},
-  {"generic": "valsartan",                    "class": "other",            "purpose_plain": "Reduces blood pressure and is used in heart failure."},
-  {"generic": "candesartan",                  "class": "other",            "purpose_plain": "Lowers blood pressure and protects the heart and kidneys."},
-  {"generic": "olmesartan",                   "class": "other",            "purpose_plain": "Controls high blood pressure to reduce the risk of stroke."},
-  {"generic": "irbesartan",                   "class": "other",            "purpose_plain": "Lowers blood pressure and protects kidneys in diabetes."},
-  {"generic": "bisoprolol",                   "class": "other",            "purpose_plain": "Slows the heart rate and reduces blood pressure."},
-  {"generic": "metoprolol",                   "class": "other",            "purpose_plain": "Lowers blood pressure and heart rate; used in heart conditions."},
-  {"generic": "atenolol",                     "class": "other",            "purpose_plain": "Reduces blood pressure and controls heart rate."},
-  {"generic": "carvedilol",                   "class": "other",            "purpose_plain": "Treats heart failure and high blood pressure."},
-  {"generic": "propranolol",                  "class": "other",            "purpose_plain": "Slows the heart rate and reduces blood pressure."},
-  {"generic": "nebivolol",                    "class": "other",            "purpose_plain": "Lowers blood pressure and reduces strain on the heart."},
-  {"generic": "hydrochlorothiazide",          "class": "other",            "purpose_plain": "Removes excess fluid from the body to lower blood pressure."},
-  {"generic": "furosemide",                   "class": "other",            "purpose_plain": "Helps the body remove excess fluid to treat fluid retention."},
-  {"generic": "spironolactone",               "class": "other",            "purpose_plain": "Removes excess fluid and treats heart failure and high blood pressure."},
-  {"generic": "torsemide",                    "class": "other",            "purpose_plain": "Treats fluid build-up in heart failure and kidney disease."},
-  {"generic": "indapamide",                   "class": "other",            "purpose_plain": "Lowers blood pressure and reduces fluid retention."},
-  {"generic": "chlorthalidone",               "class": "other",            "purpose_plain": "Reduces blood pressure and swelling from fluid retention."},
-  {"generic": "nifedipine",                   "class": "other",            "purpose_plain": "Relaxes blood vessels to lower blood pressure and relieve chest pain."},
-  {"generic": "diltiazem",                    "class": "other",            "purpose_plain": "Lowers blood pressure and heart rate; treats chest pain."},
-  {"generic": "verapamil",                    "class": "other",            "purpose_plain": "Controls heart rhythm and lowers blood pressure."},
-  {"generic": "felodipine",                   "class": "other",            "purpose_plain": "Relaxes blood vessels to treat high blood pressure."},
-  {"generic": "isradipine",                   "class": "other",            "purpose_plain": "Lowers blood pressure by relaxing blood vessel walls."},
-  {"generic": "nitroglycerine",               "class": "other",            "purpose_plain": "Relieves chest pain by widening blood vessels to the heart."},
-  {"generic": "isosorbide mononitrate",       "class": "other",            "purpose_plain": "Prevents and relieves chest pain by relaxing blood vessels."},
-  {"generic": "isosorbide dinitrate",         "class": "other",            "purpose_plain": "Treats and prevents angina chest pain."},
-  {"generic": "digoxin",                      "class": "other",            "purpose_plain": "Strengthens the heartbeat and controls heart rate in certain conditions."},
-  {"generic": "amiodarone",                   "class": "other",            "purpose_plain": "Controls abnormal heart rhythms when other medicines have not worked."},
-  {"generic": "clopidogrel",                  "class": "other",            "purpose_plain": "Prevents blood clots and reduces the risk of heart attack and stroke."},
-  {"generic": "aspirin low dose",             "class": "other",            "purpose_plain": "Used at low doses to thin the blood and prevent heart attacks."},
-  {"generic": "heparin",                      "class": "other",            "purpose_plain": "Prevents and treats dangerous blood clots."},
-  {"generic": "enoxaparin",                   "class": "other",            "purpose_plain": "Prevents blood clots after surgery and in other high-risk situations."},
-  {"generic": "rivaroxaban",                  "class": "other",            "purpose_plain": "Prevents blood clots and reduces the risk of stroke."},
-  {"generic": "apixaban",                     "class": "other",            "purpose_plain": "Reduces the risk of stroke and blood clots."},
-  {"generic": "dabigatran",                   "class": "other",            "purpose_plain": "Prevents blood clots, especially in patients with irregular heartbeat."},
-  {"generic": "glipizide",                    "class": "other",            "purpose_plain": "Lowers blood sugar in type 2 diabetes by stimulating insulin release."},
-  {"generic": "gliclazide",                   "class": "other",            "purpose_plain": "Helps control blood sugar levels in type 2 diabetes."},
-  {"generic": "glimepiride",                  "class": "other",            "purpose_plain": "Stimulates insulin release to lower blood sugar in type 2 diabetes."},
-  {"generic": "pioglitazone",                 "class": "other",            "purpose_plain": "Improves the body's response to insulin in type 2 diabetes."},
-  {"generic": "sitagliptin",                  "class": "other",            "purpose_plain": "Helps control blood sugar levels in type 2 diabetes."},
-  {"generic": "vildagliptin",                 "class": "other",            "purpose_plain": "Lowers blood sugar in type 2 diabetes by boosting insulin activity."},
-  {"generic": "dapagliflozin",                "class": "other",            "purpose_plain": "Lowers blood sugar and may protect the heart and kidneys in diabetes."},
-  {"generic": "empagliflozin",                "class": "other",            "purpose_plain": "Controls blood sugar and reduces cardiovascular risk in type 2 diabetes."},
-  {"generic": "canagliflozin",                "class": "other",            "purpose_plain": "Lowers blood sugar and reduces the risk of heart and kidney disease."},
-  {"generic": "liraglutide",                  "class": "other",            "purpose_plain": "Controls blood sugar and supports weight loss in type 2 diabetes."},
-  {"generic": "insulin regular",              "class": "other",            "purpose_plain": "Lowers blood sugar quickly, used to manage diabetes."},
-  {"generic": "insulin glargine",             "class": "other",            "purpose_plain": "Provides long-acting blood sugar control for diabetes."},
-  {"generic": "insulin isophane",             "class": "other",            "purpose_plain": "Controls blood sugar with an intermediate duration of action."},
-  {"generic": "carbimazole",                  "class": "other",            "purpose_plain": "Reduces the production of thyroid hormone in an overactive thyroid."},
-  {"generic": "propylthiouracil",             "class": "other",            "purpose_plain": "Treats an overactive thyroid gland."},
-  {"generic": "dexamethasone",                "class": "other",            "purpose_plain": "Reduces severe inflammation and suppresses immune reactions."},
-  {"generic": "methylprednisolone",           "class": "other",            "purpose_plain": "Treats inflammation and immune system disorders."},
-  {"generic": "hydrocortisone",               "class": "other",            "purpose_plain": "Replaces cortisol when the body cannot produce enough on its own."},
-  {"generic": "betamethasone",                "class": "other",            "purpose_plain": "Reduces skin inflammation and is used in severe allergic reactions."},
-  {"generic": "beclomethasone",               "class": "other",            "purpose_plain": "Reduces airway inflammation when inhaled to prevent asthma symptoms."},
-  {"generic": "budesonide",                   "class": "other",            "purpose_plain": "Controls asthma and nasal allergy symptoms by reducing inflammation."},
-  {"generic": "fluticasone",                  "class": "other",            "purpose_plain": "Prevents asthma attacks and eases nasal allergy symptoms."},
-  {"generic": "mometasone",                   "class": "other",            "purpose_plain": "Controls nasal allergy symptoms and asthma when inhaled."},
-  {"generic": "formoterol",                   "class": "other",            "purpose_plain": "Opens the airways for an extended period to ease breathing in asthma."},
-  {"generic": "salmeterol",                   "class": "other",            "purpose_plain": "Keeps airways open for up to 12 hours to prevent asthma symptoms."},
-  {"generic": "ipratropium",                  "class": "other",            "purpose_plain": "Relaxes the airways to relieve breathing difficulty in lung disease."},
-  {"generic": "tiotropium",                   "class": "other",            "purpose_plain": "Opens the airways to improve breathing in COPD."},
-  {"generic": "montelukast",                  "class": "other",            "purpose_plain": "Prevents asthma attacks and relieves hay fever symptoms."},
-  {"generic": "theophylline",                 "class": "other",            "purpose_plain": "Opens the airways to help treat asthma and COPD."},
-  {"generic": "aminophylline",                "class": "other",            "purpose_plain": "Relaxes the airways to relieve asthma and breathing difficulty."},
-  {"generic": "paroxetine",                   "class": "other",            "purpose_plain": "Treats depression, anxiety disorders, and panic attacks."},
-  {"generic": "escitalopram",                 "class": "other",            "purpose_plain": "Treats depression and anxiety by balancing serotonin in the brain."},
-  {"generic": "citalopram",                   "class": "other",            "purpose_plain": "Helps treat depression and certain anxiety disorders."},
-  {"generic": "venlafaxine",                  "class": "other",            "purpose_plain": "Treats depression and anxiety disorders."},
-  {"generic": "duloxetine",                   "class": "other",            "purpose_plain": "Treats depression, anxiety, and certain types of chronic pain."},
-  {"generic": "mirtazapine",                  "class": "other",            "purpose_plain": "Treats depression and may improve sleep and appetite."},
-  {"generic": "amitriptyline",                "class": "other",            "purpose_plain": "Treats depression and is also used for nerve pain and migraine prevention."},
-  {"generic": "nortriptyline",                "class": "other",            "purpose_plain": "Treats depression and is sometimes used for nerve pain."},
-  {"generic": "clomipramine",                 "class": "other",            "purpose_plain": "Treats obsessive-compulsive disorder and depression."},
-  {"generic": "alprazolam",                   "class": "other",            "purpose_plain": "Reduces anxiety and panic disorder symptoms quickly."},
-  {"generic": "clonazepam",                   "class": "other",            "purpose_plain": "Treats seizures and panic disorder."},
-  {"generic": "diazepam",                     "class": "other",            "purpose_plain": "Relieves anxiety, muscle spasms, and seizures."},
-  {"generic": "lorazepam",                    "class": "other",            "purpose_plain": "Reduces anxiety and is used before medical procedures."},
-  {"generic": "zolpidem",                     "class": "other",            "purpose_plain": "Helps with short-term sleep difficulties."},
-  {"generic": "zopiclone",                    "class": "other",            "purpose_plain": "Provides short-term relief of insomnia."},
-  {"generic": "quetiapine",                   "class": "other",            "purpose_plain": "Treats schizophrenia, bipolar disorder, and depression."},
-  {"generic": "olanzapine",                   "class": "other",            "purpose_plain": "Treats schizophrenia and episodes of bipolar disorder."},
-  {"generic": "risperidone",                  "class": "other",            "purpose_plain": "Manages symptoms of schizophrenia and bipolar disorder."},
-  {"generic": "haloperidol",                  "class": "other",            "purpose_plain": "Treats psychosis and severe behavioural disturbances."},
-  {"generic": "lithium carbonate",            "class": "other",            "purpose_plain": "Stabilises mood in bipolar disorder."},
-  {"generic": "valproic acid",                "class": "other",            "purpose_plain": "Controls seizures and stabilises mood in bipolar disorder."},
-  {"generic": "sodium valproate",             "class": "other",            "purpose_plain": "Prevents seizures and is used in bipolar disorder."},
-  {"generic": "carbamazepine",                "class": "other",            "purpose_plain": "Controls seizures and treats certain types of nerve pain."},
-  {"generic": "phenytoin",                    "class": "other",            "purpose_plain": "Prevents and controls seizures."},
-  {"generic": "levetiracetam",                "class": "other",            "purpose_plain": "Controls several types of seizures in epilepsy."},
-  {"generic": "lamotrigine",                  "class": "other",            "purpose_plain": "Prevents seizures and stabilises mood in bipolar disorder."},
-  {"generic": "topiramate",                   "class": "other",            "purpose_plain": "Controls seizures and is used for migraine prevention."},
-  {"generic": "gabapentin",                   "class": "other",            "purpose_plain": "Treats nerve pain and controls certain types of seizures."},
-  {"generic": "pregabalin",                   "class": "other",            "purpose_plain": "Relieves nerve pain and controls certain seizures."},
-  {"generic": "phenobarbital",                "class": "other",            "purpose_plain": "Controls seizures and is used for short-term anxiety relief."},
-  {"generic": "donepezil",                    "class": "other",            "purpose_plain": "Helps manage symptoms of Alzheimer's disease."},
-  {"generic": "memantine",                    "class": "other",            "purpose_plain": "Helps slow the progression of Alzheimer's disease symptoms."},
-  {"generic": "rivastigmine",                 "class": "other",            "purpose_plain": "Treats mild to moderate Alzheimer's and Parkinson's disease dementia."},
-  {"generic": "levodopa carbidopa",           "class": "other",            "purpose_plain": "Treats Parkinson's disease by replacing dopamine in the brain."},
-  {"generic": "pramipexole",                  "class": "other",            "purpose_plain": "Treats Parkinson's disease and restless legs syndrome."},
-  {"generic": "ropinirole",                   "class": "other",            "purpose_plain": "Manages Parkinson's disease and restless legs syndrome."},
-  {"generic": "ondansetron",                  "class": "other",            "purpose_plain": "Prevents nausea and vomiting caused by medicines or surgery."},
-  {"generic": "granisetron",                  "class": "other",            "purpose_plain": "Prevents nausea and vomiting during chemotherapy."},
-  {"generic": "dexamethasone antiemetic",     "class": "other",            "purpose_plain": "Prevents nausea during chemotherapy when given as an antiemetic."},
-  {"generic": "folic acid",                   "class": "other",            "purpose_plain": "Supports healthy red blood cells and prevents neural tube defects in pregnancy."},
-  {"generic": "iron sulfate",                 "class": "other",            "purpose_plain": "Treats iron deficiency anaemia."},
-  {"generic": "ferrous gluconate",            "class": "other",            "purpose_plain": "Supplements iron to treat or prevent iron deficiency."},
-  {"generic": "cyanocobalamin",               "class": "other",            "purpose_plain": "Treats vitamin B12 deficiency anaemia."},
-  {"generic": "hydroxocobalamin",             "class": "other",            "purpose_plain": "Replaces vitamin B12 when the body cannot absorb it properly."},
-  {"generic": "calcium gluconate",            "class": "other",            "purpose_plain": "Supplements calcium and treats low calcium levels in the blood."},
-  {"generic": "vitamin d3",                   "class": "other",            "purpose_plain": "Supports bone health and treats vitamin D deficiency."},
-  {"generic": "cholecalciferol",              "class": "other",            "purpose_plain": "Supplements vitamin D3 for bone health and immunity."},
-  {"generic": "ergocalciferol",               "class": "other",            "purpose_plain": "Treats vitamin D deficiency and supports calcium absorption."},
-  {"generic": "zinc sulfate",                 "class": "other",            "purpose_plain": "Supplements zinc and helps treat diarrhoea in children."},
-  {"generic": "potassium chloride",           "class": "other",            "purpose_plain": "Replaces potassium when blood levels are too low."},
-  {"generic": "magnesium sulfate",            "class": "other",            "purpose_plain": "Treats low magnesium levels and is used in eclampsia during pregnancy."},
-  {"generic": "oral rehydration salts",       "class": "other",            "purpose_plain": "Replaces fluid and minerals lost during diarrhoea and vomiting."},
-  {"generic": "albendazole",                  "class": "other",            "purpose_plain": "Kills intestinal worms and treats other parasitic infections."},
-  {"generic": "mebendazole",                  "class": "other",            "purpose_plain": "Treats common intestinal worm infections."},
-  {"generic": "ivermectin",                   "class": "other",            "purpose_plain": "Treats parasitic infections including river blindness and strongyloidiasis."},
-  {"generic": "praziquantel",                 "class": "other",            "purpose_plain": "Treats tapeworm and other parasitic worm infections."},
-  {"generic": "chloroquine",                  "class": "other",            "purpose_plain": "Treats and prevents malaria and certain autoimmune conditions."},
-  {"generic": "hydroxychloroquine",           "class": "other",            "purpose_plain": "Treats malaria and autoimmune conditions such as rheumatoid arthritis."},
-  {"generic": "artemether lumefantrine",      "class": "other",            "purpose_plain": "Treats malaria by killing the malaria parasite."},
-  {"generic": "quinine",                      "class": "other",            "purpose_plain": "Treats severe malaria and leg cramps."},
-  {"generic": "doxycycline malaria",          "class": "other",            "purpose_plain": "Prevents malaria when taken before and during travel to at-risk areas."},
-  {"generic": "aciclovir",                    "class": "other",            "purpose_plain": "Treats herpes virus infections including cold sores and shingles."},
-  {"generic": "valaciclovir",                 "class": "other",            "purpose_plain": "Treats and suppresses herpes virus infections."},
-  {"generic": "oseltamivir",                  "class": "other",            "purpose_plain": "Treats influenza by stopping the virus from spreading in the body."},
-  {"generic": "fluconazole",                  "class": "other",            "purpose_plain": "Treats fungal infections including thrush and yeast infections."},
-  {"generic": "itraconazole",                 "class": "other",            "purpose_plain": "Treats serious fungal infections of the skin, nails, and internal organs."},
-  {"generic": "terbinafine",                  "class": "other",            "purpose_plain": "Treats fungal infections of the skin, hair, and nails."},
-  {"generic": "clotrimazole",                 "class": "other",            "purpose_plain": "Treats fungal skin infections including athlete's foot and thrush."},
-  {"generic": "miconazole",                   "class": "other",            "purpose_plain": "Clears fungal infections of the skin, mouth, and genitals."},
-  {"generic": "nystatin",                     "class": "other",            "purpose_plain": "Treats candida fungal infections of the mouth and gut."},
-  {"generic": "ketoconazole",                 "class": "other",            "purpose_plain": "Treats skin and scalp fungal infections."},
-  {"generic": "griseofulvin",                 "class": "other",            "purpose_plain": "Treats fungal infections of the skin, hair, and nails."},
-  {"generic": "diphtheria tetanus pertussis vaccine", "class": "other",   "purpose_plain": "Prevents diphtheria, tetanus, and whooping cough through immunisation."},
-  {"generic": "oral polio vaccine",           "class": "other",            "purpose_plain": "Protects against polio virus infection."},
-  {"generic": "hepatitis b vaccine",          "class": "other",            "purpose_plain": "Prevents hepatitis B viral infection."},
-  {"generic": "measles rubella vaccine",      "class": "other",            "purpose_plain": "Protects against measles and rubella infections."},
-  {"generic": "bcg vaccine",                  "class": "other",            "purpose_plain": "Protects against severe tuberculosis, especially in newborns."},
-  {"generic": "tamoxifen",                    "class": "other",            "purpose_plain": "Treats hormone-sensitive breast cancer and reduces recurrence risk."},
-  {"generic": "anastrozole",                  "class": "other",            "purpose_plain": "Treats breast cancer by lowering oestrogen levels."},
-  {"generic": "letrozole",                    "class": "other",            "purpose_plain": "Treats hormone receptor-positive breast cancer."},
-  {"generic": "capecitabine",                 "class": "other",            "purpose_plain": "Treats certain cancers including breast and colorectal cancer."},
-  {"generic": "imatinib",                     "class": "other",            "purpose_plain": "Treats certain leukaemias and gastrointestinal tumours."},
-  {"generic": "cyclophosphamide",             "class": "other",            "purpose_plain": "Treats cancer and autoimmune conditions by suppressing cell growth."},
-  {"generic": "dexrazoxane",                  "class": "other",            "purpose_plain": "Protects the heart from damage caused by certain cancer medicines."},
-  {"generic": "ondansetron chemo",            "class": "other",            "purpose_plain": "Prevents severe nausea and vomiting caused by cancer chemotherapy."},
-  {"generic": "filgrastim",                   "class": "other",            "purpose_plain": "Stimulates the bone marrow to produce more white blood cells."},
-  {"generic": "erythropoietin",               "class": "other",            "purpose_plain": "Stimulates red blood cell production in anaemia of chronic kidney disease."},
-  {"generic": "sildenafil",                   "class": "other",            "purpose_plain": "Treats erectile dysfunction and pulmonary arterial hypertension."},
-  {"generic": "tadalafil",                    "class": "other",            "purpose_plain": "Treats erectile dysfunction and benign prostatic hyperplasia."},
-  {"generic": "finasteride",                  "class": "other",            "purpose_plain": "Treats enlarged prostate and male pattern baldness."},
-  {"generic": "tamsulosin",                   "class": "other",            "purpose_plain": "Relaxes the prostate and bladder to ease urinary symptoms."},
-  {"generic": "solifenacin",                  "class": "other",            "purpose_plain": "Reduces bladder overactivity and urgency to urinate."},
-  {"generic": "oxybutynin",                   "class": "other",            "purpose_plain": "Treats overactive bladder and reduces urinary urgency."},
-  {"generic": "tolterodine",                  "class": "other",            "purpose_plain": "Controls overactive bladder symptoms such as urgency and frequency."},
-  {"generic": "desmopressin",                 "class": "other",            "purpose_plain": "Controls bedwetting and diabetes insipidus."},
-  {"generic": "misoprostol",                  "class": "other",            "purpose_plain": "Protects the stomach lining and is used in obstetric care."},
-  {"generic": "oxytocin",                     "class": "other",            "purpose_plain": "Induces labour and helps control bleeding after childbirth."},
-  {"generic": "ergometrine",                  "class": "other",            "purpose_plain": "Controls postpartum haemorrhage and uterine bleeding."},
-  {"generic": "progesterone",                 "class": "other",            "purpose_plain": "Supports pregnancy and is used in hormonal conditions."},
-  {"generic": "medroxyprogesterone",          "class": "other",            "purpose_plain": "Treats hormonal conditions and is used as a contraceptive."},
-  {"generic": "norethisterone",               "class": "other",            "purpose_plain": "Delays periods and is used in contraception and hormonal conditions."},
-  {"generic": "combined oral contraceptive",  "class": "other",            "purpose_plain": "Prevents pregnancy through hormonal control."},
-  {"generic": "levonorgestrel",               "class": "other",            "purpose_plain": "Prevents pregnancy when taken after unprotected sex."},
-  {"generic": "clomifene",                    "class": "other",            "purpose_plain": "Stimulates ovulation to help women become pregnant."},
-  {"generic": "allopurinol",                  "class": "other",            "purpose_plain": "Lowers uric acid levels to prevent gout attacks."},
-  {"generic": "colchicine",                   "class": "other",            "purpose_plain": "Relieves the pain of acute gout attacks."},
-  {"generic": "febuxostat",                   "class": "other",            "purpose_plain": "Reduces uric acid levels to prevent gout."},
-  {"generic": "bisphosphonate alendronate",   "class": "other",            "purpose_plain": "Strengthens bones and reduces the risk of fractures in osteoporosis."},
-  {"generic": "alendronate",                  "class": "other",            "purpose_plain": "Treats osteoporosis by slowing bone loss and increasing bone density."},
-  {"generic": "risedronate",                  "class": "other",            "purpose_plain": "Prevents bone loss and reduces fracture risk in osteoporosis."},
-  {"generic": "ibandronate",                  "class": "other",            "purpose_plain": "Treats and prevents osteoporosis in post-menopausal women."},
-  {"generic": "denosumab",                    "class": "other",            "purpose_plain": "Strengthens bones and reduces fracture risk in osteoporosis."},
-  {"generic": "calcitonin",                   "class": "other",            "purpose_plain": "Treats osteoporosis and Paget's disease of bone."},
-  {"generic": "lactulose",                    "class": "other",            "purpose_plain": "Softens stools to treat constipation."},
-  {"generic": "ispaghula husk",               "class": "other",            "purpose_plain": "Adds bulk to stools to relieve constipation."},
-  {"generic": "bisacodyl",                    "class": "other",            "purpose_plain": "Stimulates the bowel to relieve short-term constipation."},
-  {"generic": "senna",                        "class": "other",            "purpose_plain": "Treats constipation by stimulating bowel movement."},
-  {"generic": "loperamide",                   "class": "other",            "purpose_plain": "Controls diarrhoea by slowing bowel movement."},
-  {"generic": "zinc oxide topical",           "class": "other",            "purpose_plain": "Protects and soothes irritated or damaged skin."},
-  {"generic": "calamine",                     "class": "other",            "purpose_plain": "Relieves itching and soothes minor skin irritations."},
-  {"generic": "mupirocin",                    "class": "other",            "purpose_plain": "Treats bacterial skin infections including impetigo."},
-  {"generic": "silver sulfadiazine",          "class": "other",            "purpose_plain": "Prevents and treats infection in burn wounds."},
-  {"generic": "acyclovir topical",            "class": "other",            "purpose_plain": "Treats cold sores and herpes skin infections when applied directly."},
-  {"generic": "tretinoin",                    "class": "other",            "purpose_plain": "Treats acne and improves skin appearance."},
-  {"generic": "benzoyl peroxide",             "class": "other",            "purpose_plain": "Kills acne-causing bacteria on the skin surface."},
-  {"generic": "adapalene",                    "class": "other",            "purpose_plain": "Treats acne by reducing inflammation and unclogging pores."},
-  {"generic": "minoxidil",                    "class": "other",            "purpose_plain": "Stimulates hair growth in male and female pattern baldness."},
-  {"generic": "latanoprost",                  "class": "other",            "purpose_plain": "Lowers pressure inside the eye to treat glaucoma."},
-  {"generic": "timolol eye drops",            "class": "other",            "purpose_plain": "Reduces eye pressure in glaucoma."},
-  {"generic": "pilocarpine",                  "class": "other",            "purpose_plain": "Reduces eye pressure in glaucoma and treats dry mouth."},
-  {"generic": "dexamethasone eye",            "class": "other",            "purpose_plain": "Reduces eye inflammation when applied as drops or ointment."},
-  {"generic": "ciprofloxacin eye drops",      "class": "other",            "purpose_plain": "Treats bacterial eye infections with antibiotic drops."},
-  {"generic": "chloramphenicol eye",          "class": "other",            "purpose_plain": "Treats bacterial conjunctivitis and other eye infections."},
-  {"generic": "artificial tears",             "class": "other",            "purpose_plain": "Lubricates dry eyes to relieve irritation and discomfort."},
-  {"generic": "gentamicin",                   "class": "other",            "purpose_plain": "Treats serious bacterial infections, often given by injection."},
-  {"generic": "tobramycin",                   "class": "other",            "purpose_plain": "Treats bacterial infections, including in the eye and lung."},
-  {"generic": "amikacin",                     "class": "other",            "purpose_plain": "Treats serious bacterial infections resistant to other antibiotics."},
-  {"generic": "piperacillin tazobactam",      "class": "other",            "purpose_plain": "Treats serious hospital-acquired bacterial infections."},
-  {"generic": "meropenem",                    "class": "other",            "purpose_plain": "Treats life-threatening bacterial infections with broad-spectrum coverage."},
-  {"generic": "imipenem cilastatin",          "class": "other",            "purpose_plain": "Treats serious bacterial infections in hospital settings."},
-  {"generic": "colistin",                     "class": "other",            "purpose_plain": "Treats infections caused by highly resistant bacteria."},
-  {"generic": "rifaximin",                    "class": "other",            "purpose_plain": "Treats traveller's diarrhoea and reduces gut bacteria in liver disease."},
-  {"generic": "neomycin",                     "class": "other",            "purpose_plain": "Treats skin infections and is used to prepare the bowel for surgery."},
-  {"generic": "bacitracin",                   "class": "other",            "purpose_plain": "Treats minor bacterial skin infections and wounds."},
-  {"generic": "polymyxin b",                  "class": "other",            "purpose_plain": "Treats serious gram-negative bacterial infections."},
-  {"generic": "sodium cromoglycate",          "class": "other",            "purpose_plain": "Prevents asthma and allergic rhinitis symptoms."},
-  {"generic": "ipratropium bromide",          "class": "other",            "purpose_plain": "Relieves acute breathlessness in asthma and COPD."},
-  {"generic": "salbutamol inhaler",           "class": "other",            "purpose_plain": "Opens the airways quickly during an asthma attack."},
-  {"generic": "terbutaline",                  "class": "other",            "purpose_plain": "Opens the airways to relieve asthma symptoms."},
-  {"generic": "doxofylline",                  "class": "other",            "purpose_plain": "Relaxes the airways to treat asthma and COPD."},
-  {"generic": "bromhexine",                   "class": "other",            "purpose_plain": "Loosens and thins mucus to make it easier to cough up."},
-  {"generic": "ambroxol",                     "class": "other",            "purpose_plain": "Thins mucus in the airways to ease breathing."},
-  {"generic": "guaifenesin",                  "class": "other",            "purpose_plain": "Thins and loosens mucus to relieve chest congestion."},
-  {"generic": "dextromethorphan",             "class": "other",            "purpose_plain": "Suppresses dry cough, especially at night."},
-  {"generic": "pseudoephedrine",              "class": "other",            "purpose_plain": "Relieves nasal congestion by shrinking swollen blood vessels."},
-  {"generic": "xylometazoline",               "class": "other",            "purpose_plain": "Decongests the nose quickly when applied as nasal drops."},
-  {"generic": "oxymetazoline",                "class": "other",            "purpose_plain": "Relieves nasal stuffiness quickly for up to 12 hours."},
-  {"generic": "ipratropium nasal",            "class": "other",            "purpose_plain": "Reduces a runny nose by drying up nasal secretions."},
-  {"generic": "nifedipine extended release",  "class": "other",            "purpose_plain": "Provides prolonged blood pressure lowering and chest pain prevention."},
-  {"generic": "amlodipine besylate",          "class": "other",            "purpose_plain": "Lowers blood pressure and prevents chest pain."},
-  {"generic": "prazosin",                     "class": "other",            "purpose_plain": "Lowers blood pressure and relieves urinary problems in enlarged prostate."},
-  {"generic": "doxazosin",                    "class": "other",            "purpose_plain": "Lowers blood pressure and relieves symptoms of enlarged prostate."},
-  {"generic": "clonidine",                    "class": "other",            "purpose_plain": "Lowers blood pressure and is used for certain pain conditions."},
-  {"generic": "methyldopa",                   "class": "other",            "purpose_plain": "Controls blood pressure, especially during pregnancy."},
-  {"generic": "hydralazine",                  "class": "other",            "purpose_plain": "Lowers blood pressure by relaxing blood vessel walls."},
-  {"generic": "nitroprusside",                "class": "other",            "purpose_plain": "Rapidly lowers dangerously high blood pressure in emergencies."},
-  {"generic": "atenolol tenormin",            "class": "other",            "purpose_plain": "Controls blood pressure and heart rate."},
-  {"generic": "ivabradine",                   "class": "other",            "purpose_plain": "Reduces the heart rate in heart failure and stable angina."},
-  {"generic": "sacubitril valsartan",         "class": "other",            "purpose_plain": "Treats heart failure by relaxing blood vessels and reducing fluid."},
-  {"generic": "eplerenone",                   "class": "other",            "purpose_plain": "Reduces fluid retention after heart attack and in heart failure."},
-  {"generic": "labetalol",                    "class": "other",            "purpose_plain": "Lowers blood pressure and is used for hypertensive emergencies."},
-  {"generic": "nicardipine",                  "class": "other",            "purpose_plain": "Lowers blood pressure and is used for angina."},
-  {"generic": "lercanidipine",                "class": "other",            "purpose_plain": "Controls high blood pressure with once-daily dosing."},
-  {"generic": "mannitol",                     "class": "other",            "purpose_plain": "Reduces brain and eye pressure in acute emergencies."},
-  {"generic": "acetazolamide",                "class": "other",            "purpose_plain": "Reduces eye pressure in glaucoma and prevents altitude sickness."},
-  {"generic": "desmopressin acetate",         "class": "other",            "purpose_plain": "Treats bedwetting and water balance disorders."},
-  {"generic": "bromocriptine",                "class": "other",            "purpose_plain": "Treats Parkinson's disease, prolactin excess, and diabetes."},
-  {"generic": "cabergoline",                  "class": "other",            "purpose_plain": "Lowers prolactin levels and treats certain pituitary tumours."},
-  {"generic": "melatonin",                    "class": "other",            "purpose_plain": "Helps regulate sleep patterns and jet lag."},
-  {"generic": "sumatriptan",                  "class": "other",            "purpose_plain": "Relieves migraine headaches and associated symptoms."},
-  {"generic": "rizatriptan",                  "class": "other",            "purpose_plain": "Treats acute migraine attacks quickly."},
-  {"generic": "naratriptan",                  "class": "other",            "purpose_plain": "Relieves migraine with a longer-lasting but slower onset of action."},
-  {"generic": "flunarizine",                  "class": "other",            "purpose_plain": "Prevents migraine attacks and treats vertigo."},
-  {"generic": "betahistine",                  "class": "other",            "purpose_plain": "Reduces vertigo, tinnitus, and hearing loss in Meniere's disease."},
-  {"generic": "clonazepam seizure",           "class": "other",            "purpose_plain": "Prevents and controls seizures in epilepsy."},
-  {"generic": "vigabatrin",                   "class": "other",            "purpose_plain": "Treats difficult-to-control epilepsy."},
-  {"generic": "oxcarbazepine",                "class": "other",            "purpose_plain": "Controls seizures in epilepsy."},
-  {"generic": "lacosamide",                   "class": "other",            "purpose_plain": "Helps control seizures in partial-onset epilepsy."},
-  {"generic": "zonisamide",                   "class": "other",            "purpose_plain": "Treats partial seizures in epilepsy."},
-  {"generic": "baclofen",                     "class": "other",            "purpose_plain": "Relieves muscle spasm and spasticity from neurological conditions."},
-  {"generic": "tizanidine",                   "class": "other",            "purpose_plain": "Reduces muscle spasms and stiffness."},
-  {"generic": "cyclobenzaprine",              "class": "other",            "purpose_plain": "Relieves muscle spasm and associated pain."},
-  {"generic": "orphenadrine",                 "class": "other",            "purpose_plain": "Treats muscle pain and stiffness."},
-  {"generic": "pyridostigmine",               "class": "other",            "purpose_plain": "Improves muscle strength in myasthenia gravis."},
-  {"generic": "azathioprine",                 "class": "other",            "purpose_plain": "Suppresses the immune system in autoimmune conditions and after transplants."},
-  {"generic": "ciclosporin",                  "class": "other",            "purpose_plain": "Prevents organ rejection after transplant and treats autoimmune diseases."},
-  {"generic": "mycophenolate",                "class": "other",            "purpose_plain": "Prevents organ rejection in transplant patients."},
-  {"generic": "tacrolimus",                   "class": "other",            "purpose_plain": "Prevents rejection of transplanted organs."},
-  {"generic": "sulfasalazine",                "class": "other",            "purpose_plain": "Treats inflammatory bowel disease and rheumatoid arthritis."},
-  {"generic": "mesalazine",                   "class": "other",            "purpose_plain": "Reduces inflammation in inflammatory bowel disease."},
-  {"generic": "infliximab",                   "class": "other",            "purpose_plain": "Treats Crohn's disease, rheumatoid arthritis, and other inflammatory conditions."},
-  {"generic": "adalimumab",                   "class": "other",            "purpose_plain": "Reduces inflammation in rheumatoid arthritis and related conditions."},
-  {"generic": "etanercept",                   "class": "other",            "purpose_plain": "Treats rheumatoid arthritis and psoriasis by blocking inflammation."},
-  {"generic": "hydroxychloroquine rheumatoid","class": "other",            "purpose_plain": "Reduces inflammation in rheumatoid arthritis and lupus."},
-  {"generic": "d-penicillamine",              "class": "other",            "purpose_plain": "Reduces joint damage in rheumatoid arthritis and treats Wilson's disease."},
-  {"generic": "colchicine gout",              "class": "other",            "purpose_plain": "Relieves gout attack pain and prevents recurrent attacks."},
-  {"generic": "indomethacin gout",            "class": "other",            "purpose_plain": "Relieves acute gout attacks through anti-inflammatory action."},
-  {"generic": "sodium stibogluconate",        "class": "other",            "purpose_plain": "Treats leishmaniasis, a parasitic infection."},
-  {"generic": "amphotericin b",               "class": "other",            "purpose_plain": "Treats serious and life-threatening fungal infections."},
-  {"generic": "voriconazole",                 "class": "other",            "purpose_plain": "Treats invasive fungal infections in immunocompromised patients."},
-  {"generic": "posaconazole",                 "class": "other",            "purpose_plain": "Prevents and treats serious invasive fungal infections."},
-  {"generic": "caspofungin",                  "class": "other",            "purpose_plain": "Treats serious fungal infections when other antifungals have failed."},
-  {"generic": "dolutegravir",                 "class": "other",            "purpose_plain": "Treats HIV infection as part of combination antiretroviral therapy."},
-  {"generic": "tenofovir",                    "class": "other",            "purpose_plain": "Treats HIV infection and prevents hepatitis B complications."},
-  {"generic": "lamivudine",                   "class": "other",            "purpose_plain": "Treats HIV and hepatitis B infections."},
-  {"generic": "efavirenz",                    "class": "other",            "purpose_plain": "Treats HIV infection as part of combination antiretroviral therapy."},
-  {"generic": "lopinavir ritonavir",          "class": "other",            "purpose_plain": "Treats HIV infection by blocking the virus from maturing."},
-  {"generic": "zidovudine",                   "class": "other",            "purpose_plain": "Treats HIV and prevents mother-to-child transmission during pregnancy."},
-  {"generic": "sofosbuvir",                   "class": "other",            "purpose_plain": "Treats hepatitis C viral infection."},
-  {"generic": "ribavirin",                    "class": "other",            "purpose_plain": "Treats hepatitis C and certain other viral infections."},
-  {"generic": "entecavir",                    "class": "other",            "purpose_plain": "Treats chronic hepatitis B infection."},
-  {"generic": "adefovir",                     "class": "other",            "purpose_plain": "Treats chronic hepatitis B infection."}
+  {
+    "generic": "ibuprofen",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Relieves pain, fever, and swelling."
+  },
+  {
+    "generic": "paracetamol",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Reduces fever and eases mild to moderate pain."
+  },
+  {
+    "generic": "diclofenac",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Eases pain and reduces inflammation in joints and muscles."
+  },
+  {
+    "generic": "naproxen",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Relieves pain, swelling, and stiffness."
+  },
+  {
+    "generic": "aspirin",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Relieves pain and reduces fever; also thins the blood at low doses."
+  },
+  {
+    "generic": "celecoxib",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Reduces pain and inflammation with less stomach irritation."
+  },
+  {
+    "generic": "etoricoxib",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Eases joint pain and inflammation in arthritis."
+  },
+  {
+    "generic": "mefenamic acid",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Relieves mild to moderate pain, including period pain."
+  },
+  {
+    "generic": "ketorolac",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Provides short-term relief of moderate to severe pain."
+  },
+  {
+    "generic": "tramadol",
+    "class": "opioid_analgesic",
+    "purpose_plain": "Treats moderate to severe pain when other pain relievers are not enough."
+  },
+  {
+    "generic": "morphine",
+    "class": "opioid_analgesic",
+    "purpose_plain": "Manages severe pain when standard pain relievers are not sufficient."
+  },
+  {
+    "generic": "codeine",
+    "class": "opioid_analgesic",
+    "purpose_plain": "Relieves mild to moderate pain and suppresses cough."
+  },
+  {
+    "generic": "indomethacin",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Reduces inflammation and pain in joints and muscles."
+  },
+  {
+    "generic": "piroxicam",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Eases arthritis pain and reduces swelling in joints."
+  },
+  {
+    "generic": "aceclofenac",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Relieves pain and inflammation in arthritis and musculoskeletal conditions."
+  },
+  {
+    "generic": "nimesulide",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Reduces pain and inflammation with a relatively quick onset."
+  },
+  {
+    "generic": "flurbiprofen",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Treats pain and inflammation in joints and soft tissues."
+  },
+  {
+    "generic": "meloxicam",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Eases joint pain in osteoarthritis and rheumatoid arthritis."
+  },
+  {
+    "generic": "ketoprofen",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Relieves pain and reduces inflammation in joints and muscles."
+  },
+  {
+    "generic": "sulindac",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Treats pain and swelling in arthritis and related conditions."
+  },
+  {
+    "generic": "oxaprozin",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Eases osteoarthritis and rheumatoid arthritis pain."
+  },
+  {
+    "generic": "etodolac",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Relieves pain and inflammation in arthritis."
+  },
+  {
+    "generic": "diflunisal",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Treats mild to moderate pain and reduces fever."
+  },
+  {
+    "generic": "parecoxib",
+    "class": "analgesic_nsaid",
+    "purpose_plain": "Provides short-term pain relief after surgery with minimal stomach side effects."
+  },
+  {
+    "generic": "omeprazole",
+    "class": "antacid_ppi",
+    "purpose_plain": "Reduces stomach acid to treat heartburn and ulcers."
+  },
+  {
+    "generic": "pantoprazole",
+    "class": "antacid_ppi",
+    "purpose_plain": "Lowers stomach acid to heal acid reflux and stomach ulcers."
+  },
+  {
+    "generic": "esomeprazole",
+    "class": "antacid_ppi",
+    "purpose_plain": "Controls excess stomach acid and relieves heartburn."
+  },
+  {
+    "generic": "rabeprazole",
+    "class": "antacid_ppi",
+    "purpose_plain": "Reduces acid in the stomach to treat reflux and ulcers."
+  },
+  {
+    "generic": "lansoprazole",
+    "class": "antacid_ppi",
+    "purpose_plain": "Decreases stomach acid to protect the stomach lining."
+  },
+  {
+    "generic": "dexlansoprazole",
+    "class": "antacid_ppi",
+    "purpose_plain": "Controls acid reflux by reducing stomach acid production."
+  },
+  {
+    "generic": "ranitidine",
+    "class": "antacid_ppi",
+    "purpose_plain": "Reduces stomach acid to relieve indigestion and heartburn."
+  },
+  {
+    "generic": "famotidine",
+    "class": "antacid_ppi",
+    "purpose_plain": "Decreases stomach acid for heartburn and acid reflux relief."
+  },
+  {
+    "generic": "aluminium hydroxide",
+    "class": "antacid_ppi",
+    "purpose_plain": "Neutralises excess stomach acid to ease indigestion quickly."
+  },
+  {
+    "generic": "magnesium hydroxide",
+    "class": "antacid_ppi",
+    "purpose_plain": "Quickly neutralises stomach acid and relieves indigestion."
+  },
+  {
+    "generic": "sodium bicarbonate",
+    "class": "antacid_ppi",
+    "purpose_plain": "Temporarily neutralises stomach acid for rapid heartburn relief."
+  },
+  {
+    "generic": "sucralfate",
+    "class": "antacid_ppi",
+    "purpose_plain": "Coats and protects the stomach lining to help ulcers heal."
+  },
+  {
+    "generic": "cimetidine",
+    "class": "antacid_ppi",
+    "purpose_plain": "Reduces stomach acid production to relieve heartburn and ulcers."
+  },
+  {
+    "generic": "nizatidine",
+    "class": "antacid_ppi",
+    "purpose_plain": "Lowers stomach acid for heartburn and stomach ulcer treatment."
+  },
+  {
+    "generic": "calcium carbonate",
+    "class": "antacid_ppi",
+    "purpose_plain": "Quickly neutralises stomach acid and provides calcium supplementation."
+  },
+  {
+    "generic": "domperidone",
+    "class": "other",
+    "purpose_plain": "Relieves nausea and helps food move normally through the stomach."
+  },
+  {
+    "generic": "metoclopramide",
+    "class": "antacid_ppi",
+    "purpose_plain": "Reduces nausea and helps the stomach empty more quickly."
+  },
+  {
+    "generic": "amoxicillin",
+    "class": "antibiotic",
+    "purpose_plain": "Kills bacteria to treat common infections."
+  },
+  {
+    "generic": "amoxicillin clavulanate",
+    "class": "antibiotic",
+    "purpose_plain": "Kills a broader range of bacteria, including resistant ones."
+  },
+  {
+    "generic": "azithromycin",
+    "class": "antibiotic",
+    "purpose_plain": "Treats bacterial infections including chest and throat infections."
+  },
+  {
+    "generic": "clarithromycin",
+    "class": "antibiotic",
+    "purpose_plain": "Fights bacterial infections of the lungs, sinuses, and skin."
+  },
+  {
+    "generic": "ciprofloxacin",
+    "class": "antibiotic",
+    "purpose_plain": "Treats urinary tract and other bacterial infections."
+  },
+  {
+    "generic": "levofloxacin",
+    "class": "antibiotic",
+    "purpose_plain": "Kills bacteria causing chest, urinary, and skin infections."
+  },
+  {
+    "generic": "doxycycline",
+    "class": "antibiotic",
+    "purpose_plain": "Treats bacterial infections including acne and chest infections."
+  },
+  {
+    "generic": "metronidazole",
+    "class": "antibiotic",
+    "purpose_plain": "Clears bacterial and parasitic infections in the gut and elsewhere."
+  },
+  {
+    "generic": "cefixime",
+    "class": "antibiotic",
+    "purpose_plain": "Treats bacterial infections of the ear, throat, and urinary tract."
+  },
+  {
+    "generic": "cefuroxime",
+    "class": "antibiotic",
+    "purpose_plain": "Fights a wide range of bacterial infections."
+  },
+  {
+    "generic": "cephalexin",
+    "class": "antibiotic",
+    "purpose_plain": "Treats skin, bone, and respiratory tract bacterial infections."
+  },
+  {
+    "generic": "clindamycin",
+    "class": "antibiotic",
+    "purpose_plain": "Fights bacterial infections, including serious skin infections."
+  },
+  {
+    "generic": "trimethoprim sulfamethoxazole",
+    "class": "antibiotic",
+    "purpose_plain": "Treats urinary tract and respiratory bacterial infections."
+  },
+  {
+    "generic": "nitrofurantoin",
+    "class": "antibiotic",
+    "purpose_plain": "Treats and prevents bacterial urinary tract infections."
+  },
+  {
+    "generic": "penicillin v",
+    "class": "antibiotic",
+    "purpose_plain": "Treats common bacterial infections such as strep throat."
+  },
+  {
+    "generic": "erythromycin",
+    "class": "antibiotic",
+    "purpose_plain": "Fights bacterial infections in patients allergic to penicillin."
+  },
+  {
+    "generic": "tetracycline",
+    "class": "antibiotic",
+    "purpose_plain": "Treats acne and various bacterial infections."
+  },
+  {
+    "generic": "minocycline",
+    "class": "antibiotic",
+    "purpose_plain": "Treats acne, skin infections, and certain bacterial illnesses."
+  },
+  {
+    "generic": "ofloxacin",
+    "class": "antibiotic",
+    "purpose_plain": "Kills bacteria causing eye, ear, and urinary tract infections."
+  },
+  {
+    "generic": "norfloxacin",
+    "class": "antibiotic",
+    "purpose_plain": "Treats urinary tract and gastrointestinal bacterial infections."
+  },
+  {
+    "generic": "moxifloxacin",
+    "class": "antibiotic",
+    "purpose_plain": "Treats chest infections and bacterial conjunctivitis."
+  },
+  {
+    "generic": "ceftriaxone",
+    "class": "antibiotic",
+    "purpose_plain": "Used by injection to treat serious bacterial infections."
+  },
+  {
+    "generic": "cefpodoxime",
+    "class": "antibiotic",
+    "purpose_plain": "Treats respiratory tract, urinary, and skin bacterial infections."
+  },
+  {
+    "generic": "cefadroxil",
+    "class": "antibiotic",
+    "purpose_plain": "Treats skin, throat, and urinary tract bacterial infections."
+  },
+  {
+    "generic": "cefazolin",
+    "class": "antibiotic",
+    "purpose_plain": "Prevents and treats bacterial infections, often used around surgery."
+  },
+  {
+    "generic": "cefdinir",
+    "class": "antibiotic",
+    "purpose_plain": "Treats ear, sinus, throat, and skin bacterial infections."
+  },
+  {
+    "generic": "vancomycin",
+    "class": "antibiotic",
+    "purpose_plain": "Treats serious bacterial infections resistant to other antibiotics."
+  },
+  {
+    "generic": "linezolid",
+    "class": "antibiotic",
+    "purpose_plain": "Treats drug-resistant bacterial infections including MRSA."
+  },
+  {
+    "generic": "rifampicin",
+    "class": "antibiotic",
+    "purpose_plain": "Treats tuberculosis and other serious bacterial infections."
+  },
+  {
+    "generic": "isoniazid",
+    "class": "antibiotic",
+    "purpose_plain": "Treats and prevents tuberculosis infection."
+  },
+  {
+    "generic": "pyrazinamide",
+    "class": "antibiotic",
+    "purpose_plain": "Used in combination to treat active tuberculosis."
+  },
+  {
+    "generic": "ethambutol",
+    "class": "antibiotic",
+    "purpose_plain": "Used alongside other medicines to treat tuberculosis."
+  },
+  {
+    "generic": "tinidazole",
+    "class": "antibiotic",
+    "purpose_plain": "Treats gut and genital infections caused by bacteria and parasites."
+  },
+  {
+    "generic": "flucloxacillin",
+    "class": "antibiotic",
+    "purpose_plain": "Treats skin and soft tissue infections caused by staphylococci."
+  },
+  {
+    "generic": "cetirizine",
+    "class": "antihistamine",
+    "purpose_plain": "Relieves allergy symptoms like sneezing, runny nose, and itchy eyes."
+  },
+  {
+    "generic": "loratadine",
+    "class": "antihistamine",
+    "purpose_plain": "Eases allergy symptoms without causing significant drowsiness."
+  },
+  {
+    "generic": "fexofenadine",
+    "class": "antihistamine",
+    "purpose_plain": "Relieves hay fever and allergy symptoms without drowsiness."
+  },
+  {
+    "generic": "desloratadine",
+    "class": "antihistamine",
+    "purpose_plain": "Controls allergy symptoms including hives and nasal congestion."
+  },
+  {
+    "generic": "levocetirizine",
+    "class": "antihistamine",
+    "purpose_plain": "Relieves sneezing, itching, and other allergy symptoms."
+  },
+  {
+    "generic": "diphenhydramine",
+    "class": "antihistamine",
+    "purpose_plain": "Relieves allergy symptoms and helps with sleep."
+  },
+  {
+    "generic": "chlorpheniramine",
+    "class": "antihistamine",
+    "purpose_plain": "Eases sneezing, runny nose, and allergic reactions."
+  },
+  {
+    "generic": "azelastine",
+    "class": "antihistamine",
+    "purpose_plain": "Relieves nasal allergy symptoms when sprayed in the nose."
+  },
+  {
+    "generic": "bilastine",
+    "class": "antihistamine",
+    "purpose_plain": "Relieves allergy symptoms including hives and hay fever."
+  },
+  {
+    "generic": "rupatadine",
+    "class": "antihistamine",
+    "purpose_plain": "Eases allergic rhinitis and hives symptoms."
+  },
+  {
+    "generic": "mizolastine",
+    "class": "antihistamine",
+    "purpose_plain": "Treats hay fever, hives, and other allergic conditions."
+  },
+  {
+    "generic": "olopatadine",
+    "class": "antihistamine",
+    "purpose_plain": "Relieves eye itching and redness caused by allergies."
+  },
+  {
+    "generic": "ebastine",
+    "class": "antihistamine",
+    "purpose_plain": "Treats hay fever and hives with minimal drowsiness."
+  },
+  {
+    "generic": "ketotifen",
+    "class": "antihistamine",
+    "purpose_plain": "Prevents asthma and allergic reactions over the long term."
+  },
+  {
+    "generic": "promethazine",
+    "class": "antihistamine",
+    "purpose_plain": "Relieves allergy symptoms and prevents motion sickness."
+  },
+  {
+    "generic": "meclizine",
+    "class": "antihistamine",
+    "purpose_plain": "Prevents nausea and dizziness from motion sickness."
+  },
+  {
+    "generic": "doxylamine",
+    "class": "antihistamine",
+    "purpose_plain": "Relieves allergy symptoms and helps with sleep."
+  },
+  {
+    "generic": "cyproheptadine",
+    "class": "antihistamine",
+    "purpose_plain": "Relieves allergy symptoms and may stimulate appetite."
+  },
+  {
+    "generic": "trimeprazine",
+    "class": "antihistamine",
+    "purpose_plain": "Relieves itching and runny nose due to allergies."
+  },
+  {
+    "generic": "metformin",
+    "class": "other",
+    "purpose_plain": "Helps control blood sugar levels in type 2 diabetes."
+  },
+  {
+    "generic": "methotrexate",
+    "class": "other",
+    "purpose_plain": "Modulates immune and inflammatory activity in certain chronic conditions."
+  },
+  {
+    "generic": "atorvastatin",
+    "class": "other",
+    "purpose_plain": "Lowers cholesterol to reduce the risk of heart disease."
+  },
+  {
+    "generic": "amlodipine",
+    "class": "other",
+    "purpose_plain": "Relaxes blood vessels to lower blood pressure and treat chest pain."
+  },
+  {
+    "generic": "losartan",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure by relaxing blood vessels."
+  },
+  {
+    "generic": "glibenclamide",
+    "class": "other",
+    "purpose_plain": "Stimulates the pancreas to release insulin and lower blood sugar."
+  },
+  {
+    "generic": "levothyroxine",
+    "class": "other",
+    "purpose_plain": "Replaces thyroid hormone when the thyroid does not produce enough."
+  },
+  {
+    "generic": "warfarin",
+    "class": "other",
+    "purpose_plain": "Thins the blood to prevent harmful clots from forming."
+  },
+  {
+    "generic": "prednisolone",
+    "class": "other",
+    "purpose_plain": "Reduces inflammation and suppresses overactive immune responses."
+  },
+  {
+    "generic": "salbutamol",
+    "class": "other",
+    "purpose_plain": "Opens the airways quickly to relieve breathlessness and wheezing."
+  },
+  {
+    "generic": "fluoxetine",
+    "class": "other",
+    "purpose_plain": "Treats depression and anxiety by balancing brain chemicals."
+  },
+  {
+    "generic": "sertraline",
+    "class": "other",
+    "purpose_plain": "Helps manage depression, anxiety, and related conditions."
+  },
+  {
+    "generic": "simvastatin",
+    "class": "other",
+    "purpose_plain": "Lowers blood cholesterol to reduce the risk of heart problems."
+  },
+  {
+    "generic": "rosuvastatin",
+    "class": "other",
+    "purpose_plain": "Reduces bad cholesterol and lowers the risk of heart disease."
+  },
+  {
+    "generic": "pravastatin",
+    "class": "other",
+    "purpose_plain": "Lowers cholesterol and helps prevent heart attacks and strokes."
+  },
+  {
+    "generic": "lovastatin",
+    "class": "other",
+    "purpose_plain": "Reduces high cholesterol to lower the risk of heart disease."
+  },
+  {
+    "generic": "fluvastatin",
+    "class": "other",
+    "purpose_plain": "Lowers cholesterol levels to protect the heart."
+  },
+  {
+    "generic": "pitavastatin",
+    "class": "other",
+    "purpose_plain": "Treats high cholesterol and reduces cardiovascular risk."
+  },
+  {
+    "generic": "enalapril",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and helps protect the heart and kidneys."
+  },
+  {
+    "generic": "lisinopril",
+    "class": "other",
+    "purpose_plain": "Reduces blood pressure and is used in heart failure treatment."
+  },
+  {
+    "generic": "ramipril",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and reduces the risk of heart attack and stroke."
+  },
+  {
+    "generic": "perindopril",
+    "class": "other",
+    "purpose_plain": "Treats high blood pressure and reduces the risk of heart disease."
+  },
+  {
+    "generic": "telmisartan",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure by blocking a chemical that tightens blood vessels."
+  },
+  {
+    "generic": "valsartan",
+    "class": "other",
+    "purpose_plain": "Reduces blood pressure and is used in heart failure."
+  },
+  {
+    "generic": "candesartan",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and protects the heart and kidneys."
+  },
+  {
+    "generic": "olmesartan",
+    "class": "other",
+    "purpose_plain": "Controls high blood pressure to reduce the risk of stroke."
+  },
+  {
+    "generic": "irbesartan",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and protects kidneys in diabetes."
+  },
+  {
+    "generic": "bisoprolol",
+    "class": "other",
+    "purpose_plain": "Slows the heart rate and reduces blood pressure."
+  },
+  {
+    "generic": "metoprolol",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and heart rate; used in heart conditions."
+  },
+  {
+    "generic": "atenolol",
+    "class": "other",
+    "purpose_plain": "Reduces blood pressure and controls heart rate."
+  },
+  {
+    "generic": "carvedilol",
+    "class": "other",
+    "purpose_plain": "Treats heart failure and high blood pressure."
+  },
+  {
+    "generic": "propranolol",
+    "class": "other",
+    "purpose_plain": "Slows the heart rate and reduces blood pressure."
+  },
+  {
+    "generic": "nebivolol",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and reduces strain on the heart."
+  },
+  {
+    "generic": "hydrochlorothiazide",
+    "class": "other",
+    "purpose_plain": "Removes excess fluid from the body to lower blood pressure."
+  },
+  {
+    "generic": "furosemide",
+    "class": "other",
+    "purpose_plain": "Helps the body remove excess fluid to treat fluid retention."
+  },
+  {
+    "generic": "spironolactone",
+    "class": "other",
+    "purpose_plain": "Removes excess fluid and treats heart failure and high blood pressure."
+  },
+  {
+    "generic": "torsemide",
+    "class": "other",
+    "purpose_plain": "Treats fluid build-up in heart failure and kidney disease."
+  },
+  {
+    "generic": "indapamide",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and reduces fluid retention."
+  },
+  {
+    "generic": "chlorthalidone",
+    "class": "other",
+    "purpose_plain": "Reduces blood pressure and swelling from fluid retention."
+  },
+  {
+    "generic": "nifedipine",
+    "class": "other",
+    "purpose_plain": "Relaxes blood vessels to lower blood pressure and relieve chest pain."
+  },
+  {
+    "generic": "diltiazem",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and heart rate; treats chest pain."
+  },
+  {
+    "generic": "verapamil",
+    "class": "other",
+    "purpose_plain": "Controls heart rhythm and lowers blood pressure."
+  },
+  {
+    "generic": "felodipine",
+    "class": "other",
+    "purpose_plain": "Relaxes blood vessels to treat high blood pressure."
+  },
+  {
+    "generic": "isradipine",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure by relaxing blood vessel walls."
+  },
+  {
+    "generic": "nitroglycerine",
+    "class": "other",
+    "purpose_plain": "Relieves chest pain by widening blood vessels to the heart."
+  },
+  {
+    "generic": "isosorbide mononitrate",
+    "class": "other",
+    "purpose_plain": "Prevents and relieves chest pain by relaxing blood vessels."
+  },
+  {
+    "generic": "isosorbide dinitrate",
+    "class": "other",
+    "purpose_plain": "Treats and prevents angina chest pain."
+  },
+  {
+    "generic": "digoxin",
+    "class": "other",
+    "purpose_plain": "Strengthens the heartbeat and controls heart rate in certain conditions."
+  },
+  {
+    "generic": "amiodarone",
+    "class": "other",
+    "purpose_plain": "Controls abnormal heart rhythms when other medicines have not worked."
+  },
+  {
+    "generic": "clopidogrel",
+    "class": "other",
+    "purpose_plain": "Prevents blood clots and reduces the risk of heart attack and stroke."
+  },
+  {
+    "generic": "aspirin low dose",
+    "class": "other",
+    "purpose_plain": "Used at low doses to thin the blood and prevent heart attacks."
+  },
+  {
+    "generic": "heparin",
+    "class": "other",
+    "purpose_plain": "Prevents and treats dangerous blood clots."
+  },
+  {
+    "generic": "enoxaparin",
+    "class": "other",
+    "purpose_plain": "Prevents blood clots after surgery and in other high-risk situations."
+  },
+  {
+    "generic": "rivaroxaban",
+    "class": "other",
+    "purpose_plain": "Prevents blood clots and reduces the risk of stroke."
+  },
+  {
+    "generic": "apixaban",
+    "class": "other",
+    "purpose_plain": "Reduces the risk of stroke and blood clots."
+  },
+  {
+    "generic": "dabigatran",
+    "class": "other",
+    "purpose_plain": "Prevents blood clots, especially in patients with irregular heartbeat."
+  },
+  {
+    "generic": "glipizide",
+    "class": "other",
+    "purpose_plain": "Lowers blood sugar in type 2 diabetes by stimulating insulin release."
+  },
+  {
+    "generic": "gliclazide",
+    "class": "other",
+    "purpose_plain": "Helps control blood sugar levels in type 2 diabetes."
+  },
+  {
+    "generic": "glimepiride",
+    "class": "other",
+    "purpose_plain": "Stimulates insulin release to lower blood sugar in type 2 diabetes."
+  },
+  {
+    "generic": "pioglitazone",
+    "class": "other",
+    "purpose_plain": "Improves the body's response to insulin in type 2 diabetes."
+  },
+  {
+    "generic": "sitagliptin",
+    "class": "other",
+    "purpose_plain": "Helps control blood sugar levels in type 2 diabetes."
+  },
+  {
+    "generic": "vildagliptin",
+    "class": "other",
+    "purpose_plain": "Lowers blood sugar in type 2 diabetes by boosting insulin activity."
+  },
+  {
+    "generic": "dapagliflozin",
+    "class": "other",
+    "purpose_plain": "Lowers blood sugar and may protect the heart and kidneys in diabetes."
+  },
+  {
+    "generic": "empagliflozin",
+    "class": "other",
+    "purpose_plain": "Controls blood sugar and reduces cardiovascular risk in type 2 diabetes."
+  },
+  {
+    "generic": "canagliflozin",
+    "class": "other",
+    "purpose_plain": "Lowers blood sugar and reduces the risk of heart and kidney disease."
+  },
+  {
+    "generic": "liraglutide",
+    "class": "other",
+    "purpose_plain": "Controls blood sugar and supports weight loss in type 2 diabetes."
+  },
+  {
+    "generic": "insulin regular",
+    "class": "other",
+    "purpose_plain": "Lowers blood sugar quickly, used to manage diabetes."
+  },
+  {
+    "generic": "insulin glargine",
+    "class": "other",
+    "purpose_plain": "Provides long-acting blood sugar control for diabetes."
+  },
+  {
+    "generic": "insulin isophane",
+    "class": "other",
+    "purpose_plain": "Controls blood sugar with an intermediate duration of action."
+  },
+  {
+    "generic": "carbimazole",
+    "class": "other",
+    "purpose_plain": "Reduces the production of thyroid hormone in an overactive thyroid."
+  },
+  {
+    "generic": "propylthiouracil",
+    "class": "other",
+    "purpose_plain": "Treats an overactive thyroid gland."
+  },
+  {
+    "generic": "dexamethasone",
+    "class": "other",
+    "purpose_plain": "Reduces severe inflammation and suppresses immune reactions."
+  },
+  {
+    "generic": "methylprednisolone",
+    "class": "other",
+    "purpose_plain": "Treats inflammation and immune system disorders."
+  },
+  {
+    "generic": "hydrocortisone",
+    "class": "other",
+    "purpose_plain": "Replaces cortisol when the body cannot produce enough on its own."
+  },
+  {
+    "generic": "betamethasone",
+    "class": "other",
+    "purpose_plain": "Reduces skin inflammation and is used in severe allergic reactions."
+  },
+  {
+    "generic": "beclomethasone",
+    "class": "other",
+    "purpose_plain": "Reduces airway inflammation when inhaled to prevent asthma symptoms."
+  },
+  {
+    "generic": "budesonide",
+    "class": "other",
+    "purpose_plain": "Controls asthma and nasal allergy symptoms by reducing inflammation."
+  },
+  {
+    "generic": "fluticasone",
+    "class": "other",
+    "purpose_plain": "Prevents asthma attacks and eases nasal allergy symptoms."
+  },
+  {
+    "generic": "mometasone",
+    "class": "other",
+    "purpose_plain": "Controls nasal allergy symptoms and asthma when inhaled."
+  },
+  {
+    "generic": "formoterol",
+    "class": "other",
+    "purpose_plain": "Opens the airways for an extended period to ease breathing in asthma."
+  },
+  {
+    "generic": "salmeterol",
+    "class": "other",
+    "purpose_plain": "Keeps airways open for up to 12 hours to prevent asthma symptoms."
+  },
+  {
+    "generic": "ipratropium",
+    "class": "other",
+    "purpose_plain": "Relaxes the airways to relieve breathing difficulty in lung disease."
+  },
+  {
+    "generic": "tiotropium",
+    "class": "other",
+    "purpose_plain": "Opens the airways to improve breathing in COPD."
+  },
+  {
+    "generic": "montelukast",
+    "class": "other",
+    "purpose_plain": "Prevents asthma attacks and relieves hay fever symptoms."
+  },
+  {
+    "generic": "theophylline",
+    "class": "other",
+    "purpose_plain": "Opens the airways to help treat asthma and COPD."
+  },
+  {
+    "generic": "aminophylline",
+    "class": "other",
+    "purpose_plain": "Relaxes the airways to relieve asthma and breathing difficulty."
+  },
+  {
+    "generic": "paroxetine",
+    "class": "other",
+    "purpose_plain": "Treats depression, anxiety disorders, and panic attacks."
+  },
+  {
+    "generic": "escitalopram",
+    "class": "other",
+    "purpose_plain": "Treats depression and anxiety by balancing serotonin in the brain."
+  },
+  {
+    "generic": "citalopram",
+    "class": "other",
+    "purpose_plain": "Helps treat depression and certain anxiety disorders."
+  },
+  {
+    "generic": "venlafaxine",
+    "class": "other",
+    "purpose_plain": "Treats depression and anxiety disorders."
+  },
+  {
+    "generic": "duloxetine",
+    "class": "other",
+    "purpose_plain": "Treats depression, anxiety, and certain types of chronic pain."
+  },
+  {
+    "generic": "mirtazapine",
+    "class": "other",
+    "purpose_plain": "Treats depression and may improve sleep and appetite."
+  },
+  {
+    "generic": "amitriptyline",
+    "class": "other",
+    "purpose_plain": "Treats depression and is also used for nerve pain and migraine prevention."
+  },
+  {
+    "generic": "nortriptyline",
+    "class": "other",
+    "purpose_plain": "Treats depression and is sometimes used for nerve pain."
+  },
+  {
+    "generic": "clomipramine",
+    "class": "other",
+    "purpose_plain": "Treats obsessive-compulsive disorder and depression."
+  },
+  {
+    "generic": "alprazolam",
+    "class": "other",
+    "purpose_plain": "Reduces anxiety and panic disorder symptoms quickly."
+  },
+  {
+    "generic": "clonazepam",
+    "class": "other",
+    "purpose_plain": "Treats seizures and panic disorder."
+  },
+  {
+    "generic": "diazepam",
+    "class": "other",
+    "purpose_plain": "Relieves anxiety, muscle spasms, and seizures."
+  },
+  {
+    "generic": "lorazepam",
+    "class": "other",
+    "purpose_plain": "Reduces anxiety and is used before medical procedures."
+  },
+  {
+    "generic": "zolpidem",
+    "class": "other",
+    "purpose_plain": "Helps with short-term sleep difficulties."
+  },
+  {
+    "generic": "zopiclone",
+    "class": "other",
+    "purpose_plain": "Provides short-term relief of insomnia."
+  },
+  {
+    "generic": "quetiapine",
+    "class": "other",
+    "purpose_plain": "Treats schizophrenia, bipolar disorder, and depression."
+  },
+  {
+    "generic": "olanzapine",
+    "class": "other",
+    "purpose_plain": "Treats schizophrenia and episodes of bipolar disorder."
+  },
+  {
+    "generic": "risperidone",
+    "class": "other",
+    "purpose_plain": "Manages symptoms of schizophrenia and bipolar disorder."
+  },
+  {
+    "generic": "haloperidol",
+    "class": "other",
+    "purpose_plain": "Treats psychosis and severe behavioural disturbances."
+  },
+  {
+    "generic": "lithium carbonate",
+    "class": "other",
+    "purpose_plain": "Stabilises mood in bipolar disorder."
+  },
+  {
+    "generic": "valproic acid",
+    "class": "other",
+    "purpose_plain": "Controls seizures and stabilises mood in bipolar disorder."
+  },
+  {
+    "generic": "sodium valproate",
+    "class": "other",
+    "purpose_plain": "Prevents seizures and is used in bipolar disorder."
+  },
+  {
+    "generic": "carbamazepine",
+    "class": "other",
+    "purpose_plain": "Controls seizures and treats certain types of nerve pain."
+  },
+  {
+    "generic": "phenytoin",
+    "class": "other",
+    "purpose_plain": "Prevents and controls seizures."
+  },
+  {
+    "generic": "levetiracetam",
+    "class": "other",
+    "purpose_plain": "Controls several types of seizures in epilepsy."
+  },
+  {
+    "generic": "lamotrigine",
+    "class": "other",
+    "purpose_plain": "Prevents seizures and stabilises mood in bipolar disorder."
+  },
+  {
+    "generic": "topiramate",
+    "class": "other",
+    "purpose_plain": "Controls seizures and is used for migraine prevention."
+  },
+  {
+    "generic": "gabapentin",
+    "class": "other",
+    "purpose_plain": "Treats nerve pain and controls certain types of seizures."
+  },
+  {
+    "generic": "pregabalin",
+    "class": "other",
+    "purpose_plain": "Relieves nerve pain and controls certain seizures."
+  },
+  {
+    "generic": "phenobarbital",
+    "class": "other",
+    "purpose_plain": "Controls seizures and is used for short-term anxiety relief."
+  },
+  {
+    "generic": "donepezil",
+    "class": "other",
+    "purpose_plain": "Helps manage symptoms of Alzheimer's disease."
+  },
+  {
+    "generic": "memantine",
+    "class": "other",
+    "purpose_plain": "Helps slow the progression of Alzheimer's disease symptoms."
+  },
+  {
+    "generic": "rivastigmine",
+    "class": "other",
+    "purpose_plain": "Treats mild to moderate Alzheimer's and Parkinson's disease dementia."
+  },
+  {
+    "generic": "levodopa carbidopa",
+    "class": "other",
+    "purpose_plain": "Treats Parkinson's disease by replacing dopamine in the brain."
+  },
+  {
+    "generic": "pramipexole",
+    "class": "other",
+    "purpose_plain": "Treats Parkinson's disease and restless legs syndrome."
+  },
+  {
+    "generic": "ropinirole",
+    "class": "other",
+    "purpose_plain": "Manages Parkinson's disease and restless legs syndrome."
+  },
+  {
+    "generic": "ondansetron",
+    "class": "other",
+    "purpose_plain": "Prevents nausea and vomiting caused by medicines or surgery."
+  },
+  {
+    "generic": "granisetron",
+    "class": "other",
+    "purpose_plain": "Prevents nausea and vomiting during chemotherapy."
+  },
+  {
+    "generic": "dexamethasone antiemetic",
+    "class": "other",
+    "purpose_plain": "Prevents nausea during chemotherapy when given as an antiemetic."
+  },
+  {
+    "generic": "folic acid",
+    "class": "other",
+    "purpose_plain": "Supports healthy red blood cells and prevents neural tube defects in pregnancy."
+  },
+  {
+    "generic": "iron sulfate",
+    "class": "other",
+    "purpose_plain": "Treats iron deficiency anaemia."
+  },
+  {
+    "generic": "ferrous gluconate",
+    "class": "other",
+    "purpose_plain": "Supplements iron to treat or prevent iron deficiency."
+  },
+  {
+    "generic": "cyanocobalamin",
+    "class": "other",
+    "purpose_plain": "Treats vitamin B12 deficiency anaemia."
+  },
+  {
+    "generic": "hydroxocobalamin",
+    "class": "other",
+    "purpose_plain": "Replaces vitamin B12 when the body cannot absorb it properly."
+  },
+  {
+    "generic": "calcium gluconate",
+    "class": "other",
+    "purpose_plain": "Supplements calcium and treats low calcium levels in the blood."
+  },
+  {
+    "generic": "cholecalciferol",
+    "class": "other",
+    "purpose_plain": "Supplements vitamin D3 for bone health and immunity."
+  },
+  {
+    "generic": "ergocalciferol",
+    "class": "other",
+    "purpose_plain": "Treats vitamin D deficiency and supports calcium absorption."
+  },
+  {
+    "generic": "zinc sulfate",
+    "class": "other",
+    "purpose_plain": "Supplements zinc and helps treat diarrhoea in children."
+  },
+  {
+    "generic": "potassium chloride",
+    "class": "other",
+    "purpose_plain": "Replaces potassium when blood levels are too low."
+  },
+  {
+    "generic": "magnesium sulfate",
+    "class": "other",
+    "purpose_plain": "Treats low magnesium levels and is used in eclampsia during pregnancy."
+  },
+  {
+    "generic": "oral rehydration salts",
+    "class": "other",
+    "purpose_plain": "Replaces fluid and minerals lost during diarrhoea and vomiting."
+  },
+  {
+    "generic": "albendazole",
+    "class": "other",
+    "purpose_plain": "Kills intestinal worms and treats other parasitic infections."
+  },
+  {
+    "generic": "mebendazole",
+    "class": "other",
+    "purpose_plain": "Treats common intestinal worm infections."
+  },
+  {
+    "generic": "ivermectin",
+    "class": "other",
+    "purpose_plain": "Treats parasitic infections including river blindness and strongyloidiasis."
+  },
+  {
+    "generic": "praziquantel",
+    "class": "other",
+    "purpose_plain": "Treats tapeworm and other parasitic worm infections."
+  },
+  {
+    "generic": "chloroquine",
+    "class": "other",
+    "purpose_plain": "Treats and prevents malaria and certain autoimmune conditions."
+  },
+  {
+    "generic": "hydroxychloroquine",
+    "class": "other",
+    "purpose_plain": "Treats malaria and autoimmune conditions such as rheumatoid arthritis."
+  },
+  {
+    "generic": "artemether lumefantrine",
+    "class": "other",
+    "purpose_plain": "Treats malaria by killing the malaria parasite."
+  },
+  {
+    "generic": "quinine",
+    "class": "other",
+    "purpose_plain": "Treats severe malaria and leg cramps."
+  },
+  {
+    "generic": "doxycycline malaria",
+    "class": "other",
+    "purpose_plain": "Prevents malaria when taken before and during travel to at-risk areas."
+  },
+  {
+    "generic": "aciclovir",
+    "class": "other",
+    "purpose_plain": "Treats herpes virus infections including cold sores and shingles."
+  },
+  {
+    "generic": "valaciclovir",
+    "class": "other",
+    "purpose_plain": "Treats and suppresses herpes virus infections."
+  },
+  {
+    "generic": "oseltamivir",
+    "class": "other",
+    "purpose_plain": "Treats influenza by stopping the virus from spreading in the body."
+  },
+  {
+    "generic": "fluconazole",
+    "class": "other",
+    "purpose_plain": "Treats fungal infections including thrush and yeast infections."
+  },
+  {
+    "generic": "itraconazole",
+    "class": "other",
+    "purpose_plain": "Treats serious fungal infections of the skin, nails, and internal organs."
+  },
+  {
+    "generic": "terbinafine",
+    "class": "other",
+    "purpose_plain": "Treats fungal infections of the skin, hair, and nails."
+  },
+  {
+    "generic": "clotrimazole",
+    "class": "other",
+    "purpose_plain": "Treats fungal skin infections including athlete's foot and thrush."
+  },
+  {
+    "generic": "miconazole",
+    "class": "other",
+    "purpose_plain": "Clears fungal infections of the skin, mouth, and genitals."
+  },
+  {
+    "generic": "nystatin",
+    "class": "other",
+    "purpose_plain": "Treats candida fungal infections of the mouth and gut."
+  },
+  {
+    "generic": "ketoconazole",
+    "class": "other",
+    "purpose_plain": "Treats skin and scalp fungal infections."
+  },
+  {
+    "generic": "griseofulvin",
+    "class": "other",
+    "purpose_plain": "Treats fungal infections of the skin, hair, and nails."
+  },
+  {
+    "generic": "diphtheria tetanus pertussis vaccine",
+    "class": "other",
+    "purpose_plain": "Prevents diphtheria, tetanus, and whooping cough through immunisation."
+  },
+  {
+    "generic": "oral polio vaccine",
+    "class": "other",
+    "purpose_plain": "Protects against polio virus infection."
+  },
+  {
+    "generic": "hepatitis b vaccine",
+    "class": "other",
+    "purpose_plain": "Prevents hepatitis B viral infection."
+  },
+  {
+    "generic": "measles rubella vaccine",
+    "class": "other",
+    "purpose_plain": "Protects against measles and rubella infections."
+  },
+  {
+    "generic": "bcg vaccine",
+    "class": "other",
+    "purpose_plain": "Protects against severe tuberculosis, especially in newborns."
+  },
+  {
+    "generic": "tamoxifen",
+    "class": "other",
+    "purpose_plain": "Used in long-term treatment of certain hormone-related conditions."
+  },
+  {
+    "generic": "anastrozole",
+    "class": "other",
+    "purpose_plain": "Lowers hormone levels to manage certain hormone-sensitive conditions."
+  },
+  {
+    "generic": "letrozole",
+    "class": "other",
+    "purpose_plain": "Regulates hormone levels in the management of specific endocrine conditions."
+  },
+  {
+    "generic": "capecitabine",
+    "class": "other",
+    "purpose_plain": "Slows the growth of rapidly dividing cells in specialized therapies."
+  },
+  {
+    "generic": "imatinib",
+    "class": "other",
+    "purpose_plain": "Inhibits targeted enzymes in specialized long-term medical treatments."
+  },
+  {
+    "generic": "cyclophosphamide",
+    "class": "other",
+    "purpose_plain": "Modulates immune response and cell division in specialized medical treatments."
+  },
+  {
+    "generic": "dexrazoxane",
+    "class": "other",
+    "purpose_plain": "Helps protect heart tissue during specialized medication therapies."
+  },
+  {
+    "generic": "ondansetron chemo",
+    "class": "other",
+    "purpose_plain": "Prevents severe nausea and vomiting associated with specialized medical treatments."
+  },
+  {
+    "generic": "filgrastim",
+    "class": "other",
+    "purpose_plain": "Stimulates the bone marrow to produce more white blood cells."
+  },
+  {
+    "generic": "erythropoietin",
+    "class": "other",
+    "purpose_plain": "Stimulates red blood cell production in anaemia of chronic kidney disease."
+  },
+  {
+    "generic": "sildenafil",
+    "class": "other",
+    "purpose_plain": "Treats erectile dysfunction and pulmonary arterial hypertension."
+  },
+  {
+    "generic": "tadalafil",
+    "class": "other",
+    "purpose_plain": "Treats erectile dysfunction and benign prostatic hyperplasia."
+  },
+  {
+    "generic": "finasteride",
+    "class": "other",
+    "purpose_plain": "Treats enlarged prostate and male pattern baldness."
+  },
+  {
+    "generic": "tamsulosin",
+    "class": "other",
+    "purpose_plain": "Relaxes the prostate and bladder to ease urinary symptoms."
+  },
+  {
+    "generic": "solifenacin",
+    "class": "other",
+    "purpose_plain": "Reduces bladder overactivity and urgency to urinate."
+  },
+  {
+    "generic": "oxybutynin",
+    "class": "other",
+    "purpose_plain": "Treats overactive bladder and reduces urinary urgency."
+  },
+  {
+    "generic": "tolterodine",
+    "class": "other",
+    "purpose_plain": "Controls overactive bladder symptoms such as urgency and frequency."
+  },
+  {
+    "generic": "desmopressin",
+    "class": "other",
+    "purpose_plain": "Controls bedwetting and diabetes insipidus."
+  },
+  {
+    "generic": "misoprostol",
+    "class": "other",
+    "purpose_plain": "Protects the stomach lining and is used in obstetric care."
+  },
+  {
+    "generic": "oxytocin",
+    "class": "other",
+    "purpose_plain": "Induces labour and helps control bleeding after childbirth."
+  },
+  {
+    "generic": "ergometrine",
+    "class": "other",
+    "purpose_plain": "Controls postpartum haemorrhage and uterine bleeding."
+  },
+  {
+    "generic": "progesterone",
+    "class": "other",
+    "purpose_plain": "Supports pregnancy and is used in hormonal conditions."
+  },
+  {
+    "generic": "medroxyprogesterone",
+    "class": "other",
+    "purpose_plain": "Treats hormonal conditions and is used as a contraceptive."
+  },
+  {
+    "generic": "norethisterone",
+    "class": "other",
+    "purpose_plain": "Delays periods and is used in contraception and hormonal conditions."
+  },
+  {
+    "generic": "combined oral contraceptive",
+    "class": "other",
+    "purpose_plain": "Prevents pregnancy through hormonal control."
+  },
+  {
+    "generic": "levonorgestrel",
+    "class": "other",
+    "purpose_plain": "Prevents pregnancy when taken after unprotected sex."
+  },
+  {
+    "generic": "clomifene",
+    "class": "other",
+    "purpose_plain": "Stimulates ovulation to help women become pregnant."
+  },
+  {
+    "generic": "allopurinol",
+    "class": "other",
+    "purpose_plain": "Lowers uric acid levels to prevent gout attacks."
+  },
+  {
+    "generic": "colchicine",
+    "class": "other",
+    "purpose_plain": "Relieves the pain of acute gout attacks."
+  },
+  {
+    "generic": "febuxostat",
+    "class": "other",
+    "purpose_plain": "Reduces uric acid levels to prevent gout."
+  },
+  {
+    "generic": "bisphosphonate alendronate",
+    "class": "other",
+    "purpose_plain": "Strengthens bones and reduces the risk of fractures in osteoporosis."
+  },
+  {
+    "generic": "alendronate",
+    "class": "other",
+    "purpose_plain": "Treats osteoporosis by slowing bone loss and increasing bone density."
+  },
+  {
+    "generic": "risedronate",
+    "class": "other",
+    "purpose_plain": "Prevents bone loss and reduces fracture risk in osteoporosis."
+  },
+  {
+    "generic": "ibandronate",
+    "class": "other",
+    "purpose_plain": "Treats and prevents osteoporosis in post-menopausal women."
+  },
+  {
+    "generic": "denosumab",
+    "class": "other",
+    "purpose_plain": "Strengthens bones and reduces fracture risk in osteoporosis."
+  },
+  {
+    "generic": "calcitonin",
+    "class": "other",
+    "purpose_plain": "Treats osteoporosis and Paget's disease of bone."
+  },
+  {
+    "generic": "lactulose",
+    "class": "other",
+    "purpose_plain": "Softens stools to treat constipation."
+  },
+  {
+    "generic": "ispaghula husk",
+    "class": "other",
+    "purpose_plain": "Adds bulk to stools to relieve constipation."
+  },
+  {
+    "generic": "bisacodyl",
+    "class": "other",
+    "purpose_plain": "Stimulates the bowel to relieve short-term constipation."
+  },
+  {
+    "generic": "senna",
+    "class": "other",
+    "purpose_plain": "Treats constipation by stimulating bowel movement."
+  },
+  {
+    "generic": "loperamide",
+    "class": "other",
+    "purpose_plain": "Controls diarrhoea by slowing bowel movement."
+  },
+  {
+    "generic": "zinc oxide topical",
+    "class": "other",
+    "purpose_plain": "Protects and soothes irritated or damaged skin."
+  },
+  {
+    "generic": "calamine",
+    "class": "other",
+    "purpose_plain": "Relieves itching and soothes minor skin irritations."
+  },
+  {
+    "generic": "mupirocin",
+    "class": "other",
+    "purpose_plain": "Treats bacterial skin infections including impetigo."
+  },
+  {
+    "generic": "silver sulfadiazine",
+    "class": "other",
+    "purpose_plain": "Prevents and treats infection in burn wounds."
+  },
+  {
+    "generic": "acyclovir topical",
+    "class": "other",
+    "purpose_plain": "Treats cold sores and herpes skin infections when applied directly."
+  },
+  {
+    "generic": "tretinoin",
+    "class": "other",
+    "purpose_plain": "Treats acne and improves skin appearance."
+  },
+  {
+    "generic": "benzoyl peroxide",
+    "class": "other",
+    "purpose_plain": "Kills acne-causing bacteria on the skin surface."
+  },
+  {
+    "generic": "adapalene",
+    "class": "other",
+    "purpose_plain": "Treats acne by reducing inflammation and unclogging pores."
+  },
+  {
+    "generic": "minoxidil",
+    "class": "other",
+    "purpose_plain": "Stimulates hair growth in male and female pattern baldness."
+  },
+  {
+    "generic": "latanoprost",
+    "class": "other",
+    "purpose_plain": "Lowers pressure inside the eye to treat glaucoma."
+  },
+  {
+    "generic": "timolol eye drops",
+    "class": "other",
+    "purpose_plain": "Reduces eye pressure in glaucoma."
+  },
+  {
+    "generic": "pilocarpine",
+    "class": "other",
+    "purpose_plain": "Reduces eye pressure in glaucoma and treats dry mouth."
+  },
+  {
+    "generic": "dexamethasone eye",
+    "class": "other",
+    "purpose_plain": "Reduces eye inflammation when applied as drops or ointment."
+  },
+  {
+    "generic": "ciprofloxacin eye drops",
+    "class": "other",
+    "purpose_plain": "Treats bacterial eye infections with antibiotic drops."
+  },
+  {
+    "generic": "chloramphenicol eye",
+    "class": "other",
+    "purpose_plain": "Treats bacterial conjunctivitis and other eye infections."
+  },
+  {
+    "generic": "artificial tears",
+    "class": "other",
+    "purpose_plain": "Lubricates dry eyes to relieve irritation and discomfort."
+  },
+  {
+    "generic": "gentamicin",
+    "class": "other",
+    "purpose_plain": "Treats serious bacterial infections, often given by injection."
+  },
+  {
+    "generic": "tobramycin",
+    "class": "other",
+    "purpose_plain": "Treats bacterial infections, including in the eye and lung."
+  },
+  {
+    "generic": "amikacin",
+    "class": "other",
+    "purpose_plain": "Treats serious bacterial infections resistant to other antibiotics."
+  },
+  {
+    "generic": "piperacillin tazobactam",
+    "class": "other",
+    "purpose_plain": "Treats serious hospital-acquired bacterial infections."
+  },
+  {
+    "generic": "meropenem",
+    "class": "other",
+    "purpose_plain": "Treats life-threatening bacterial infections with broad-spectrum coverage."
+  },
+  {
+    "generic": "imipenem cilastatin",
+    "class": "other",
+    "purpose_plain": "Treats serious bacterial infections in hospital settings."
+  },
+  {
+    "generic": "colistin",
+    "class": "other",
+    "purpose_plain": "Treats infections caused by highly resistant bacteria."
+  },
+  {
+    "generic": "rifaximin",
+    "class": "other",
+    "purpose_plain": "Treats traveller's diarrhoea and reduces gut bacteria in liver disease."
+  },
+  {
+    "generic": "neomycin",
+    "class": "other",
+    "purpose_plain": "Treats skin infections and is used to prepare the bowel for surgery."
+  },
+  {
+    "generic": "bacitracin",
+    "class": "other",
+    "purpose_plain": "Treats minor bacterial skin infections and wounds."
+  },
+  {
+    "generic": "polymyxin b",
+    "class": "other",
+    "purpose_plain": "Treats serious gram-negative bacterial infections."
+  },
+  {
+    "generic": "sodium cromoglycate",
+    "class": "other",
+    "purpose_plain": "Prevents asthma and allergic rhinitis symptoms."
+  },
+  {
+    "generic": "ipratropium bromide",
+    "class": "other",
+    "purpose_plain": "Relieves acute breathlessness in asthma and COPD."
+  },
+  {
+    "generic": "salbutamol inhaler",
+    "class": "other",
+    "purpose_plain": "Opens the airways quickly during an asthma attack."
+  },
+  {
+    "generic": "terbutaline",
+    "class": "other",
+    "purpose_plain": "Opens the airways to relieve asthma symptoms."
+  },
+  {
+    "generic": "doxofylline",
+    "class": "other",
+    "purpose_plain": "Relaxes the airways to treat asthma and COPD."
+  },
+  {
+    "generic": "bromhexine",
+    "class": "other",
+    "purpose_plain": "Loosens and thins mucus to make it easier to cough up."
+  },
+  {
+    "generic": "ambroxol",
+    "class": "other",
+    "purpose_plain": "Thins mucus in the airways to ease breathing."
+  },
+  {
+    "generic": "guaifenesin",
+    "class": "other",
+    "purpose_plain": "Thins and loosens mucus to relieve chest congestion."
+  },
+  {
+    "generic": "dextromethorphan",
+    "class": "other",
+    "purpose_plain": "Suppresses dry cough, especially at night."
+  },
+  {
+    "generic": "pseudoephedrine",
+    "class": "other",
+    "purpose_plain": "Relieves nasal congestion by shrinking swollen blood vessels."
+  },
+  {
+    "generic": "xylometazoline",
+    "class": "other",
+    "purpose_plain": "Decongests the nose quickly when applied as nasal drops."
+  },
+  {
+    "generic": "oxymetazoline",
+    "class": "other",
+    "purpose_plain": "Relieves nasal stuffiness quickly for up to 12 hours."
+  },
+  {
+    "generic": "ipratropium nasal",
+    "class": "other",
+    "purpose_plain": "Reduces a runny nose by drying up nasal secretions."
+  },
+  {
+    "generic": "nifedipine extended release",
+    "class": "other",
+    "purpose_plain": "Provides prolonged blood pressure lowering and chest pain prevention."
+  },
+  {
+    "generic": "amlodipine besylate",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and prevents chest pain."
+  },
+  {
+    "generic": "prazosin",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and relieves urinary problems in enlarged prostate."
+  },
+  {
+    "generic": "doxazosin",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and relieves symptoms of enlarged prostate."
+  },
+  {
+    "generic": "clonidine",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and is used for certain pain conditions."
+  },
+  {
+    "generic": "methyldopa",
+    "class": "other",
+    "purpose_plain": "Controls blood pressure, especially during pregnancy."
+  },
+  {
+    "generic": "hydralazine",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure by relaxing blood vessel walls."
+  },
+  {
+    "generic": "nitroprusside",
+    "class": "other",
+    "purpose_plain": "Rapidly lowers dangerously high blood pressure in emergencies."
+  },
+  {
+    "generic": "atenolol tenormin",
+    "class": "other",
+    "purpose_plain": "Controls blood pressure and heart rate."
+  },
+  {
+    "generic": "ivabradine",
+    "class": "other",
+    "purpose_plain": "Reduces the heart rate in heart failure and stable angina."
+  },
+  {
+    "generic": "sacubitril valsartan",
+    "class": "other",
+    "purpose_plain": "Treats heart failure by relaxing blood vessels and reducing fluid."
+  },
+  {
+    "generic": "eplerenone",
+    "class": "other",
+    "purpose_plain": "Reduces fluid retention after heart attack and in heart failure."
+  },
+  {
+    "generic": "labetalol",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and is used for hypertensive emergencies."
+  },
+  {
+    "generic": "nicardipine",
+    "class": "other",
+    "purpose_plain": "Lowers blood pressure and is used for angina."
+  },
+  {
+    "generic": "lercanidipine",
+    "class": "other",
+    "purpose_plain": "Controls high blood pressure with once-daily dosing."
+  },
+  {
+    "generic": "mannitol",
+    "class": "other",
+    "purpose_plain": "Reduces brain and eye pressure in acute emergencies."
+  },
+  {
+    "generic": "acetazolamide",
+    "class": "other",
+    "purpose_plain": "Reduces eye pressure in glaucoma and prevents altitude sickness."
+  },
+  {
+    "generic": "desmopressin acetate",
+    "class": "other",
+    "purpose_plain": "Treats bedwetting and water balance disorders."
+  },
+  {
+    "generic": "bromocriptine",
+    "class": "other",
+    "purpose_plain": "Treats Parkinson's disease, prolactin excess, and diabetes."
+  },
+  {
+    "generic": "cabergoline",
+    "class": "other",
+    "purpose_plain": "Treats certain hormone imbalances and regulates pituitary hormone production."
+  },
+  {
+    "generic": "melatonin",
+    "class": "other",
+    "purpose_plain": "Helps regulate sleep patterns and jet lag."
+  },
+  {
+    "generic": "sumatriptan",
+    "class": "other",
+    "purpose_plain": "Relieves migraine headaches and associated symptoms."
+  },
+  {
+    "generic": "rizatriptan",
+    "class": "other",
+    "purpose_plain": "Treats acute migraine attacks quickly."
+  },
+  {
+    "generic": "naratriptan",
+    "class": "other",
+    "purpose_plain": "Relieves migraine with a longer-lasting but slower onset of action."
+  },
+  {
+    "generic": "flunarizine",
+    "class": "other",
+    "purpose_plain": "Prevents migraine attacks and treats vertigo."
+  },
+  {
+    "generic": "betahistine",
+    "class": "other",
+    "purpose_plain": "Reduces vertigo, tinnitus, and hearing loss in Meniere's disease."
+  },
+  {
+    "generic": "clonazepam seizure",
+    "class": "other",
+    "purpose_plain": "Prevents and controls seizures in epilepsy."
+  },
+  {
+    "generic": "vigabatrin",
+    "class": "other",
+    "purpose_plain": "Treats difficult-to-control epilepsy."
+  },
+  {
+    "generic": "oxcarbazepine",
+    "class": "other",
+    "purpose_plain": "Controls seizures in epilepsy."
+  },
+  {
+    "generic": "lacosamide",
+    "class": "other",
+    "purpose_plain": "Helps control seizures in partial-onset epilepsy."
+  },
+  {
+    "generic": "zonisamide",
+    "class": "other",
+    "purpose_plain": "Treats partial seizures in epilepsy."
+  },
+  {
+    "generic": "baclofen",
+    "class": "other",
+    "purpose_plain": "Relieves muscle spasm and spasticity from neurological conditions."
+  },
+  {
+    "generic": "tizanidine",
+    "class": "other",
+    "purpose_plain": "Reduces muscle spasms and stiffness."
+  },
+  {
+    "generic": "cyclobenzaprine",
+    "class": "other",
+    "purpose_plain": "Relieves muscle spasm and associated pain."
+  },
+  {
+    "generic": "orphenadrine",
+    "class": "other",
+    "purpose_plain": "Treats muscle pain and stiffness."
+  },
+  {
+    "generic": "pyridostigmine",
+    "class": "other",
+    "purpose_plain": "Improves muscle strength in myasthenia gravis."
+  },
+  {
+    "generic": "azathioprine",
+    "class": "other",
+    "purpose_plain": "Suppresses the immune system in autoimmune conditions and after transplants."
+  },
+  {
+    "generic": "ciclosporin",
+    "class": "other",
+    "purpose_plain": "Prevents organ rejection after transplant and treats autoimmune diseases."
+  },
+  {
+    "generic": "mycophenolate",
+    "class": "other",
+    "purpose_plain": "Prevents organ rejection in transplant patients."
+  },
+  {
+    "generic": "tacrolimus",
+    "class": "other",
+    "purpose_plain": "Prevents rejection of transplanted organs."
+  },
+  {
+    "generic": "sulfasalazine",
+    "class": "other",
+    "purpose_plain": "Treats inflammatory bowel disease and rheumatoid arthritis."
+  },
+  {
+    "generic": "mesalazine",
+    "class": "other",
+    "purpose_plain": "Reduces inflammation in inflammatory bowel disease."
+  },
+  {
+    "generic": "infliximab",
+    "class": "other",
+    "purpose_plain": "Treats Crohn's disease, rheumatoid arthritis, and other inflammatory conditions."
+  },
+  {
+    "generic": "adalimumab",
+    "class": "other",
+    "purpose_plain": "Reduces inflammation in rheumatoid arthritis and related conditions."
+  },
+  {
+    "generic": "etanercept",
+    "class": "other",
+    "purpose_plain": "Treats rheumatoid arthritis and psoriasis by blocking inflammation."
+  },
+  {
+    "generic": "hydroxychloroquine rheumatoid",
+    "class": "other",
+    "purpose_plain": "Reduces inflammation in rheumatoid arthritis and lupus."
+  },
+  {
+    "generic": "d-penicillamine",
+    "class": "other",
+    "purpose_plain": "Reduces joint damage in rheumatoid arthritis and treats Wilson's disease."
+  },
+  {
+    "generic": "colchicine gout",
+    "class": "other",
+    "purpose_plain": "Relieves gout attack pain and prevents recurrent attacks."
+  },
+  {
+    "generic": "indomethacin gout",
+    "class": "other",
+    "purpose_plain": "Relieves acute gout attacks through anti-inflammatory action."
+  },
+  {
+    "generic": "sodium stibogluconate",
+    "class": "other",
+    "purpose_plain": "Treats leishmaniasis, a parasitic infection."
+  },
+  {
+    "generic": "amphotericin b",
+    "class": "other",
+    "purpose_plain": "Treats serious and life-threatening fungal infections."
+  },
+  {
+    "generic": "voriconazole",
+    "class": "other",
+    "purpose_plain": "Treats invasive fungal infections in immunocompromised patients."
+  },
+  {
+    "generic": "posaconazole",
+    "class": "other",
+    "purpose_plain": "Prevents and treats serious invasive fungal infections."
+  },
+  {
+    "generic": "caspofungin",
+    "class": "other",
+    "purpose_plain": "Treats serious fungal infections when other antifungals have failed."
+  },
+  {
+    "generic": "dolutegravir",
+    "class": "other",
+    "purpose_plain": "Suppresses viral replication as part of combination antiviral therapy."
+  },
+  {
+    "generic": "tenofovir",
+    "class": "other",
+    "purpose_plain": "Suppresses viral replication and helps protect liver health in antiviral therapy."
+  },
+  {
+    "generic": "lamivudine",
+    "class": "other",
+    "purpose_plain": "Helps control viral replication as part of targeted antiviral treatment."
+  },
+  {
+    "generic": "efavirenz",
+    "class": "other",
+    "purpose_plain": "Inhibits viral activity as part of combination antiviral therapy."
+  },
+  {
+    "generic": "lopinavir ritonavir",
+    "class": "other",
+    "purpose_plain": "Helps control viral levels by inhibiting specific viral enzymes in combination therapy."
+  },
+  {
+    "generic": "zidovudine",
+    "class": "other",
+    "purpose_plain": "Slows viral multiplication and helps prevent vertical transmission during pregnancy."
+  },
+  {
+    "generic": "sofosbuvir",
+    "class": "other",
+    "purpose_plain": "Treats hepatitis C viral infection."
+  },
+  {
+    "generic": "ribavirin",
+    "class": "other",
+    "purpose_plain": "Treats hepatitis C and certain other viral infections."
+  },
+  {
+    "generic": "entecavir",
+    "class": "other",
+    "purpose_plain": "Treats chronic hepatitis B infection."
+  },
+  {
+    "generic": "adefovir",
+    "class": "other",
+    "purpose_plain": "Treats chronic hepatitis B infection."
+  },
+  {
+    "generic": "clavulanic acid",
+    "class": "antibiotic",
+    "purpose_plain": "Is combined with amoxicillin so that it keeps working against resistant bacteria."
+  },
+  {
+    "generic": "trimethoprim",
+    "class": "antibiotic",
+    "purpose_plain": "Treats urinary tract and other bacterial infections."
+  },
+  {
+    "generic": "sulfamethoxazole",
+    "class": "antibiotic",
+    "purpose_plain": "Treats urinary tract and respiratory bacterial infections, usually together with trimethoprim."
+  },
+  {
+    "generic": "phenylephrine",
+    "class": "other",
+    "purpose_plain": "Relieves a blocked nose caused by colds and allergies."
+  },
+  {
+    "generic": "serratiopeptidase",
+    "class": "other",
+    "purpose_plain": "Used together with pain relievers to ease swelling after injury or surgery."
+  },
+  {
+    "generic": "ornidazole",
+    "class": "other",
+    "purpose_plain": "Treats certain gut and gynaecological infections caused by protozoa and anaerobic bacteria."
+  },
+  {
+    "generic": "levosalbutamol",
+    "class": "other",
+    "purpose_plain": "Opens the airways to ease breathing in asthma and similar conditions."
+  },
+  {
+    "generic": "caffeine",
+    "class": "other",
+    "purpose_plain": "Is added to some pain relievers to help them work and to ease tiredness."
+  },
+  {
+    "generic": "fentanyl",
+    "class": "opioid_analgesic",
+    "purpose_plain": "Manages severe persistent pain when continuous relief is required."
+  },
+  {
+    "generic": "oxycodone",
+    "class": "opioid_analgesic",
+    "purpose_plain": "Relieves moderate to severe pain when non-opioid medicines are inadequate."
+  },
+  {
+    "generic": "tapentadol",
+    "class": "opioid_analgesic",
+    "purpose_plain": "Treats moderate to severe acute pain and neuropathic discomfort."
+  },
+  {
+    "generic": "buprenorphine",
+    "class": "opioid_analgesic",
+    "purpose_plain": "Manages chronic severe pain and supports specialized therapies."
+  }
 ]

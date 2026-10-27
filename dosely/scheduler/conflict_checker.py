@@ -26,6 +26,7 @@ from datetime import datetime, time
 from typing import Sequence
 
 from dosely.scheduler.models import ScheduleEntry
+from dosely.synonyms import canonical
 
 
 # ---------------------------------------------------------------------------
@@ -61,6 +62,35 @@ _ANTACID_CLASSES: frozenset[str] = frozenset({
 })
 
 
+def _product_key(entry: ScheduleEntry) -> str:
+    """Distinct product identifier (by prescription line_id if present, else drug name)."""
+    if entry.line_id is not None:
+        return f"line_{entry.line_id}"
+    return entry.drug.strip().lower()
+
+
+def _entry_ingredients(entry: ScheduleEntry) -> list[str]:
+    """Canonical active ingredients present in this entry."""
+    if entry.ingredients:
+        return [canonical(i) for i in entry.ingredients]
+    dc = (entry.drug_class or "").strip().lower()
+    if dc and dc != "unknown":
+        return [canonical(entry.drug)]
+    return []
+
+
+def _entry_classes(entry: ScheduleEntry) -> set[str]:
+    """All therapeutic classes represented by this entry's ingredients or class."""
+    classes = set()
+    if entry.ingredient_classes:
+        for c in entry.ingredient_classes.values():
+            if c:
+                classes.add(c.strip().lower())
+    dc = (entry.drug_class or "").strip().lower()
+    if dc:
+        classes.add(dc)
+    return classes
+
 
 # ---------------------------------------------------------------------------
 # Public function
@@ -68,29 +98,29 @@ _ANTACID_CLASSES: frozenset[str] = frozenset({
 
 def check_conflicts(entries: list[ScheduleEntry]) -> list[ScheduleEntry]:
     """
-    Check for conflicts and annotate entries with warnings.
+    Check for conflicts at the ingredient level and annotate entries with warnings.
 
     Mutates ``entries`` in-place and also returns them for chaining.
-
-    Parameters
-    ----------
-    entries : list[ScheduleEntry]
-        The raw daily timeline produced by MedicationScheduler.
-
-    Returns
-    -------
-    Same list with `.warnings` populated where conflicts exist.
     """
     # ------------------------------------------------------------------ #
-    # 1. Antacid-spacing check                                            #
+    # 1. Antacid-spacing check (ingredient level)                         #
     # ------------------------------------------------------------------ #
-    antacid_entries = [e for e in entries if (e.drug_class or "").lower() in _ANTACID_CLASSES]
-    non_antacid_entries = [e for e in entries if (e.drug_class or "").lower() not in _ANTACID_CLASSES]
+    for antacid in entries:
+        antacid_classes = _entry_classes(antacid)
+        has_antacid = bool(antacid_classes & _ANTACID_CLASSES)
+        if not has_antacid:
+            continue
 
-    for antacid in antacid_entries:
-        for other in non_antacid_entries:
-            if antacid.drug.strip().lower() == other.drug.strip().lower():
+        for other in entries:
+            # Skip doses of the same product
+            if _product_key(antacid) == _product_key(other):
                 continue
+
+            other_classes = _entry_classes(other)
+            has_non_antacid = bool(other_classes - _ANTACID_CLASSES) or not other_classes
+            if not has_non_antacid:
+                continue
+
             gap = _minutes_between(antacid.time, other.time)
             if gap is None:
                 continue
@@ -112,30 +142,59 @@ def check_conflicts(entries: list[ScheduleEntry]) -> list[ScheduleEntry]:
                     other.warnings.append(other_msg)
 
     # ------------------------------------------------------------------ #
-    # 2. Duplicate drug-class check                                       #
+    # 2. Duplicate drug-class check (ingredient level across products)    #
     # ------------------------------------------------------------------ #
-    class_to_entries: dict[str, list[ScheduleEntry]] = {}
+    # Map class -> {product_key -> (display_name, list of entries)}
+    class_products: dict[str, dict[str, tuple[str, list[ScheduleEntry]]]] = {}
     for entry in entries:
-        dc = (entry.drug_class or "").strip().lower()
-        if dc and dc not in ("other", "unknown"):
-            class_to_entries.setdefault(dc, []).append(entry)
+        pkey = _product_key(entry)
+        classes = _entry_classes(entry)
+        for dc in classes:
+            if dc and dc not in ("other", "unknown"):
+                prod_map = class_products.setdefault(dc, {})
+                if pkey not in prod_map:
+                    prod_map[pkey] = (entry.drug, [])
+                prod_map[pkey][1].append(entry)
 
-    for dc, group in class_to_entries.items():
-        # Deduplicate by drug name to count distinct drugs (not slots)
-        distinct_drugs: dict[str, str] = {}
-        for e in group:
-            distinct_drugs.setdefault(e.drug.strip().lower(), e.drug)
+    for dc, prod_map in class_products.items():
+        if len(prod_map) >= 2:
+            names = ", ".join(name for name, _ in prod_map.values())
+            warn = (
+                f"Duplicate drug class '{dc}': {names} are all in the same class. "
+                "Taking two medicines of the same class together may increase "
+                "side-effect risk — please confirm with your doctor or pharmacist."
+            )
+            for _, entry_list in prod_map.values():
+                for entry in entry_list:
+                    if warn not in entry.warnings:
+                        entry.warnings.append(warn)
 
-        if len(distinct_drugs) >= 2:
-            names = ", ".join(distinct_drugs.values())
-            for entry in group:
-                warn = (
-                    f"Duplicate drug class '{dc}': {names} are all in the same class. "
-                    "Taking two medicines of the same class together may increase "
-                    "side-effect risk — please confirm with your doctor or pharmacist."
-                )
-                if warn not in entry.warnings:
-                    entry.warnings.append(warn)
+    # ------------------------------------------------------------------ #
+    # 3. Duplicate active ingredient check                               #
+    # ------------------------------------------------------------------ #
+    # Map ingredient -> {product_key -> (display_name, list of entries)}
+    ingredient_products: dict[str, dict[str, tuple[str, list[ScheduleEntry]]]] = {}
+    for entry in entries:
+        pkey = _product_key(entry)
+        ings = _entry_ingredients(entry)
+        for ing in ings:
+            prod_map = ingredient_products.setdefault(ing, {})
+            if pkey not in prod_map:
+                prod_map[pkey] = (entry.drug, [])
+            prod_map[pkey][1].append(entry)
+
+    for ing, prod_map in ingredient_products.items():
+        if len(prod_map) >= 2:
+            names = ", ".join(name for name, _ in prod_map.values())
+            warn = (
+                f"Duplicate ingredient '{ing}': {names} contain {ing}. "
+                "Taking multiple medicines with the same active ingredient increases the risk "
+                "of accidental overdose — please confirm with your doctor or pharmacist."
+            )
+            for _, entry_list in prod_map.values():
+                for entry in entry_list:
+                    if warn not in entry.warnings:
+                        entry.warnings.append(warn)
 
     return entries
 

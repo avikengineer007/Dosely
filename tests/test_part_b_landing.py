@@ -48,13 +48,19 @@ def test_landing_page_makes_no_api_calls():
     assert "XMLHttpRequest" not in text or "open(" not in text
 
 
-def test_landing_page_pinned_threejs_version():
+def test_landing_page_vendored_threejs_matches_hash():
     assert LANDING_FILE.exists()
     content = LANDING_FILE.read_text(encoding="utf-8")
-    assert "three.js" in content
-    assert "@latest" not in content
-    # Exact pinned version check
-    assert "three.js/r128/three.min.js" in content
+    assert "/static/vendor/three.min.js" in content
+    assert "integrity=\"sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu\"" in content
+    assert "crossorigin=\"anonymous\"" in content
+
+    # Verify actual file on disk matches hash
+    vendor_file = Path(__file__).resolve().parent.parent / "static" / "vendor" / "three.min.js"
+    assert vendor_file.exists()
+    import hashlib, base64
+    digest = base64.b64encode(hashlib.sha384(vendor_file.read_bytes()).digest()).decode()
+    assert f"sha384-{digest}" == "sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu"
 
 
 def test_landing_page_medical_disclaimer():
@@ -65,12 +71,17 @@ def test_landing_page_medical_disclaimer():
     assert "<footer>" in text.lower()
 
 
-def test_landing_csp_allows_cdnjs_and_google_fonts():
+def test_landing_csp_and_permissions_policy():
     response = client.get("/")
     csp = response.headers.get("content-security-policy", "")
-    assert "https://cdnjs.cloudflare.com" in csp
+    assert "https://cdnjs.cloudflare.com" not in csp
+    assert "script-src 'self'" in csp
     assert "https://fonts.googleapis.com" in csp
     assert "https://fonts.gstatic.com" in csp
+
+    pp = response.headers.get("permissions-policy", "")
+    assert "camera=()" in pp
+    assert "microphone=()" in pp
 
 
 def test_app_and_api_csp_retains_stricter_policy():

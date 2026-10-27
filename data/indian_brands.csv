@@ -10,7 +10,7 @@ Volini,diclofenac
 Naprosyn,naproxen
 Ecosprin,aspirin
 Disprin,aspirin
-Ultracet,tramadol
+Ultracet,tramadol + paracetamol
 Contramal,tramadol
 Pan,pantoprazole
 Pan D,pantoprazole + domperidone
@@ -27,8 +27,8 @@ Mucaine,aluminium hydroxide
 Sucral,sucralfate
 Mox,amoxicillin
 Amoxil,amoxicillin
-Augmentin,amoxicillin clavulanate
-Clavam,amoxicillin clavulanate
+Augmentin,amoxicillin + clavulanic acid
+Clavam,amoxicillin + clavulanic acid
 Azee,azithromycin
 Zithromax,azithromycin
 Azithral,azithromycin
@@ -48,8 +48,8 @@ Ceftas,cefixime
 Zinnat,cefuroxime
 Sporidex,cephalexin
 Dalacin,clindamycin
-Septra,trimethoprim sulfamethoxazole
-Bactrim,trimethoprim sulfamethoxazole
+Septra,trimethoprim + sulfamethoxazole
+Bactrim,trimethoprim + sulfamethoxazole
 Macrobid,nitrofurantoin
 Cetzine,cetirizine
 Okacet,cetirizine
@@ -88,3 +88,32 @@ Fludac,fluoxetine
 Prozac,fluoxetine
 Serta,sertraline
 Zoloft,sertraline
+Flexon,ibuprofen + paracetamol
+Omez D,omeprazole + domperidone
+Pantocid DSR,pantoprazole + domperidone
+Nexpro RD,esomeprazole + domperidone
+Razo-D,rabeprazole + domperidone
+Zerodol-P,aceclofenac + paracetamol
+Hifenac-P,aceclofenac + paracetamol
+Zerodol-SP,aceclofenac + paracetamol + serratiopeptidase
+Moxikind-CV,amoxicillin + clavulanic acid
+Cotrimoxazole,trimethoprim + sulfamethoxazole
+Co-trimoxazole,trimethoprim + sulfamethoxazole
+Sinarest,paracetamol + chlorpheniramine + phenylephrine
+Cheston Cold,cetirizine + paracetamol + phenylephrine
+Action 500 Extra,paracetamol + caffeine
+Duolin,levosalbutamol + ipratropium
+Seroflo,salmeterol + fluticasone
+Foracort,formoterol + budesonide
+Telma-AM,telmisartan + amlodipine
+Telma-H,telmisartan + hydrochlorothiazide
+Oflox-OZ,ofloxacin + ornidazole
+Ciplox-TZ,ciprofloxacin + tinidazole
+Allegra-M,fexofenadine + montelukast
+Montair-LC,montelukast + levocetirizine
+Glycomet-GP,metformin + glimepiride
+Amaryl-M,glimepiride + metformin
+Ecosprin-AV,aspirin + atorvastatin
+Voveran Plus,diclofenac + paracetamol
+Wikoryl,paracetamol + phenylephrine + chlorpheniramine
+Ascoril D,dextromethorphan + phenylephrine + chlorpheniramine

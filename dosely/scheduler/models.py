@@ -126,6 +126,8 @@ class DrugInput:
     drug_class: str
     frequency_raw: Optional[str] = None
     food_relation: Optional[str] = None     # FOOD_* constant or None
+    # Active ingredients for combinations / single drugs: [{generic, drug_class, purpose_plain, strength}]
+    ingredients: list[dict] = field(default_factory=list)
     # Arbitrary extra context the caller may pass through
     extra: dict = field(default_factory=dict)
 
@@ -159,6 +161,9 @@ class ScheduleEntry:
     warnings:        list[str] = field(default_factory=list)
     drug_class:      str = ""
     suggestion_text: Optional[str] = None
+    ingredients:     list[str] = field(default_factory=list)
+    ingredient_classes: dict[str, str] = field(default_factory=dict)
+    line_id:         Optional[int] = None
 
     def __post_init__(self) -> None:
         if self.suggested and self.suggestion_text is None:
@@ -176,6 +181,8 @@ class ScheduleEntry:
         }
         if self.suggested:
             d["suggestion_text"] = self.suggestion_text or DEFAULT_SUGGESTION_TEXT
+        if self.ingredients:
+            d["ingredients"] = list(self.ingredients)
         return d
 
     def __getitem__(self, key: str):
@@ -187,4 +194,7 @@ class ScheduleEntry:
         return getattr(self, key, default)
 
     def keys(self):
-        return ["time", "drug", "instruction", "source", "suggested", "warnings", "drug_class", "suggestion_text"]
+        k = ["time", "drug", "instruction", "source", "suggested", "warnings", "drug_class", "suggestion_text"]
+        if self.ingredients:
+            k.append("ingredients")
+        return k

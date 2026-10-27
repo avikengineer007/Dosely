@@ -37,12 +37,13 @@ _create_access_token = create_access_token
 from dosely.drug_db import DrugDatabase
 from dosely.drug_matcher import DrugMatcher
 from dosely.extractor import extract
-from dosely.models import Medicine, Prescription
+from dosely.models import IngredientInfo, Medicine, Prescription
 from dosely.rate_limiter import rate_limit
 from dosely.repository import PrescriptionRepository
 from dosely.scheduler import MedicationScheduler
 from dosely.scheduler.models import DrugInput
 from dosely.storage import EncryptedStorage
+from dosely.upload_validator import validate_and_sanitize_upload
 
 router = APIRouter(prefix="", tags=["prescriptions"])
 
@@ -70,7 +71,7 @@ def get_storage() -> EncryptedStorage:
 def get_matcher() -> DrugMatcher:
     global _matcher
     if _matcher is None:
-        db = DrugDatabase.build()
+        db = DrugDatabase.build(strict=True)
         _matcher = DrugMatcher(db)
     return _matcher
 
@@ -172,13 +173,6 @@ async def upload_prescription(
     repo: Annotated[PrescriptionRepository, Depends(get_repo)],
     storage: Annotated[EncryptedStorage, Depends(get_storage)],
 ) -> dict[str, Any]:
-    content_type = (file.content_type or "").split(";")[0].strip().lower()
-    if content_type not in _ACCEPTED_MIME_TYPES:
-        raise HTTPException(
-            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            detail=f"Unsupported file type '{content_type}'. Must be one of {_ACCEPTED_MIME_TYPES}",
-        )
-
     file_bytes = await file.read(_MAX_FILE_BYTES + 1)
     if len(file_bytes) > _MAX_FILE_BYTES:
         raise HTTPException(
@@ -186,19 +180,31 @@ async def upload_prescription(
             detail="File exceeds 20MB limit.",
         )
 
+    content_type = (file.content_type or "").split(";")[0].strip().lower()
+    clean_bytes, clean_mime = validate_and_sanitize_upload(file_bytes, content_type)
+
     prescription_id = str(uuid.uuid4())
     user_id = str(current_user.get("sub", "anonymous"))
 
-    # Encrypt and save image at rest
-    enc_path = storage.save(prescription_id, file_bytes)
+    # Encrypt and save sanitized image at rest
+    enc_path = storage.save(prescription_id, clean_bytes)
 
     # Perform extraction
     try:
-        extracted: Prescription = extract(file_bytes, prescription_id=prescription_id)
+        extracted: Prescription = extract(clean_bytes, prescription_id=prescription_id)
         matcher_instance = get_matcher()
         for m in extracted.medicines:
             if m.name_raw:
                 m_res = matcher_instance.match(m.name_raw)
+                if m_res.ingredients:
+                    m.ingredients = [IngredientInfo(**ing) for ing in m_res.ingredients]
+                if m_res.match_type in ("exact_generic", "exact_brand"):
+                    m.name_generic = m_res.generic
+                    if m_res.needs_review:
+                        m.needs_review = True
+                        for r in m_res.review_reasons:
+                            if r not in m.review_reasons:
+                                m.review_reasons.append(r)
                 if m_res.match_type == "fuzzy_suggestion":
                     m.suggested_generic = m_res.suggested_generic
                     m.suggested_class = m_res.suggested_class
@@ -213,7 +219,7 @@ async def upload_prescription(
             "image_quality": "poor",
             "medicines": [],
             "needs_human_review": True,
-            "review_summary": [f"Extraction error: {exc}"],
+            "review_summary": [f"Extraction error: {exc.__class__.__name__}"],
         }
 
     # Persist in SQLite
@@ -221,7 +227,7 @@ async def upload_prescription(
         prescription_id=prescription_id,
         user_id=user_id,
         image_path=enc_path,
-        mime_type=content_type,
+        mime_type=clean_mime,
         image_quality=extracted_dict.get("image_quality", "fair"),
         extracted_data=extracted_dict,
     )
@@ -230,6 +236,7 @@ async def upload_prescription(
         "id": prescription_id,
         "status": created["status"],
         "confirmed": created["confirmed"],
+        "extracted_data": extracted_dict,
         "prescription": extracted_dict,
         "disclaimer": "This is not medical advice.",
     }
@@ -238,7 +245,7 @@ async def upload_prescription(
 @router.get(
     "/prescriptions/{prescription_id}",
     summary="Get prescription details",
-    dependencies=[Depends(rate_limit(max_requests=60, window_seconds=60))],
+    dependencies=[Depends(rate_limit(max_requests=30, window_seconds=60))],
 )
 async def get_prescription(
     prescription_id: str,
@@ -348,6 +355,7 @@ async def confirm_prescription(
                 drug_class=matched_dict.get("class", "unknown"),
                 frequency_raw=med.frequency_raw,
                 food_relation=med.food_instruction,
+                ingredients=matched_dict.get("ingredients", []),
             )
         )
 
@@ -370,6 +378,7 @@ async def confirm_prescription(
         "confirmed": True,
         "matched_drugs": matched_results,
         "schedule": timeline,
+        "timeline": timeline,
         "disclaimer": "This is not medical advice.",
     }
 
@@ -408,6 +417,7 @@ async def get_prescription_schedule(
         "status": "confirmed",
         "confirmed": True,
         "schedule": rec.get("schedule", []),
+        "timeline": rec.get("schedule", []),
         "disclaimer": "This is not medical advice.",
     }
 

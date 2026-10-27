@@ -8,9 +8,33 @@ from __future__ import annotations
 
 from datetime import date
 from enum import Enum
-from typing import Annotated, Optional
+from typing import Annotated, Any, Optional
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+
+# ---------------------------------------------------------------------------
+# IngredientInfo
+# ---------------------------------------------------------------------------
+
+class IngredientInfo(BaseModel):
+    """A single active ingredient in a medicine (for combinations or single drugs)."""
+    model_config = ConfigDict(populate_by_name=True)
+
+    generic: str
+    drug_class: str = Field(default="unknown")
+    purpose_plain: Optional[str] = None
+    strength: Optional[str] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _handle_class_alias(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if "class" in data and "drug_class" not in data:
+                data["drug_class"] = data["class"]
+            elif "drug_class" in data and "class" not in data:
+                data["class"] = data["drug_class"]
+        return data
 
 
 # ---------------------------------------------------------------------------
@@ -148,6 +172,10 @@ class Medicine(BaseModel):
     lasa_warning: Optional[str] = Field(
         default=None,
         description="Warning for look-alike/sound-alike drug pair.",
+    )
+    ingredients: list[IngredientInfo] = Field(
+        default_factory=list,
+        description="Active ingredients for combination or single products.",
     )
 
     # Quality signals

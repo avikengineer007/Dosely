@@ -81,8 +81,7 @@ footer{background:#000;color:#8a8a8a;font-size:13px;padding:0 clamp(20px,5vw,64p
 <div class="nav"><span class="dot"></span>Dosely<a href="/app" class="btn" style="margin-left:24px;padding:8px 18px;font-size:14px;text-decoration:none;display:inline-flex;align-items:center">Open Dosely</a></div>
 <div class="copy" id="copy">
 <h1>Know every medicine. Never miss a dose.</h1>
-<p>Upload your prescription. Dosely tells you what each medicine is for and when to take it.</p>
-<button class="btn" onclick="document.getElementById('demo').scrollIntoView()">See it read a prescription</button>
+<a href="/app" class="btn" style="text-decoration:none;display:inline-block">Open Dosely App</a>
 </div>
 <div class="cap2" id="cap2"><h2>Every capsule has a purpose and a time.</h2></div>
 <div class="hint" id="hint">Scroll to open the capsule</div>
@@ -99,22 +98,6 @@ footer{background:#000;color:#8a8a8a;font-size:13px;padding:0 clamp(20px,5vw,64p
 <p class="lead">Mixed-up or missed doses are a real risk, and the fix should not need a medical degree.</p>
 </div></section>
 
-<section class="pad demo" id="demo"><div class="wrap">
-<h2>Watch Dosely read a prescription.</h2>
-<p class="note">This is a sample prescription made up for the demo.</p>
-<div class="grid">
-<div>
-<div class="rx" id="rx"><b>Sample prescription</b><span class="big">Rx</span>
-<p>Tab Pantoprazole 40mg &nbsp;OD, before food</p>
-<p>Tab Ibuprofen 400mg &nbsp;BD, after food</p>
-<p>Cap Amoxicillin 500mg &nbsp;x 5 days</p>
-<div class="scan"></div></div>
-<div class="act"><button class="btn" id="go">Scan prescription</button><span class="note" id="status"></span></div>
-</div>
-<div class="res" id="res" aria-live="polite"><div class="empty">Press Scan prescription to see your medicines and when to take them.</div></div>
-</div>
-</div></section>
-
 <section class="pad trust"><div class="wrap">
 <h2>Built so you stay in charge.</h2>
 <ul>
@@ -122,11 +105,11 @@ footer{background:#000;color:#8a8a8a;font-size:13px;padding:0 clamp(20px,5vw,64p
 <li>If your doctor wrote no timing, Dosely suggests one and says so clearly.</li>
 <li>Dosely explains and reminds. It never replaces your doctor or pharmacist.</li>
 </ul>
-<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center"><a href="/app" class="btn" style="text-decoration:none;display:inline-block">Open Dosely</a><button class="btn" style="background:#222;border:1px solid #444" onclick="document.getElementById('demo').scrollIntoView()">Run the demo again</button></div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center"><a href="/app" class="btn" style="text-decoration:none;display:inline-block">Open Dosely</a></div>
 </div></section>
 <footer><div class="wrap">Dosely is not medical advice. Always follow your doctor's instructions.</div></footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="/static/vendor/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
 <script>
 (function(){
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -173,19 +156,6 @@ size();prog();frame();
 addEventListener('resize',function(){size();prog();if(reduce)frame()});
 addEventListener('scroll',function(){prog();if(reduce)frame()},{passive:true});
 }else{addEventListener('scroll',prog,{passive:true});prog()}
-
-var meds=[
-{n:'Pantoprazole',s:'40 mg',c:'Antacid',d:'Lowers stomach acid and protects your stomach.',t:[7.5],src:'From your prescription: once a day, before food'},
-{n:'Ibuprofen',s:'400 mg',c:'Painkiller',d:'Eases pain, fever and swelling. Take it after food.',t:[9,21],src:'From your prescription: twice a day, after food'},
-{n:'Amoxicillin',s:'500 mg',c:'Antibiotic',d:'Fights bacterial infection. Finish all 5 days.',t:[7,15,23],src:'No timing was written',sug:1}];
-function fmt(h){var H=Math.floor(h),m=Math.round((h-H)*60),ap=H%24>=12?'pm':'am',d=H%12||12;return d+':'+('0'+m).slice(-2)+' '+ap}
-function card(m,i){var ticks=m.t.map(function(h){return '<span class="tick" style="left:'+((h-6)/18*100)+'%">'+fmt(h)+'</span>'}).join('');
-return '<div class="med" style="animation-delay:'+(i*.35)+'s"><div class="top"><strong>'+m.n+' '+m.s+'</strong><span class="chip">'+m.c+'</span></div><p>'+m.d+'</p><div class="track">'+ticks+'</div><div class="axis"><span>6 am</span><span>12 pm</span><span>6 pm</span><span>12 am</span></div><div class="src">'+(m.sug?'<span class="sug">Suggested, confirm with your doctor or pharmacist.</span> '+m.src+'.':m.src+'.')+'</div></div>'}
-var go=document.getElementById('go'),rx=document.getElementById('rx'),res=document.getElementById('res'),st=document.getElementById('status');
-go.addEventListener('click',function(){
-go.disabled=true;st.textContent='Reading your prescription...';res.innerHTML='<div class="empty">Reading...</div>';
-rx.style.setProperty('--h',(rx.offsetHeight-3)+'px');rx.classList.remove('scanning');void rx.offsetWidth;rx.classList.add('scanning');
-setTimeout(function(){res.innerHTML=meds.map(card).join('')+'<p class="note">Before anything is scheduled, you check what Dosely read.</p>';st.textContent='Done. 3 medicines found.';go.textContent='Scan again';go.disabled=false},reduce?50:1700)});
 })();
 </script>
 </body>
