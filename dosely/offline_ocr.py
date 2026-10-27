@@ -63,7 +63,8 @@ def _get_easyocr_reader():
     global _reader_instance
     if _reader_instance is None:
         try:
-            import easyocr
+            import importlib
+            easyocr = importlib.import_module("easyocr")
             # Initialize with English, CPU mode
             _reader_instance = easyocr.Reader(["en"], gpu=False, verbose=False)
         except Exception:
