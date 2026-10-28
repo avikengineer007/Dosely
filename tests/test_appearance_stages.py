@@ -41,7 +41,7 @@ from dosely.preprocessing import (
 
 
 def _render_thin_stroke_text(
-    text: str = "Paracetamol 500mg\\nAmoxicillin 250mg\\nCiprofloxacin 500mg",
+    text: str = "Paracetamol 500mg\nAmoxicillin 250mg\nCiprofloxacin 500mg",
     size: tuple[int, int] = (600, 400),
     stroke_width: int = 1,
     font_size: int = 20,
@@ -50,13 +50,30 @@ def _render_thin_stroke_text(
     w, h = size
     pil_img = Image.new("RGB", (w, h), color=(245, 245, 245))
     draw = ImageDraw.Draw(pil_img)
-    try:
-        font = ImageFont.truetype("arial.ttf", font_size)
-    except Exception:
-        font = ImageFont.load_default()
+    font = None
+    for name in [
+        "arial.ttf",
+        "Arial.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+        "DejaVuSans.ttf",
+        "LiberationSans-Regular.ttf",
+    ]:
+        try:
+            font = ImageFont.truetype(name, font_size)
+            break
+        except Exception:
+            pass
+    if font is None:
+        try:
+            font = ImageFont.load_default(size=font_size)
+        except Exception:
+            font = ImageFont.load_default()
 
     y = 50
-    for line in text.split("\\n"):
+    lines = [l for l in text.replace("\\n", "\n").splitlines() if l.strip()]
+    for line in lines:
         draw.text((40, y), line, fill=(20, 20, 20), font=font)
         y += font_size + 20
 

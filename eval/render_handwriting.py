@@ -57,7 +57,11 @@ def _get_handwriting_font(index: int, size: int) -> ImageFont.ImageFont:
                 return ImageFont.truetype(str(p), size)
             except Exception:
                 pass
-    return ImageFont.load_default()
+    try:
+        return ImageFont.load_default(size=size)
+    except TypeError:
+        return ImageFont.load_default()
+
 
 
 def render_synthetic_handwriting_line(

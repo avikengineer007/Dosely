@@ -40,8 +40,28 @@ from dosely.preprocessing import (
 # Synthetic image generators for testing
 # ---------------------------------------------------------------------------
 
+def _get_font(size: int = 24) -> ImageFont.ImageFont:
+    for name in [
+        "arial.ttf",
+        "Arial.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "DejaVuSans.ttf",
+        "calibri.ttf",
+        "times.ttf",
+    ]:
+        try:
+            return ImageFont.truetype(name, size)
+        except Exception:
+            pass
+    try:
+        return ImageFont.load_default(size=size)
+    except TypeError:
+        return ImageFont.load_default()
+
+
 def _create_clean_prescription_image(
-    text: str = "Paracetamol 500mg TDS\\nAmoxicillin 250mg BD",
+    text: str = "Paracetamol 500mg TDS\nAmoxicillin 250mg BD",
     font_size: int = 24,
     size: tuple[int, int] = (800, 600),
     skew_angle: float = 0.0,
@@ -51,15 +71,12 @@ def _create_clean_prescription_image(
     paper_color = (245, 245, 245)
     pil_img = Image.new("RGB", (w, h), color=paper_color)
     draw = ImageDraw.Draw(pil_img)
-    try:
-        font = ImageFont.truetype("arial.ttf", font_size)
-    except Exception:
-        font = ImageFont.load_default()
+    font = _get_font(font_size)
 
     draw.text((60, 50), "CITY HOSPITAL - PRESCRIPTION", fill=(0, 0, 0), font=font)
     draw.line([(50, 90), (w - 50, 90)], fill=(0, 0, 0), width=2)
     y = 120
-    for line in text.split("\\n"):
+    for line in text.replace("\\n", "\n").splitlines():
         draw.text((60, y), line, fill=(0, 0, 0), font=font)
         y += font_size + 15
 
@@ -67,6 +84,7 @@ def _create_clean_prescription_image(
         pil_img = pil_img.rotate(skew_angle, resample=Image.BICUBIC, fillcolor=paper_color)
 
     return cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
+
 
 
 # ---------------------------------------------------------------------------

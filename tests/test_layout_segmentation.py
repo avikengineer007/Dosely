@@ -37,12 +37,24 @@ from dosely.storage import EncryptedStorage
 
 
 def _get_font(size: int = 24) -> ImageFont.ImageFont:
-    for name in ["arial.ttf", "calibri.ttf", "times.ttf"]:
+    for name in [
+        "arial.ttf",
+        "Arial.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "DejaVuSans.ttf",
+        "calibri.ttf",
+        "times.ttf",
+    ]:
         try:
             return ImageFont.truetype(name, size)
         except Exception:
             pass
-    return ImageFont.load_default()
+    try:
+        return ImageFont.load_default(size=size)
+    except TypeError:
+        return ImageFont.load_default()
+
 
 
 def _render_synthetic_prescription_page(

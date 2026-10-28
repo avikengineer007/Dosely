@@ -45,7 +45,7 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "test_images"
 
 
 def _make_sample_document(
-    text: str = "Dr. S. K. Mukherjee, MBBS\\nParacetamol 500mg BD x 5 days\\nAmoxicillin 500mg TDS x 7 days",
+    text: str = "Dr. S. K. Mukherjee, MBBS\nParacetamol 500mg BD x 5 days\nAmoxicillin 500mg TDS x 7 days",
     size: tuple[int, int] = (600, 800),
     bg_color: tuple[int, int, int] = (245, 245, 245),
 ) -> np.ndarray:
@@ -53,15 +53,32 @@ def _make_sample_document(
     w, h = size
     pil_img = Image.new("RGB", (w, h), color=bg_color)
     draw = ImageDraw.Draw(pil_img)
-    try:
-        font = ImageFont.truetype("arial.ttf", 22)
-    except Exception:
-        font = ImageFont.load_default()
+    font = None
+    for name in [
+        "arial.ttf",
+        "Arial.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+        "DejaVuSans.ttf",
+        "LiberationSans-Regular.ttf",
+    ]:
+        try:
+            font = ImageFont.truetype(name, 22)
+            break
+        except Exception:
+            pass
+    if font is None:
+        try:
+            font = ImageFont.load_default(size=22)
+        except Exception:
+            font = ImageFont.load_default()
 
     draw.text((40, 40), "CITY HEALTH CLINIC", fill=(20, 20, 20), font=font)
     draw.line([(30, 80), (w - 30, 80)], fill=(0, 0, 0), width=2)
     y = 120
-    for line in text.split("\\n"):
+    lines = [l for l in text.replace("\\n", "\n").splitlines() if l.strip()]
+    for line in lines:
         draw.text((40, y), line, fill=(10, 10, 10), font=font)
         y += 40
     return cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)

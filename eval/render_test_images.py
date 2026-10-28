@@ -43,7 +43,13 @@ def _get_font(font_name: str, size: int) -> ImageFont.ImageFont:
     try:
         return ImageFont.truetype(font_name, size)
     except Exception:
+        pass
+    try:
+        return ImageFont.load_default(size=size)
+    except TypeError:
         return ImageFont.load_default()
+
+
 
 
 def render_prescription_image(
