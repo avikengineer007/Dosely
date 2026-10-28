@@ -1,0 +1,156 @@
+{
+  "clinically_reviewed": false,
+  "status": "pending_pharmacist_review",
+  "version": "1.0.0",
+  "description": "Prescription abbreviation and shorthand lexicon for handwritten prescripts with confusion pairs and plausibility tables.",
+  "frequencies": {
+    "OD": {
+      "canonical": "Once daily",
+      "timing_slots": ["morning"],
+      "variants": ["od", "o.d.", "once daily", "q.d.", "qd", "1/d", "1-0-0", "0-1-0"]
+    },
+    "BD": {
+      "canonical": "Twice daily",
+      "timing_slots": ["morning", "night"],
+      "variants": ["bd", "b.d.", "bid", "b.i.d.", "twice daily", "2/d", "1-0-1", "1+0+1", "1 - 0 - 1", "1 + 0 + 1"]
+    },
+    "TDS": {
+      "canonical": "Three times daily",
+      "timing_slots": ["morning", "afternoon", "night"],
+      "variants": ["tds", "t.d.s.", "tid", "t.i.d.", "three times daily", "3/d", "1-1-1", "1+1+1", "1 - 1 - 1"]
+    },
+    "QID": {
+      "canonical": "Four times daily",
+      "timing_slots": ["morning", "afternoon", "evening", "night"],
+      "variants": ["qid", "q.i.d.", "four times daily", "4/d", "1-1-1-1", "1+1+1+1"]
+    },
+    "NIGHT_ONLY": {
+      "canonical": "Once daily at night",
+      "timing_slots": ["night"],
+      "variants": ["0-0-1", "0+0+1", "0 - 0 - 1", "night only"]
+    },
+    "HS": {
+      "canonical": "At bedtime",
+      "timing_slots": ["night"],
+      "variants": ["hs", "h.s.", "bedtime", "at night"]
+    },
+    "SOS": {
+      "canonical": "As needed",
+      "timing_slots": ["as_needed"],
+      "variants": ["sos", "s.o.s.", "prn", "p.r.n.", "when needed", "as needed"]
+    },
+    "STAT": {
+      "canonical": "Immediately (single dose)",
+      "timing_slots": ["immediate"],
+      "variants": ["stat", "immediately", "single dose"]
+    },
+    "AC": {
+      "canonical": "Before food",
+      "timing_slots": null,
+      "variants": ["ac", "a.c.", "before food", "before meals", "bf", "b.f."]
+    },
+    "EMPTY_STOMACH": {
+      "canonical": "Before food / Empty stomach",
+      "timing_slots": null,
+      "variants": ["empty stomach", "on empty stomach"]
+    },
+    "PC": {
+      "canonical": "After food",
+      "timing_slots": null,
+      "variants": ["pc", "p.c.", "after food", "after meals", "af", "a.f."]
+    }
+  },
+  "forms": {
+    "tab": "tablet",
+    "cap": "capsule",
+    "syp": "syrup",
+    "inj": "injection",
+    "oint": "ointment",
+    "gtt": "drops",
+    "1/2 tab": "half tablet"
+  },
+  "confusions": {
+    "O/B D": {
+      "status": "AMBIGUOUS",
+      "candidates": ["OD (Once daily)", "BD (Twice daily)"]
+    },
+    "OD or BD": {
+      "status": "AMBIGUOUS",
+      "candidates": ["OD (Once daily)", "BD (Twice daily)"]
+    },
+    "tid or bid": {
+      "status": "AMBIGUOUS",
+      "candidates": ["TID (Three times daily)", "BID (Twice daily)"]
+    },
+    "1/7": {
+      "status": "AMBIGUOUS",
+      "candidates": ["1 tablet", "7 days"]
+    },
+    "0/6": {
+      "status": "AMBIGUOUS",
+      "candidates": ["0", "6"]
+    }
+  },
+  "plausible_strengths": {
+    "paracetamol": {
+      "unit": "mg",
+      "allowed_values": [125, 250, 500, 650, 1000],
+      "max_single_dose_mg": 1000
+    },
+    "amoxicillin": {
+      "unit": "mg",
+      "allowed_values": [125, 250, 500, 625, 875, 1000],
+      "max_single_dose_mg": 1000
+    },
+    "thyroxine": {
+      "unit": "mcg",
+      "allowed_values": [12.5, 25, 50, 75, 88, 100, 112, 125, 137, 150, 175, 200],
+      "max_single_dose_mg": 0.3
+    },
+    "metformin": {
+      "unit": "mg",
+      "allowed_values": [250, 500, 850, 1000],
+      "max_single_dose_mg": 1000
+    },
+    "azithromycin": {
+      "unit": "mg",
+      "allowed_values": [250, 500],
+      "max_single_dose_mg": 500
+    },
+    "pantoprazole": {
+      "unit": "mg",
+      "allowed_values": [20, 40],
+      "max_single_dose_mg": 40
+    },
+    "omeprazole": {
+      "unit": "mg",
+      "allowed_values": [10, 20, 40],
+      "max_single_dose_mg": 40
+    },
+    "cetirizine": {
+      "unit": "mg",
+      "allowed_values": [5, 10],
+      "max_single_dose_mg": 10
+    },
+    "atorvastatin": {
+      "unit": "mg",
+      "allowed_values": [10, 20, 40, 80],
+      "max_single_dose_mg": 80
+    },
+    "amlodipine": {
+      "unit": "mg",
+      "allowed_values": [2.5, 5, 10],
+      "max_single_dose_mg": 10
+    },
+    "ibuprofen": {
+      "unit": "mg",
+      "allowed_values": [200, 400, 600, 800],
+      "max_single_dose_mg": 800
+    },
+    "ciprofloxacin": {
+      "unit": "mg",
+      "allowed_values": [250, 500, 750],
+      "max_single_dose_mg": 750
+    }
+  }
+}

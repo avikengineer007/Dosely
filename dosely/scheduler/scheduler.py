@@ -136,6 +136,8 @@ class MedicationScheduler:
                 ingredients=ing_names,
                 ingredient_classes=ing_classes,
                 line_id=line_id,
+                form=drug.form,
+                strength=drug.strength,
             )]
 
         time_instrs = resolve_slots(
@@ -156,6 +158,8 @@ class MedicationScheduler:
                 ingredients=ing_names,
                 ingredient_classes=ing_classes,
                 line_id=line_id,
+                form=drug.form,
+                strength=drug.strength,
             )
             for t, instr in time_instrs
         ]
@@ -187,6 +191,8 @@ class MedicationScheduler:
                 ingredients=ing_names,
                 ingredient_classes=ing_classes,
                 line_id=line_id,
+                form=drug.form,
+                strength=drug.strength,
             )]
 
         # Determine most conservative class among ingredients
@@ -220,6 +226,8 @@ class MedicationScheduler:
                 ingredients=ing_names,
                 ingredient_classes=ing_classes,
                 line_id=line_id,
+                form=drug.form,
+                strength=drug.strength,
             ))
 
         if not entries:
@@ -233,6 +241,8 @@ class MedicationScheduler:
                 ingredients=ing_names,
                 ingredient_classes=ing_classes,
                 line_id=line_id,
+                form=drug.form,
+                strength=drug.strength,
             ))
 
         return entries

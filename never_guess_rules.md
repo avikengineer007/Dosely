@@ -178,6 +178,36 @@ If no medicines can be extracted (empty `medicines` list), the system MUST:
 
 ---
 
+### 15. Candidate Lists are Hints, Not Decisions
+
+Candidate lists derived from handwriting matching or packet photos are suggestions for user selection only:
+
+- **Never** auto-select any candidate, regardless of similarity score.
+- Confirmed generic names and classes are populated ONLY when the user makes an explicit choice (`source="user_selected"`).
+- Top candidates within a small score gap must be presented with equal prominence.
+
+---
+
+### 16. Disputed Reads Force Review
+
+When independent model reads disagree on a drug name, strength, frequency, or duration:
+
+- Disputed reads MUST set `needs_review = True`.
+- Surface all distinct readings with their vote counts.
+- Drug names and strengths require unanimous consensus (K=N); any lack of consensus is treated as disputed.
+
+---
+
+### 17. "Can't Tell" Items are Never Scheduled
+
+When the user marks an unreadable medicine as "can't tell":
+
+- The item is excluded from scheduling.
+- The item is listed on the results screen as "Not scheduled: please ask your doctor or pharmacist".
+- An unreadable medicine is **never** silently dropped.
+
+---
+
 ## Severity Matrix
 
 | Scenario                         | Action Required            | UI Treatment              |

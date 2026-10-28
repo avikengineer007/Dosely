@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import json
 import logging
 import os
 import secrets
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence
 
 from cryptography.fernet import Fernet, MultiFernet
 
@@ -161,14 +162,88 @@ class EncryptedStorage:
         encrypted_data = path.read_bytes()
         return self._cipher.decrypt(encrypted_data)
 
+    def save_manifest(self, prescription_id: str, manifest_data: dict[str, Any]) -> str:
+        """
+        Persist pipeline manifest alongside the encrypted source image.
+        Manifest contains only execution metrics and no content/pixels/OCR text.
+        """
+        manifest_path = self.storage_dir / f"{prescription_id}.manifest.json"
+        manifest_path.write_text(json.dumps(manifest_data, indent=2), encoding="utf-8")
+        return str(manifest_path)
+
+    def load_manifest(self, file_path_or_id: str) -> Optional[dict[str, Any]]:
+        """Read and deserialize pipeline manifest if present."""
+        path = Path(file_path_or_id)
+        if not path.exists():
+            candidate = self.storage_dir / f"{file_path_or_id}.manifest.json"
+            if candidate.exists():
+                path = candidate
+            else:
+                return None
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+
+    def save_line_crop(self, prescription_id: str, line_id: str, crop_bytes: bytes) -> str:
+        """
+        Encrypt raw line crop bytes and save to storage directory.
+        Line crops are health data and encrypted at rest with the same cipher.
+        """
+        encrypted_data = self._cipher.encrypt(crop_bytes)
+        file_path = self.storage_dir / f"{prescription_id}_line_{line_id}.enc"
+        file_path.write_bytes(encrypted_data)
+        return str(file_path)
+
+    def load_line_crop(self, prescription_id: str, line_id: str) -> bytes:
+        """Decrypt line crop bytes."""
+        file_path = self.storage_dir / f"{prescription_id}_line_{line_id}.enc"
+        if not file_path.exists():
+            raise FileNotFoundError(f"Line crop not found for {prescription_id} line {line_id}")
+        return self._cipher.decrypt(file_path.read_bytes())
+
+    def save_packet_photo(self, prescription_id: str, packet_id: str, photo_bytes: bytes) -> str:
+        """
+        Encrypt raw packet/box photo bytes and save to storage directory.
+        Packet photos are health data and encrypted at rest with the same cipher.
+        """
+        encrypted_data = self._cipher.encrypt(photo_bytes)
+        file_path = self.storage_dir / f"{prescription_id}_packet_{packet_id}.enc"
+        file_path.write_bytes(encrypted_data)
+        return str(file_path)
+
+    def load_packet_photo(self, prescription_id: str, packet_id: str) -> bytes:
+        """Decrypt packet photo bytes."""
+        file_path = self.storage_dir / f"{prescription_id}_packet_{packet_id}.enc"
+        if not file_path.exists():
+            raise FileNotFoundError(f"Packet photo not found for {prescription_id} packet {packet_id}")
+        return self._cipher.decrypt(file_path.read_bytes())
+
     def delete(self, file_path_or_id: str) -> bool:
-        """Safely delete encrypted file."""
+        """Safely delete encrypted file, accompanying manifest, line crops, and packet photos."""
         path = Path(file_path_or_id)
         if not path.exists():
             candidate = self.storage_dir / f"{file_path_or_id}.enc"
             if candidate.exists():
                 path = candidate
+        deleted = False
         if path.exists():
             path.unlink()
-            return True
-        return False
+            deleted = True
+        # Also clean up manifest if present
+        manifest_candidate = self.storage_dir / f"{path.stem}.manifest.json"
+        if manifest_candidate.exists():
+            manifest_candidate.unlink()
+        # Also clean up all associated line crops
+        for crop_file in self.storage_dir.glob(f"{path.stem}_line_*.enc"):
+            try:
+                crop_file.unlink()
+            except Exception:
+                pass
+        # Also clean up all associated packet photos
+        for packet_file in self.storage_dir.glob(f"{path.stem}_packet_*.enc"):
+            try:
+                packet_file.unlink()
+            except Exception:
+                pass
+        return deleted

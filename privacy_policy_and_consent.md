@@ -15,6 +15,9 @@ Matra is a personal prescription-assistant application that helps you understand
 | Data | Purpose | Retained |
 |---|---|---|
 | Prescription image or PDF | Extract medicine names, dosages, and instructions | Up to 30 days, encrypted at rest |
+| Handwriting line crops | Display original handwriting alongside extractions | Up to 30 days, encrypted at rest |
+| Optional packet photos | Provide high-confidence printed text hints for unreadable lines | Up to 30 days, encrypted at rest |
+| Optional pharmacist export | Enable consulting your pharmacist with a de-identified snippet | Time-limited (1-48h), zero patient PII |
 | Medicine names, dosages, schedule | Build and display your dosing plan | Up to 30 days |
 | Dose-taken / dose-skipped logs | Show your adherence timeline | Up to 30 days |
 | Reminder fire / snooze events | Deliver reminders; do not repeat snoozed alerts | Up to 30 days |
@@ -27,8 +30,8 @@ We do **not** use cookies or track you across other sites or apps.
 
 ## 3. Encryption at rest
 
-Every prescription image or PDF you upload is **encrypted immediately** using AES-256 (Fernet symmetric encryption) before being written to disk.  
-The decryption key is stored separately from the data and is never logged.
+Every prescription image, PDF, handwriting line crop, and optional packet photo you upload is **encrypted immediately** using AES-256 (Fernet symmetric encryption) before being written to disk.  
+The decryption key is stored separately from the data and is never logged. Line crops and packet photos are cascade-deleted immediately whenever the prescription is deleted.
 
 ---
 

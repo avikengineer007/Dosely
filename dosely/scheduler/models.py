@@ -130,6 +130,8 @@ class DrugInput:
     ingredients: list[dict] = field(default_factory=list)
     # Arbitrary extra context the caller may pass through
     extra: dict = field(default_factory=dict)
+    form: Optional[str] = None
+    strength: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------
@@ -152,6 +154,8 @@ class ScheduleEntry:
     ``warnings``    : list of warning strings (may be empty).
     ``drug_class``  : propagated from DrugInput for conflict checking.
     ``suggestion_text``: "Suggested, confirm with your doctor or pharmacist" when suggested=True.
+    ``form``        : dosage form (tablet, capsule, syrup, etc.).
+    ``strength``    : drug strength (e.g. 500mg).
     """
     time:            str          # "HH:MM"
     drug:            str
@@ -164,6 +168,8 @@ class ScheduleEntry:
     ingredients:     list[str] = field(default_factory=list)
     ingredient_classes: dict[str, str] = field(default_factory=dict)
     line_id:         Optional[int] = None
+    form:            Optional[str] = None
+    strength:        Optional[str] = None
 
     def __post_init__(self) -> None:
         if self.suggested and self.suggestion_text is None:
@@ -183,6 +189,10 @@ class ScheduleEntry:
             d["suggestion_text"] = self.suggestion_text or DEFAULT_SUGGESTION_TEXT
         if self.ingredients:
             d["ingredients"] = list(self.ingredients)
+        if self.form:
+            d["form"] = self.form
+        if self.strength:
+            d["strength"] = self.strength
         return d
 
     def __getitem__(self, key: str):
@@ -197,4 +207,8 @@ class ScheduleEntry:
         k = ["time", "drug", "instruction", "source", "suggested", "warnings", "drug_class", "suggestion_text"]
         if self.ingredients:
             k.append("ingredients")
+        if self.form:
+            k.append("form")
+        if self.strength:
+            k.append("strength")
         return k

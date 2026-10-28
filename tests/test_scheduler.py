@@ -725,3 +725,37 @@ class TestGlobalSafetyRule3SuggestionDisclaimer:
         assert entry.suggestion_text is None
         d = entry.to_dict()
         assert "suggestion_text" not in d
+
+    def test_form_and_strength_propagation_in_timeline(self):
+        scheduler = MedicationScheduler()
+        drugs = [
+            DrugInput(
+                name="Lisinopril",
+                drug_class="other",
+                frequency_raw="OD",
+                form="tablet",
+                strength="10mg",
+            ),
+            DrugInput(
+                name="Amoxicillin",
+                drug_class="antibiotic",
+                form="capsule",
+                strength="500mg",
+            ),
+        ]
+        timeline = scheduler.schedule(drugs)
+        assert len(timeline) >= 2
+        lis = next(e for e in timeline if e.drug == "Lisinopril")
+        assert lis.form == "tablet"
+        assert lis.strength == "10mg"
+        d_lis = lis.to_dict()
+        assert d_lis["form"] == "tablet"
+        assert d_lis["strength"] == "10mg"
+
+        amox = next(e for e in timeline if e.drug == "Amoxicillin")
+        assert amox.form == "capsule"
+        assert amox.strength == "500mg"
+        d_amox = amox.to_dict()
+        assert d_amox["form"] == "capsule"
+        assert d_amox["strength"] == "500mg"
+

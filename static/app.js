@@ -240,6 +240,38 @@
               ? `<div style="font-size:12px;color:var(--text-muted);margin:4px 0 8px">Contains: ${escapeHtml(m.ingredients.map(i => i.name).join(" + "))}</div>`
               : "";
 
+            const currentForm = (m.form || "").toLowerCase();
+            const formOptions = [
+              { val: "tablet", label: "Tablet" },
+              { val: "capsule", label: "Capsule" },
+              { val: "syrup", label: "Syrup" },
+              { val: "suspension", label: "Suspension" },
+              { val: "injection", label: "Injection" },
+              { val: "drops", label: "Drops" },
+              { val: "ointment", label: "Ointment" },
+              { val: "cream", label: "Cream" },
+              { val: "inhaler", label: "Inhaler" },
+              { val: "other", label: "Other" }
+            ];
+
+            let inferredForm = currentForm;
+            if (!inferredForm || inferredForm === "unknown") {
+              const nl = (m.name_raw || "").toLowerCase();
+              if (/\b(tab|tablet|tabs)\b/.test(nl)) inferredForm = "tablet";
+              else if (/\b(cap|capsule|caps)\b/.test(nl)) inferredForm = "capsule";
+              else if (/\b(syp|syrup)\b/.test(nl)) inferredForm = "syrup";
+              else if (/\b(inj|injection)\b/.test(nl)) inferredForm = "injection";
+              else if (/\b(drops?)\b/.test(nl)) inferredForm = "drops";
+              else if (/\b(oint|ointment|cream)\b/.test(nl)) inferredForm = "ointment";
+              else inferredForm = "tablet";
+            }
+
+            let inferredStrength = m.strength || "";
+            if (!inferredStrength) {
+              const sm = (m.name_raw || "").match(/\b(\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml|iu|%))\b/i);
+              if (sm) inferredStrength = sm[1];
+            }
+
             return `
               <div class="med-card" style="background:${bg};border:1px solid ${border};border-radius:8px;padding:14px;margin-bottom:12px">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -250,14 +282,26 @@
                   </div>
                 </div>
                 ${ingredientsStr}
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-bottom:8px">
                   <div>
                     <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Medicine Name</label>
-                    <input type="text" class="med-name-input" data-idx="${idx}" value="${escapeHtml(m.name_raw || "")}" placeholder="e.g. Pantoprazole 40mg" style="width:100%;background:#0f172a;border:1px solid var(--border);color:#fff;padding:8px;border-radius:6px;box-sizing:border-box;font-size:13px">
+                    <input type="text" class="med-name-input" data-idx="${idx}" value="${escapeHtml(m.name_raw || "")}" placeholder="e.g. Lisinopril" style="width:100%;background:#0f172a;border:1px solid var(--border);color:#fff;padding:8px;border-radius:6px;box-sizing:border-box;font-size:13px">
                   </div>
                   <div>
-                    <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Frequency / Dosage</label>
-                    <input type="text" class="med-freq-input" data-idx="${idx}" value="${escapeHtml(m.frequency_raw || "")}" placeholder="e.g. BD, once daily" style="width:100%;background:#0f172a;border:1px solid var(--border);color:#fff;padding:8px;border-radius:6px;box-sizing:border-box;font-size:13px">
+                    <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Frequency / Schedule</label>
+                    <input type="text" class="med-freq-input" data-idx="${idx}" value="${escapeHtml(m.frequency_raw || "")}" placeholder="e.g. BD, once daily, 1-0-1" style="width:100%;background:#0f172a;border:1px solid var(--border);color:#fff;padding:8px;border-radius:6px;box-sizing:border-box;font-size:13px">
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                  <div>
+                    <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Medicine Type (Form)</label>
+                    <select class="med-form-select" data-idx="${idx}" style="width:100%;background:#0f172a;border:1px solid var(--border);color:#fff;padding:8px;border-radius:6px;box-sizing:border-box;font-size:13px">
+                      ${formOptions.map(opt => `<option value="${opt.val}" ${inferredForm === opt.val ? "selected" : ""}>${opt.label}</option>`).join("")}
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Strength</label>
+                    <input type="text" class="med-strength-input" data-idx="${idx}" value="${escapeHtml(inferredStrength)}" placeholder="e.g. 500mg, 10mg" style="width:100%;background:#0f172a;border:1px solid var(--border);color:#fff;padding:8px;border-radius:6px;box-sizing:border-box;font-size:13px">
                   </div>
                 </div>
               </div>
@@ -313,6 +357,8 @@
         syncInputs();
         medicines.push({
           name_raw: "",
+          form: "tablet",
+          strength: "",
           frequency_raw: "",
           needs_review: true,
         });
@@ -340,6 +386,8 @@
             .filter(m => m.name_raw && m.name_raw.trim().length > 0)
             .map(m => ({
               name_raw: m.name_raw.trim(),
+              form: (m.form || "").trim() || undefined,
+              strength: (m.strength || "").trim() || undefined,
               frequency_raw: (m.frequency_raw || "").trim(),
             }));
 
@@ -393,10 +441,14 @@
 
     function syncInputs() {
       const nameInputs = document.querySelectorAll(".med-name-input");
+      const formInputs = document.querySelectorAll(".med-form-select");
+      const strengthInputs = document.querySelectorAll(".med-strength-input");
       const freqInputs = document.querySelectorAll(".med-freq-input");
       nameInputs.forEach((input, i) => {
         if (medicines[i]) {
           medicines[i].name_raw = input.value;
+          medicines[i].form = formInputs[i] ? formInputs[i].value : (medicines[i].form || "tablet");
+          medicines[i].strength = strengthInputs[i] ? strengthInputs[i].value : (medicines[i].strength || "");
           medicines[i].frequency_raw = freqInputs[i] ? freqInputs[i].value : "";
         }
       });
@@ -440,13 +492,26 @@
           const timeSlot = t.time || "--:--";
           const instruction = t.instruction || "";
           const isSuggested = t.source === "default" || t.suggested;
+          const form = t.form || t.dosage_form || "";
+          const strength = t.strength || "";
+
+          let metaBadges = [];
+          if (form && form.toLowerCase() !== "unknown") {
+            metaBadges.push(`<span style="background:rgba(59, 130, 246, 0.15);color:#60a5fa;border:1px solid rgba(59, 130, 246, 0.3);font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;text-transform:capitalize">💊 ${escapeHtml(form)}</span>`);
+          }
+          if (strength) {
+            metaBadges.push(`<span style="background:rgba(148, 163, 184, 0.12);color:#cbd5e1;border:1px solid rgba(148, 163, 184, 0.25);font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px">${escapeHtml(strength)}</span>`);
+          }
 
           return `
             <div style="display:flex;align-items:center;background:#1e293b;border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:10px">
               <div style="font-weight:700;font-size:16px;color:var(--red);min-width:85px">${escapeHtml(timeSlot)}</div>
               <div style="flex:1;margin-left:16px">
-                <div style="font-weight:600;font-size:15px;text-transform:capitalize">${escapeHtml(drugName)}</div>
-                <div style="color:var(--text-muted);font-size:13px;margin-top:2px">${escapeHtml(instruction)}</div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-weight:600;font-size:15px;text-transform:capitalize">${escapeHtml(drugName)}</span>
+                  ${metaBadges.join(" ")}
+                </div>
+                <div style="color:var(--text-muted);font-size:13px;margin-top:4px">${escapeHtml(instruction)}</div>
               </div>
               ${isSuggested ? `<span style="font-size:11px;background:#334155;color:#94a3b8;padding:2px 6px;border-radius:4px">Suggested</span>` : ""}
             </div>

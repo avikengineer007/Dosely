@@ -93,6 +93,49 @@ class ImageQuality(str, Enum):
 
 
 # ---------------------------------------------------------------------------
+# Handwriting Field Read Models
+# ---------------------------------------------------------------------------
+
+class ReadAlternative(BaseModel):
+    """Candidate reading of a handwritten word/token with its confidence."""
+    text: str
+    confidence: float = 1.0
+
+    @field_validator("confidence", mode="before")
+    @classmethod
+    def _clamp_confidence(cls, v: Any) -> float:
+        try:
+            val = float(v)
+            return max(0.0, min(1.0, val))
+        except (TypeError, ValueError):
+            return 0.0
+
+
+class FieldRead(BaseModel):
+    """Detailed read metadata for a handwritten field."""
+    text: Optional[str] = None
+    confidence: float = 1.0
+    legibility: str = "clear"  # "clear" | "partial" | "illegible"
+    alternatives: list[ReadAlternative] = Field(default_factory=list)
+    char_uncertain: list[int] = Field(default_factory=list)
+    masked_text: Optional[str] = None
+
+    @field_validator("confidence", mode="before")
+    @classmethod
+    def _clamp_confidence(cls, v: Any) -> float:
+        try:
+            val = float(v)
+            return max(0.0, min(1.0, val))
+        except (TypeError, ValueError):
+            return 0.0
+
+    @field_validator("alternatives")
+    @classmethod
+    def _limit_alternatives(cls, v: list[ReadAlternative]) -> list[ReadAlternative]:
+        return v[:3]
+
+
+# ---------------------------------------------------------------------------
 # Medicine model
 # ---------------------------------------------------------------------------
 
@@ -106,10 +149,36 @@ class Medicine(BaseModel):
     needs_review is auto-set by model_validator; do not set manually.
     """
 
-    # Raw OCR
+    # Raw OCR / Transcription
     name_raw: str = Field(
         ...,
         description="Exact text of the drug name as read from the prescription.",
+    )
+    raw_transcription: Optional[str] = Field(
+        default=None,
+        description="Verbatim raw transcript of handwriting before any interpretation.",
+    )
+    name_interpreted: Optional[str] = Field(
+        default=None,
+        description="Interpreted drug name candidate.",
+    )
+
+    # Handwriting detailed reads
+    name_read: Optional[FieldRead] = Field(
+        default=None,
+        description="Detailed read object for drug name.",
+    )
+    strength_read: Optional[FieldRead] = Field(
+        default=None,
+        description="Detailed read object for strength.",
+    )
+    frequency_read: Optional[FieldRead] = Field(
+        default=None,
+        description="Detailed read object for frequency.",
+    )
+    duration_read: Optional[FieldRead] = Field(
+        default=None,
+        description="Detailed read object for duration.",
     )
 
     # Normalised / enriched
@@ -177,6 +246,10 @@ class Medicine(BaseModel):
         default_factory=list,
         description="Active ingredients for combination or single products.",
     )
+    source: str = Field(
+        default="extracted",
+        description="Origin of resolution: extracted | suggested | user_selected.",
+    )
 
     # Quality signals
     confidence: Annotated[float, Field(ge=0.0, le=1.0)] = Field(
@@ -220,6 +293,16 @@ class Medicine(BaseModel):
             reasons.append(
                 f"Overall confidence ({self.confidence:.2f}) is below threshold (0.70)."
             )
+
+        for f_name, f_read in [
+            ("name", self.name_read),
+            ("strength", self.strength_read),
+            ("frequency", self.frequency_read),
+            ("duration", self.duration_read),
+        ]:
+            if f_read is not None:
+                if f_read.legibility == "illegible" or f_read.text is None:
+                    reasons.append(f"{f_name.capitalize()} is marked illegible or unreadable.")
 
         if reasons:
             self.needs_review = True
@@ -288,6 +371,10 @@ class Prescription(BaseModel):
     review_summary: list[str] = Field(
         default_factory=list,
         description="Prescription-level reasons for human review.",
+    )
+    pipeline_manifest: Optional[dict[str, Any]] = Field(
+        default=None,
+        description="Execution metrics and audit trail of image preprocessing stages.",
     )
 
     # ------------------------------------------------------------------

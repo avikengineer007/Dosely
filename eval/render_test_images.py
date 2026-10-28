@@ -230,5 +230,120 @@ def render_all_test_cases(
     return ground_truth_records
 
 
+DEGRADATION_TYPES = ["tilt", "perspective", "blur", "glare", "noise", "low_res", "shadow"]
+
+
+def apply_degradation(
+    img: Image.Image,
+    degradation_type: str,
+    severity: float = 1.0,
+) -> Image.Image:
+    """
+    Apply synthetic real-world smartphone camera degradations:
+      - tilt: in-plane rotation (e.g. 8.0 * severity)
+      - perspective: 4-corner trapezoid perspective warp
+      - blur: camera defocus Gaussian blur
+      - glare: localized specular white reflection hotspot
+      - noise: high ISO sensor Gaussian noise
+      - low_res: downscaling then upscaling (loss of high frequencies)
+      - shadow: uneven lighting / shadow gradient across page
+    """
+    import cv2
+    import numpy as np
+
+    arr = np.array(img)
+    h, w = arr.shape[:2]
+
+    deg = degradation_type.lower()
+    if deg == "tilt":
+        angle = 8.0 * severity
+        M = cv2.getRotationMatrix2D((w // 2, h // 2), angle, 1.0)
+        warped = cv2.warpAffine(arr, M, (w, h), borderValue=(245, 245, 245))
+        return Image.fromarray(warped)
+
+    elif deg == "perspective":
+        offset = int(min(w, h) * 0.12 * severity)
+        pts1 = np.float32([[0, 0], [w - 1, 0], [w - 1, h - 1], [0, h - 1]])
+        pts2 = np.float32([
+            [offset, offset // 2],
+            [w - 1 - offset // 2, 0],
+            [w - 1, h - 1 - offset],
+            [0, h - 1],
+        ])
+        M = cv2.getPerspectiveTransform(pts1, pts2)
+        warped = cv2.warpPerspective(arr, M, (w, h), borderValue=(245, 245, 245))
+        return Image.fromarray(warped)
+
+    elif deg == "blur":
+        sigma = 2.5 * severity
+        ksize = int(math.ceil(sigma * 3)) * 2 + 1
+        blurred = cv2.GaussianBlur(arr, (ksize, ksize), sigmaX=sigma)
+        return Image.fromarray(blurred)
+
+    elif deg == "glare":
+        cx, cy = w // 2, h // 3
+        r = int(min(w, h) * 0.18 * severity)
+        mask = np.zeros((h, w), dtype=np.uint8)
+        cv2.circle(mask, (cx, cy), r, 255, -1)
+        mask_blur = cv2.GaussianBlur(mask, (31, 31), 0).astype(np.float32) / 255.0
+        if arr.ndim == 3:
+            mask_blur = np.expand_dims(mask_blur, axis=2)
+        blended = np.clip(arr.astype(np.float32) * (1.0 - mask_blur) + 255.0 * mask_blur, 0, 255).astype(np.uint8)
+        return Image.fromarray(blended)
+
+    elif deg == "noise":
+        rng = np.random.default_rng(42)
+        noise = rng.normal(0, 18.0 * severity, arr.shape).astype(np.float32)
+        noisy = np.clip(arr.astype(np.float32) + noise, 0, 255).astype(np.uint8)
+        return Image.fromarray(noisy)
+
+    elif deg == "low_res":
+        factor = max(0.2, 0.45 / severity)
+        small = cv2.resize(arr, (int(w * factor), int(h * factor)), interpolation=cv2.INTER_AREA)
+        upscaled = cv2.resize(small, (w, h), interpolation=cv2.INTER_LINEAR)
+        return Image.fromarray(upscaled)
+
+    elif deg == "shadow":
+        grad = np.tile(np.linspace(max(0.2, 1.0 - 0.65 * severity), 1.0, w, dtype=np.float32), (h, 1))
+        if arr.ndim == 3:
+            grad = np.expand_dims(grad, axis=2)
+        shadowed = np.clip(arr.astype(np.float32) * grad, 0, 255).astype(np.uint8)
+        return Image.fromarray(shadowed)
+
+    return img
+
+
+def render_degradation_matrix(
+    input_dir: Path = OUTPUT_DIR,
+    output_dir: Path = DATA_DIR / "degraded_test_images",
+    num_samples: int = 5,
+) -> dict[str, list[str]]:
+    """
+    Renders degraded image pairs for benchmarking pipeline resilience.
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    images = sorted(list(input_dir.glob("rx-tc-*.png")))[:num_samples]
+    matrix_index: dict[str, list[str]] = {}
+
+    for deg in DEGRADATION_TYPES:
+        matrix_index[deg] = []
+        deg_dir = output_dir / deg
+        deg_dir.mkdir(parents=True, exist_ok=True)
+        for img_path in images:
+            with Image.open(img_path) as im:
+                degraded = apply_degradation(im, degradation_type=deg, severity=1.0)
+                out_path = deg_dir / img_path.name
+                degraded.save(out_path, format="PNG", optimize=True)
+                matrix_index[deg].append(str(out_path.relative_to(PROJECT_ROOT)))
+
+    index_file = output_dir / "matrix_index.json"
+    with open(index_file, "w", encoding="utf-8") as f:
+        json.dump(matrix_index, f, indent=2)
+
+    print(f"Rendered degradation matrix for {len(images)} images across {len(DEGRADATION_TYPES)} types to {output_dir}")
+    return matrix_index
+
+
 if __name__ == "__main__":
     render_all_test_cases()
+    render_degradation_matrix()

@@ -43,4 +43,9 @@ venv.bak/
 .DS_Store
 *.db
 data/encrypted_uploads/
+data/real_samples/
+data/real_handwriting/
+data/synthetic_handwriting/
+data/degraded_test_images/
+eval/output_samples/
 get-shit-done-antigravity/

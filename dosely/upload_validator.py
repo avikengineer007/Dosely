@@ -20,6 +20,13 @@ from fastapi import HTTPException, status
 from PIL import Image
 
 try:
+    import pypdfium2 as pdfium
+    _PDFIUM_AVAILABLE = True
+except ImportError:
+    pdfium = None
+    _PDFIUM_AVAILABLE = False
+
+try:
     import pymupdf as fitz
 except ImportError:
     try:
@@ -119,7 +126,26 @@ def validate_and_sanitize_upload(raw_bytes: bytes, declared_mime: str) -> Tuple[
                     detail="PDF rejected: contains active content (JavaScript, Launch, or EmbeddedFile).",
                 )
 
-        if fitz is not None:
+        if _PDFIUM_AVAILABLE and pdfium is not None:
+            try:
+                doc = pdfium.PdfDocument(raw_bytes)
+                page_count = len(doc)
+                if page_count > 10:
+                    doc.close()
+                    raise HTTPException(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        detail=f"PDF page count ({page_count}) exceeds limit of 10 pages.",
+                    )
+                doc.close()
+            except HTTPException:
+                raise
+            except Exception:
+                if b"\x00\x00" in raw_bytes or len(raw_bytes) < 10:
+                    raise HTTPException(
+                        status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+                        detail="Malformed or unreadable PDF document.",
+                    )
+        elif fitz is not None:
             try:
                 doc = fitz.open(stream=raw_bytes, filetype="pdf")
                 if doc.is_encrypted:

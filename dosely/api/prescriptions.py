@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import base64
 import io
+import re
 import uuid
 from typing import Annotated, Any, Optional
 
@@ -106,6 +107,7 @@ class ConfirmedMedicineInput(BaseModel):
     duration_days: Optional[int] = None
     food_instruction: Optional[str] = None
     user_accepted: bool = True
+    cant_tell: bool = False
 
 
 class ConfirmPrescriptionRequest(BaseModel):
@@ -222,6 +224,13 @@ async def upload_prescription(
             "review_summary": [f"Extraction error: {exc.__class__.__name__}"],
         }
 
+    # Persist pipeline manifest alongside encrypted source image
+    if extracted_dict.get("pipeline_manifest"):
+        try:
+            storage.save_manifest(prescription_id, extracted_dict["pipeline_manifest"])
+        except Exception:
+            pass
+
     # Persist in SQLite
     created = repo.create(
         prescription_id=prescription_id,
@@ -324,8 +333,26 @@ async def confirm_prescription(
     # 1. Run DrugMatcher on confirmed medicines
     matched_results: list[dict[str, Any]] = []
     scheduler_inputs: list[DrugInput] = []
+    unscheduled_items: list[dict[str, Any]] = []
 
     for med in payload.medicines:
+        if med.cant_tell:
+            unscheduled_items.append({
+                "name_raw": med.name_raw,
+                "status": "unreadable",
+                "message": "Not scheduled: please ask your doctor or pharmacist",
+            })
+            matched_results.append({
+                "name_raw": med.name_raw,
+                "cant_tell": True,
+                "matching": {
+                    "generic": None,
+                    "class": "unknown",
+                    "status": "unreadable",
+                },
+            })
+            continue
+
         chosen_generic = med.name_generic.strip() if med.name_generic else None
         if chosen_generic and chosen_generic.lower() != "unknown":
             # User explicitly chose or confirmed a generic
@@ -340,9 +367,42 @@ async def confirm_prescription(
                 matched_dict["generic"] = None
                 matched_dict["class"] = "unknown"
 
+        med_form = med.form
+        if not med_form or str(med_form).lower() in ("unknown", "none", ""):
+            name_lower = med.name_raw.lower()
+            if re.search(r"\b(tab|tablet|tabs)\b", name_lower):
+                med_form = "tablet"
+            elif re.search(r"\b(cap|capsule|caps)\b", name_lower):
+                med_form = "capsule"
+            elif re.search(r"\b(syp|syrup)\b", name_lower):
+                med_form = "syrup"
+            elif re.search(r"\b(inj|injection)\b", name_lower):
+                med_form = "injection"
+            elif re.search(r"\b(drops?|eye drops?|ear drops?)\b", name_lower):
+                med_form = "drops"
+            elif re.search(r"\b(oint|ointment)\b", name_lower):
+                med_form = "ointment"
+            elif re.search(r"\b(cream)\b", name_lower):
+                med_form = "cream"
+            elif re.search(r"\b(inhaler|puff|rotahaler)\b", name_lower):
+                med_form = "inhaler"
+            elif re.search(r"\b(susp|suspension)\b", name_lower):
+                med_form = "suspension"
+            else:
+                med_form = None
+
+        med_strength = med.strength
+        if not med_strength or str(med_strength).lower() in ("unknown", "none", ""):
+            str_match = re.search(r"\b(\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml|iu|%))\b", med.name_raw, re.IGNORECASE)
+            if str_match:
+                med_strength = str_match.group(1)
+            else:
+                med_strength = None
+
         matched_results.append({
             "name_raw": med.name_raw,
-            "strength": med.strength,
+            "strength": med_strength,
+            "form": med_form,
             "frequency_raw": med.frequency_raw,
             "duration_days": med.duration_days,
             "food_instruction": med.food_instruction,
@@ -356,6 +416,8 @@ async def confirm_prescription(
                 frequency_raw=med.frequency_raw,
                 food_relation=med.food_instruction,
                 ingredients=matched_dict.get("ingredients", []),
+                form=med_form,
+                strength=med_strength,
             )
         )
 
@@ -377,6 +439,7 @@ async def confirm_prescription(
         "status": "confirmed",
         "confirmed": True,
         "matched_drugs": matched_results,
+        "unscheduled_items": unscheduled_items,
         "schedule": timeline,
         "timeline": timeline,
         "disclaimer": "This is not medical advice.",
@@ -412,12 +475,62 @@ async def get_prescription_schedule(
             detail="Prescription has not been confirmed. Nothing is matched or scheduled until user confirms.",
         )
 
+    schedule = rec.get("schedule", [])
+    matched_drugs = rec.get("matched_drugs", [])
+    confirmed_meds = rec.get("confirmed_data", {}).get("medicines", [])
+
+    enriched_schedule = []
+    for entry in schedule:
+        e = dict(entry) if isinstance(entry, dict) else entry.to_dict()
+        if not e.get("form") or not e.get("strength"):
+            target_name = (e.get("drug") or "").lower()
+            found_form = None
+            found_strength = None
+            for md in matched_drugs:
+                gen_name = (md.get("matching", {}).get("generic") or "").lower()
+                raw_name = (md.get("name_raw") or "").lower()
+                if target_name and (target_name == gen_name or target_name in raw_name or raw_name in target_name):
+                    found_form = found_form or md.get("form")
+                    found_strength = found_strength or md.get("strength")
+            if not found_form or not found_strength:
+                for cm in confirmed_meds:
+                    raw_name = (cm.get("name_raw") or "").lower()
+                    if target_name and (target_name in raw_name or raw_name in target_name):
+                        found_form = found_form or cm.get("form")
+                        found_strength = found_strength or cm.get("strength")
+            # Fallback regex inference from drug name if still missing
+            if not found_form:
+                if re.search(r"\b(tab|tablet|tabs)\b", target_name):
+                    found_form = "tablet"
+                elif re.search(r"\b(cap|capsule|caps)\b", target_name):
+                    found_form = "capsule"
+                elif re.search(r"\b(syp|syrup)\b", target_name):
+                    found_form = "syrup"
+                elif re.search(r"\b(inj|injection)\b", target_name):
+                    found_form = "injection"
+                elif re.search(r"\b(drops?)\b", target_name):
+                    found_form = "drops"
+                elif re.search(r"\b(ointment|oint|cream)\b", target_name):
+                    found_form = "ointment"
+                else:
+                    found_form = "tablet"  # sensible default dosage form for oral prescription medications
+            if not found_strength:
+                str_match = re.search(r"\b(\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml|iu|%))\b", target_name, re.IGNORECASE)
+                if str_match:
+                    found_strength = str_match.group(1)
+
+            if not e.get("form") and found_form:
+                e["form"] = found_form
+            if not e.get("strength") and found_strength:
+                e["strength"] = found_strength
+        enriched_schedule.append(e)
+
     return {
         "id": rec["id"],
         "status": "confirmed",
         "confirmed": True,
-        "schedule": rec.get("schedule", []),
-        "timeline": rec.get("schedule", []),
+        "schedule": enriched_schedule,
+        "timeline": enriched_schedule,
         "disclaimer": "This is not medical advice.",
     }
 
