@@ -143,6 +143,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response: Response = await call_next(request)
         path = request.scope.get("path", request.url.path)
 
+        response.headers["X-Debug-Orig-Scope"] = str(orig_scope_path)
+        response.headers["X-Debug-VC-Path"] = str(vc_path)
+        response.headers["X-Debug-Fwd-Uri"] = str(fwd_uri)
+        response.headers["X-Debug-Fwd-Path"] = str(fwd_path)
+        response.headers["X-Debug-Clean-Path"] = str(clean_path)
+        response.headers["X-Debug-Final-Path"] = str(path)
+
         # Standard baseline security headers for all routes
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
@@ -234,9 +241,26 @@ if _resolved_static and _resolved_static.exists():
     app.mount("/api/static", StaticFiles(directory=str(_resolved_static)), name="api_static")
 
 from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 import logging
 
 _api_logger = logging.getLogger("dosely.api")
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404 and request.method == "GET":
+        p = request.scope.get("path", "")
+        # If request is not for an API endpoint (/api/v1/...), serve frontend landing/app
+        if not p.startswith("/api/v1"):
+            if "/app" in p or request.query_params.get("__vc_path") == "/app":
+                return await app_page()
+            return await landing_page()
+    return Response(
+        content=json.dumps({"detail": exc.detail}),
+        status_code=exc.status_code,
+        media_type="application/json",
+        headers=exc.headers or {},
+    )
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
