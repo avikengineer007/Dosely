@@ -34,6 +34,7 @@ from dosely.config import PURGE_DAYS, PURGE_INTERVAL_HOURS
 
 
 from pathlib import Path
+from urllib.parse import urlsplit
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, Response
@@ -71,13 +72,31 @@ def _find_dir(rel_path: str) -> Path | None:
     return None
 
 
+# Pre-cache HTML templates in memory at module load time for instantaneous serving
+_LANDING_HTML: str = ""
+_landing_candidate = _find_file("dosely.html")
+if _landing_candidate and _landing_candidate.exists():
+    try:
+        _LANDING_HTML = _landing_candidate.read_text(encoding="utf-8")
+    except Exception:
+        pass
+
+_APP_HTML: str = ""
+_app_candidate = _find_file("frontend/app.html")
+if _app_candidate and _app_candidate.exists():
+    try:
+        _APP_HTML = _app_candidate.read_text(encoding="utf-8")
+    except Exception:
+        pass
+
+
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Normalize Vercel serverless rewrite path (?__vc_path=..., x-forwarded-uri, etc.) before routing
         orig_scope_path = request.scope.get("path", "/")
         vc_path = request.query_params.get("__vc_path")
         fwd_uri = request.headers.get("x-forwarded-uri") or request.headers.get("x-matched-path")
-        fwd_path = fwd_uri.split("?")[0] if fwd_uri else None
+        fwd_path = urlsplit(fwd_uri).path if fwd_uri else None
 
         ignored_targets = {
             "/api",
@@ -111,6 +130,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         request.scope["path"] = clean_path
         request.scope["raw_path"] = clean_path.encode("utf-8")
+        request.scope["root_path"] = ""
         if hasattr(request, "_url"):
             delattr(request, "_url")
 
@@ -271,9 +291,12 @@ async def vercel_cron_purge(request: Request) -> dict[str, int]:
 async def landing_page() -> HTMLResponse:
     """Serve single-file static landing page with Three.js visualization."""
     landing_path = _find_file("dosely.html")
-    if not landing_path or not landing_path.exists():
+    if landing_path and landing_path.exists():
+        content = landing_path.read_text(encoding="utf-8")
+    elif _LANDING_HTML:
+        content = _LANDING_HTML
+    else:
         return HTMLResponse("<h1>Dosely Landing Page Not Found</h1>", status_code=404)
-    content = landing_path.read_text(encoding="utf-8")
     return HTMLResponse(content=content, status_code=200)
 
 
@@ -284,7 +307,10 @@ async def landing_page() -> HTMLResponse:
 async def app_page(path: str = "") -> HTMLResponse:
     """Serve the Dosely application shell with deep-link support."""
     app_path = _find_file("frontend/app.html")
-    if not app_path or not app_path.exists():
+    if app_path and app_path.exists():
+        content = app_path.read_text(encoding="utf-8")
+    elif _APP_HTML:
+        content = _APP_HTML
+    else:
         return HTMLResponse("<h1>Dosely App Not Found</h1>", status_code=404)
-    content = app_path.read_text(encoding="utf-8")
     return HTMLResponse(content=content, status_code=200)
