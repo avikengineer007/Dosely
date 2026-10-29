@@ -48,19 +48,37 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Normalize Vercel serverless rewrite path (?__vc_path=...) before routing
         orig_scope_path = request.scope.get("path", "/")
         vc_path = request.query_params.get("__vc_path")
-        ignored_targets = ("/main.py", "main.py", "/api/index", "/api/index.py", "api/index", "api/index.py", "/$1", "/:path*")
+        ignored_targets = (
+            "/api",
+            "/api/",
+            "api",
+            "/api/index",
+            "/api/index.py",
+            "api/index",
+            "api/index.py",
+            "/main.py",
+            "main.py",
+            "/$1",
+            "/:path*",
+            "",
+        )
         if vc_path and vc_path not in ignored_targets:
             clean_path = "/" + vc_path.lstrip("/")
-            request.scope["path"] = clean_path
-            request.scope["raw_path"] = clean_path.encode("utf-8")
-            qs_parts = [
-                p for p in request.scope.get("query_string", b"").split(b"&")
-                if p and not p.startswith(b"__vc_path=")
-            ]
-            request.scope["query_string"] = b"&".join(qs_parts)
-        elif orig_scope_path in ignored_targets:
-            request.scope["path"] = "/"
-            request.scope["raw_path"] = b"/"
+        elif orig_scope_path in ignored_targets or (vc_path and vc_path in ignored_targets):
+            clean_path = "/"
+        else:
+            clean_path = orig_scope_path
+
+        request.scope["path"] = clean_path
+        request.scope["raw_path"] = clean_path.encode("utf-8")
+        if hasattr(request, "_url"):
+            delattr(request, "_url")
+
+        qs_parts = [
+            p for p in request.scope.get("query_string", b"").split(b"&")
+            if p and not p.startswith(b"__vc_path=")
+        ]
+        request.scope["query_string"] = b"&".join(qs_parts)
 
         response: Response = await call_next(request)
         path = request.scope.get("path", request.url.path)
