@@ -65,12 +65,6 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response: Response = await call_next(request)
         path = request.scope.get("path", request.url.path)
 
-        response.headers["X-Debug-Orig-Path"] = str(orig_scope_path)
-        response.headers["X-Debug-Scope-Path"] = str(request.scope.get("path"))
-        response.headers["X-Debug-VC-Path"] = str(vc_path)
-        response.headers["X-Debug-Raw-Path"] = str(request.scope.get("raw_path"))
-        response.headers["X-Debug-Query"] = str(request.scope.get("query_string"))
-
         # Standard baseline security headers for all routes
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
@@ -159,31 +153,9 @@ if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 from fastapi.exceptions import RequestValidationError
-from starlette.exceptions import HTTPException as StarletteHTTPException
 import logging
 
 _api_logger = logging.getLogger("dosely.api")
-
-@app.exception_handler(StarletteHTTPException)
-async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
-    if exc.status_code == 404:
-        return Response(
-            content=json.dumps({
-                "detail": "Not Found",
-                "scope_path": str(request.scope.get("path")),
-                "root_path": str(request.scope.get("root_path")),
-                "url_path": str(request.url.path),
-                "query": str(request.scope.get("query_string")),
-                "vc_path": str(request.query_params.get("__vc_path")),
-            }),
-            status_code=404,
-            media_type="application/json",
-        )
-    return Response(
-        content=json.dumps({"detail": exc.detail}),
-        status_code=exc.status_code,
-        media_type="application/json",
-    )
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
