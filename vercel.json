@@ -5,6 +5,12 @@
       "maxDuration": 60
     }
   },
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/main.py?__vc_path=/:path*"
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron/purge",

@@ -127,3 +127,27 @@ def test_vercel_cron_purge_endpoint(monkeypatch):
     body = res_ok.json()
     assert "purged_count" in body
     assert "retention_days" in body
+
+
+def test_vercel_rewrite_path_normalization():
+    """Verify Vercel rewrite URLs (/main.py?__vc_path=...) route cleanly to /, /app, and API endpoints."""
+    client = TestClient(main.app)
+
+    r_root = client.get("/main.py?__vc_path=/")
+    assert r_root.status_code == 200
+    assert "Dosely" in r_root.text
+    assert "unsafe-inline" in r_root.headers.get("Content-Security-Policy", "")
+
+    r_bare = client.get("/main.py")
+    assert r_bare.status_code == 200
+    assert "Dosely" in r_bare.text
+
+    r_app = client.get("/main.py?__vc_path=/app")
+    assert r_app.status_code == 200
+    assert 'id="root"' in r_app.text
+    assert "camera=(self)" in r_app.headers.get("Permissions-Policy", "")
+
+    r_health = client.get("/main.py?__vc_path=/api/v1/health")
+    assert r_health.status_code == 200
+    assert r_health.json() == {"status": "ok"}
+

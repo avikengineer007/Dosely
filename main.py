@@ -45,8 +45,23 @@ STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        # Normalize Vercel serverless rewrite path (?__vc_path=...) before routing
+        vc_path = request.query_params.get("__vc_path")
+        if vc_path:
+            clean_path = "/" + vc_path.lstrip("/")
+            request.scope["path"] = clean_path
+            request.scope["raw_path"] = clean_path.encode("utf-8")
+            qs_parts = [
+                p for p in request.scope.get("query_string", b"").split(b"&")
+                if p and not p.startswith(b"__vc_path=")
+            ]
+            request.scope["query_string"] = b"&".join(qs_parts)
+        elif request.scope.get("path") == "/main.py":
+            request.scope["path"] = "/"
+            request.scope["raw_path"] = b"/"
+
         response: Response = await call_next(request)
-        path = request.url.path
+        path = request.scope.get("path", request.url.path)
 
         # Standard baseline security headers for all routes
         response.headers["X-Content-Type-Options"] = "nosniff"
