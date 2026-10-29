@@ -48,7 +48,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Normalize Vercel serverless rewrite path (?__vc_path=...) before routing
         orig_scope_path = request.scope.get("path", "/")
         vc_path = request.query_params.get("__vc_path")
-        if vc_path and vc_path not in ("/main.py", "main.py", "/$1", "/:path*"):
+        ignored_targets = ("/main.py", "main.py", "/api/index", "/api/index.py", "api/index", "api/index.py", "/$1", "/:path*")
+        if vc_path and vc_path not in ignored_targets:
             clean_path = "/" + vc_path.lstrip("/")
             request.scope["path"] = clean_path
             request.scope["raw_path"] = clean_path.encode("utf-8")
@@ -57,7 +58,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 if p and not p.startswith(b"__vc_path=")
             ]
             request.scope["query_string"] = b"&".join(qs_parts)
-        elif orig_scope_path in ("/main.py", "main.py", "/$1", "/:path*"):
+        elif orig_scope_path in ignored_targets:
             request.scope["path"] = "/"
             request.scope["raw_path"] = b"/"
 
@@ -158,9 +159,31 @@ if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 import logging
 
 _api_logger = logging.getLogger("dosely.api")
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        return Response(
+            content=json.dumps({
+                "detail": "Not Found",
+                "scope_path": str(request.scope.get("path")),
+                "root_path": str(request.scope.get("root_path")),
+                "url_path": str(request.url.path),
+                "query": str(request.scope.get("query_string")),
+                "vc_path": str(request.query_params.get("__vc_path")),
+            }),
+            status_code=404,
+            media_type="application/json",
+        )
+    return Response(
+        content=json.dumps({"detail": exc.detail}),
+        status_code=exc.status_code,
+        media_type="application/json",
+    )
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):

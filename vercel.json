@@ -1,18 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "main.py": {
+    "api/*.py": {
       "maxDuration": 60
     }
   },
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/main.py?__vc_path=/"
-    },
-    {
-      "source": "/((?!main\\.py$).*)",
-      "destination": "/main.py?__vc_path=/$1"
+      "source": "/(.*)",
+      "destination": "/api/index?__vc_path=/$1"
     }
   ],
   "crons": [
