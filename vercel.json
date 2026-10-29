@@ -7,7 +7,11 @@
   },
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/",
+      "destination": "/main.py?__vc_path=/"
+    },
+    {
+      "source": "/((?!main\\.py$).*)",
       "destination": "/main.py?__vc_path=/$1"
     }
   ],

@@ -46,8 +46,9 @@ STATIC_DIR = Path(__file__).resolve().parent / "static"
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Normalize Vercel serverless rewrite path (?__vc_path=...) before routing
+        orig_scope_path = request.scope.get("path", "/")
         vc_path = request.query_params.get("__vc_path")
-        if vc_path:
+        if vc_path and vc_path not in ("/main.py", "main.py", "/$1", "/:path*"):
             clean_path = "/" + vc_path.lstrip("/")
             request.scope["path"] = clean_path
             request.scope["raw_path"] = clean_path.encode("utf-8")
@@ -56,14 +57,14 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 if p and not p.startswith(b"__vc_path=")
             ]
             request.scope["query_string"] = b"&".join(qs_parts)
-        elif request.scope.get("path") in ("/main.py", "main.py"):
+        elif orig_scope_path in ("/main.py", "main.py", "/$1", "/:path*"):
             request.scope["path"] = "/"
             request.scope["raw_path"] = b"/"
 
         response: Response = await call_next(request)
         path = request.scope.get("path", request.url.path)
 
-        response.headers["X-Debug-Orig-Path"] = str(request.url.path)
+        response.headers["X-Debug-Orig-Path"] = str(orig_scope_path)
         response.headers["X-Debug-Scope-Path"] = str(request.scope.get("path"))
         response.headers["X-Debug-VC-Path"] = str(vc_path)
         response.headers["X-Debug-Raw-Path"] = str(request.scope.get("raw_path"))
