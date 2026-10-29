@@ -63,6 +63,12 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response: Response = await call_next(request)
         path = request.scope.get("path", request.url.path)
 
+        response.headers["X-Debug-Orig-Path"] = str(request.url.path)
+        response.headers["X-Debug-Scope-Path"] = str(request.scope.get("path"))
+        response.headers["X-Debug-VC-Path"] = str(vc_path)
+        response.headers["X-Debug-Raw-Path"] = str(request.scope.get("raw_path"))
+        response.headers["X-Debug-Query"] = str(request.scope.get("query_string"))
+
         # Standard baseline security headers for all routes
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
