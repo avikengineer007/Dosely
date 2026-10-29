@@ -5,12 +5,6 @@
       "maxDuration": 60
     }
   },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/main.py"
-    }
-  ],
   "crons": [
     {
       "path": "/api/cron/purge",
@@ -18,4 +12,3 @@
     }
   ]
 }
-
