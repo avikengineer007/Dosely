@@ -14,13 +14,20 @@ import logging
 import os
 import secrets
 from pathlib import Path
+import tempfile
 from typing import Any, Optional, Sequence
 
 from cryptography.fernet import Fernet, MultiFernet
 
+from dosely.cloud_db import CloudBlobStore, get_cloud_db_config, is_vercel
+
 logger = logging.getLogger(__name__)
 
-_DEFAULT_STORAGE_DIR = Path(__file__).resolve().parent.parent / "data" / "encrypted_uploads"
+_DEFAULT_STORAGE_DIR = (
+    Path(tempfile.gettempdir()) / "encrypted_uploads"
+    if is_vercel()
+    else Path(__file__).resolve().parent.parent / "data" / "encrypted_uploads"
+)
 STORAGE_DIR = Path(os.getenv("STORAGE_DIR", str(_DEFAULT_STORAGE_DIR)))
 
 COMPROMISED_DEFAULT_HASHES = frozenset({
@@ -111,7 +118,7 @@ def get_encryption_keys() -> list[bytes]:
     if extra_keys_str:
         for k in extra_keys_str.split(","):
             k = k.strip()
-            if k and len(k) >= 32 and k not in COMPROMISED_DEFAULTS:
+            if k and len(k) >= 32 and not _is_compromised(k):
                 extra_fernet = base64.urlsafe_b64encode(hashlib.sha256(k.encode("utf-8")).digest())
                 if extra_fernet not in keys:
                     keys.append(extra_fernet)
@@ -121,7 +128,8 @@ def get_encryption_keys() -> list[bytes]:
 class EncryptedStorage:
     """
     Symmetric encryption engine for persisting image and PDF bytes at rest.
-    Uses MultiFernet to support seamless key rotation.
+    Uses MultiFernet to support seamless key rotation, with optional CloudBlobStore
+    replication for serverless deployments (Vercel + Neon/Turso).
     """
 
     def __init__(
@@ -135,15 +143,23 @@ class EncryptedStorage:
         self._keys = key_list
         self._cipher = MultiFernet([Fernet(k) for k in key_list])
 
+        self._cloud_blobs: Optional[CloudBlobStore] = None
+        if self.storage_dir == STORAGE_DIR:
+            cloud_cfg = get_cloud_db_config()
+            if cloud_cfg is not None:
+                self._cloud_blobs = CloudBlobStore(cloud_cfg)
+
     def save(self, prescription_id: str, raw_bytes: bytes, extension: str = "bin") -> str:
         """
-        Encrypt raw bytes using primary key and write to storage directory.
+        Encrypt raw bytes using primary key and write to storage directory (and cloud blob store).
         Always uses a synthetic UUID-based filename, never client filename.
         """
         encrypted_data = self._cipher.encrypt(raw_bytes)
         filename = f"{prescription_id}.enc"
         file_path = self.storage_dir / filename
         file_path.write_bytes(encrypted_data)
+        if self._cloud_blobs is not None:
+            self._cloud_blobs.put(filename, encrypted_data)
         return str(file_path)
 
     def load(self, file_path_or_id: str) -> bytes:
@@ -152,23 +168,34 @@ class EncryptedStorage:
         MultiFernet tries the primary key, then all rotation fallback keys.
         """
         path = Path(file_path_or_id)
-        if not path.exists():
-            candidate = self.storage_dir / f"{file_path_or_id}.enc"
-            if candidate.exists():
-                path = candidate
-            else:
-                raise FileNotFoundError(f"Encrypted file not found: {file_path_or_id}")
+        if path.exists():
+            encrypted_data = path.read_bytes()
+            return self._cipher.decrypt(encrypted_data)
 
-        encrypted_data = path.read_bytes()
-        return self._cipher.decrypt(encrypted_data)
+        candidate = self.storage_dir / f"{file_path_or_id}.enc"
+        if candidate.exists():
+            encrypted_data = candidate.read_bytes()
+            return self._cipher.decrypt(encrypted_data)
+
+        if self._cloud_blobs is not None:
+            blob_key = path.name if path.suffix == ".enc" else f"{path.stem}.enc"
+            cloud_bytes = self._cloud_blobs.get(blob_key)
+            if cloud_bytes is not None:
+                return self._cipher.decrypt(cloud_bytes)
+
+        raise FileNotFoundError(f"Encrypted file not found: {file_path_or_id}")
 
     def save_manifest(self, prescription_id: str, manifest_data: dict[str, Any]) -> str:
         """
         Persist pipeline manifest alongside the encrypted source image.
         Manifest contains only execution metrics and no content/pixels/OCR text.
         """
-        manifest_path = self.storage_dir / f"{prescription_id}.manifest.json"
-        manifest_path.write_text(json.dumps(manifest_data, indent=2), encoding="utf-8")
+        filename = f"{prescription_id}.manifest.json"
+        manifest_path = self.storage_dir / filename
+        raw_text = json.dumps(manifest_data, indent=2)
+        manifest_path.write_text(raw_text, encoding="utf-8")
+        if self._cloud_blobs is not None:
+            self._cloud_blobs.put(filename, raw_text.encode("utf-8"))
         return str(manifest_path)
 
     def load_manifest(self, file_path_or_id: str) -> Optional[dict[str, Any]]:
@@ -178,6 +205,15 @@ class EncryptedStorage:
             candidate = self.storage_dir / f"{file_path_or_id}.manifest.json"
             if candidate.exists():
                 path = candidate
+            elif self._cloud_blobs is not None:
+                stem = path.stem[:-9] if path.name.endswith(".manifest.json") else path.stem
+                cloud_bytes = self._cloud_blobs.get(f"{stem}.manifest.json")
+                if cloud_bytes is not None:
+                    try:
+                        return json.loads(cloud_bytes.decode("utf-8"))
+                    except Exception:
+                        return None
+                return None
             else:
                 return None
         try:
@@ -191,16 +227,24 @@ class EncryptedStorage:
         Line crops are health data and encrypted at rest with the same cipher.
         """
         encrypted_data = self._cipher.encrypt(crop_bytes)
-        file_path = self.storage_dir / f"{prescription_id}_line_{line_id}.enc"
+        filename = f"{prescription_id}_line_{line_id}.enc"
+        file_path = self.storage_dir / filename
         file_path.write_bytes(encrypted_data)
+        if self._cloud_blobs is not None:
+            self._cloud_blobs.put(filename, encrypted_data)
         return str(file_path)
 
     def load_line_crop(self, prescription_id: str, line_id: str) -> bytes:
         """Decrypt line crop bytes."""
-        file_path = self.storage_dir / f"{prescription_id}_line_{line_id}.enc"
-        if not file_path.exists():
-            raise FileNotFoundError(f"Line crop not found for {prescription_id} line {line_id}")
-        return self._cipher.decrypt(file_path.read_bytes())
+        filename = f"{prescription_id}_line_{line_id}.enc"
+        file_path = self.storage_dir / filename
+        if file_path.exists():
+            return self._cipher.decrypt(file_path.read_bytes())
+        if self._cloud_blobs is not None:
+            cloud_bytes = self._cloud_blobs.get(filename)
+            if cloud_bytes is not None:
+                return self._cipher.decrypt(cloud_bytes)
+        raise FileNotFoundError(f"Line crop not found for {prescription_id} line {line_id}")
 
     def save_packet_photo(self, prescription_id: str, packet_id: str, photo_bytes: bytes) -> str:
         """
@@ -208,16 +252,24 @@ class EncryptedStorage:
         Packet photos are health data and encrypted at rest with the same cipher.
         """
         encrypted_data = self._cipher.encrypt(photo_bytes)
-        file_path = self.storage_dir / f"{prescription_id}_packet_{packet_id}.enc"
+        filename = f"{prescription_id}_packet_{packet_id}.enc"
+        file_path = self.storage_dir / filename
         file_path.write_bytes(encrypted_data)
+        if self._cloud_blobs is not None:
+            self._cloud_blobs.put(filename, encrypted_data)
         return str(file_path)
 
     def load_packet_photo(self, prescription_id: str, packet_id: str) -> bytes:
         """Decrypt packet photo bytes."""
-        file_path = self.storage_dir / f"{prescription_id}_packet_{packet_id}.enc"
-        if not file_path.exists():
-            raise FileNotFoundError(f"Packet photo not found for {prescription_id} packet {packet_id}")
-        return self._cipher.decrypt(file_path.read_bytes())
+        filename = f"{prescription_id}_packet_{packet_id}.enc"
+        file_path = self.storage_dir / filename
+        if file_path.exists():
+            return self._cipher.decrypt(file_path.read_bytes())
+        if self._cloud_blobs is not None:
+            cloud_bytes = self._cloud_blobs.get(filename)
+            if cloud_bytes is not None:
+                return self._cipher.decrypt(cloud_bytes)
+        raise FileNotFoundError(f"Packet photo not found for {prescription_id} packet {packet_id}")
 
     def delete(self, file_path_or_id: str) -> bool:
         """Safely delete encrypted file, accompanying manifest, line crops, and packet photos."""
@@ -246,4 +298,7 @@ class EncryptedStorage:
                 packet_file.unlink()
             except Exception:
                 pass
+        if self._cloud_blobs is not None:
+            cloud_deleted = self._cloud_blobs.delete_prefix(path.stem)
+            deleted = deleted or cloud_deleted
         return deleted

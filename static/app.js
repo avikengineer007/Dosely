@@ -103,6 +103,54 @@
     return res;
   }
 
+  async function compressImageIfNeeded(file) {
+    const MAX_SERVERLESS_BYTES = 3.5 * 1024 * 1024;
+    if (!file || file.size <= MAX_SERVERLESS_BYTES || !file.type.startsWith("image/")) {
+      return file;
+    }
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        const MAX_DIM = 2400;
+        let width = img.width;
+        let height = img.height;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          function (blob) {
+            if (blob && blob.size < file.size) {
+              const newName = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+              resolve(new File([blob], newName, { type: "image/jpeg" }));
+            } else {
+              resolve(file);
+            }
+          },
+          "image/jpeg",
+          0.85
+        );
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        resolve(file);
+      };
+      img.src = url;
+    });
+  }
+
   async function handleFileUpload(file) {
     if (!file) return;
 
@@ -118,8 +166,9 @@
     `;
 
     try {
+      const processedFile = await compressImageIfNeeded(file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", processedFile);
 
       const res = await authFetch("/prescriptions/upload", {
         method: "POST",

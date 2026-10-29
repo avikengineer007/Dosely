@@ -1,0 +1,23 @@
+# Exclude dev/test/eval datasets and local caches from Vercel serverless bundle (<250 MB limit)
+.git/
+.github/
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+tests/
+eval/
+audit/
+get-shit-done-antigravity/
+frontend/node_modules/
+data/degraded_test_images/
+data/real_handwriting/
+data/synthetic_handwriting/
+data/test_images/
+data/real_samples/
+data/review/
+data/encrypted_uploads/
+data/prescriptions.db
+*.pyc
+.env
+

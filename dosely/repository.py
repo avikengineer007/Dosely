@@ -11,32 +11,47 @@ import json
 import sqlite3
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import tempfile
 from typing import Any, Optional
 
-_DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "prescriptions.db"
+from dosely.cloud_db import CloudConnection, get_cloud_db_config, is_vercel
+
+_DEFAULT_DB_PATH = (
+    Path(tempfile.gettempdir()) / "prescriptions.db"
+    if is_vercel()
+    else Path(__file__).resolve().parent.parent / "data" / "prescriptions.db"
+)
 
 
 class PrescriptionRepository:
-    """Manages the prescription records lifecycle in SQLite."""
+    """Manages the prescription records lifecycle in SQLite or Serverless Cloud DB (Neon / Turso)."""
 
     def __init__(self, db_path: str | Path = _DEFAULT_DB_PATH) -> None:
+        self._cloud_config: Optional[dict[str, str]] = None
+        if str(db_path) == str(_DEFAULT_DB_PATH):
+            self._cloud_config = get_cloud_db_config()
+
         self.db_path = str(db_path)
-        if self.db_path != ":memory:":
-            Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
-            self._shared_conn: Optional[sqlite3.Connection] = None
-        else:
-            self._shared_conn = sqlite3.connect(":memory:", check_same_thread=False)
-            self._shared_conn.row_factory = sqlite3.Row
+        self._shared_conn: Optional[sqlite3.Connection] = None
+
+        if self._cloud_config is None:
+            if self.db_path != ":memory:":
+                Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
+            else:
+                self._shared_conn = sqlite3.connect(":memory:", check_same_thread=False)
+                self._shared_conn.row_factory = sqlite3.Row
         self._init_db()
 
-    def _get_connection(self) -> sqlite3.Connection:
+    def _get_connection(self) -> Any:
+        if self._cloud_config is not None:
+            return CloudConnection(self._cloud_config)
         if self._shared_conn is not None:
             return self._shared_conn
         conn = sqlite3.connect(self.db_path, check_same_thread=False)
         conn.row_factory = sqlite3.Row
         return conn
 
-    def _close_conn(self, conn: sqlite3.Connection) -> None:
+    def _close_conn(self, conn: Any) -> None:
         if self._shared_conn is None:
             conn.close()
 
@@ -327,11 +342,22 @@ class PrescriptionRepository:
                 for r in reminders_list:
                     conn.execute(
                         """
-                        INSERT OR REPLACE INTO reminders (
+                        INSERT INTO reminders (
                             id, prescription_id, user_id, drug_name,
                             scheduled_time, timezone, fire_at_timestamp,
                             status, snoozed_until, fired_at, notification_payload
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ON CONFLICT(id) DO UPDATE SET
+                            prescription_id = excluded.prescription_id,
+                            user_id = excluded.user_id,
+                            drug_name = excluded.drug_name,
+                            scheduled_time = excluded.scheduled_time,
+                            timezone = excluded.timezone,
+                            fire_at_timestamp = excluded.fire_at_timestamp,
+                            status = excluded.status,
+                            snoozed_until = excluded.snoozed_until,
+                            fired_at = excluded.fired_at,
+                            notification_payload = excluded.notification_payload
                         """,
                         (
                             r["id"],

@@ -19,14 +19,17 @@ from dosely.logging import setup_secure_logging
 setup_secure_logging()
 
 import contextlib
+import hmac
 import json
+import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from dosely.api.prescriptions import get_repo, get_storage, router as prescriptions_router
 from dosely.api.router import router
-from dosely.background import purge_scheduler_context
+from dosely.background import purge_scheduler_context, run_purge_job
+from dosely.cloud_db import is_vercel
 from dosely.config import PURGE_DAYS, PURGE_INTERVAL_HOURS
 
 
@@ -90,6 +93,10 @@ async def lifespan(app: FastAPI):
     """Application lifespan: register background jobs on startup, stop on shutdown."""
     repo = get_repo()
     storage = get_storage()
+    if is_vercel():
+        # On Vercel Serverless, periodic purges are triggered by Vercel Cron (/api/cron/purge)
+        yield
+        return
     async with purge_scheduler_context(
         repo=repo,
         storage=storage,
@@ -152,6 +159,27 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=422,
         media_type="application/json",
     )
+
+
+@app.get("/api/cron/purge", include_in_schema=False)
+async def vercel_cron_purge(request: Request) -> dict[str, int]:
+    """
+    Vercel Cron Job endpoint for daily data retention purge.
+    Verifies Authorization: Bearer <CRON_SECRET>.
+    """
+    cron_secret = os.getenv("CRON_SECRET", "").strip()
+    auth_header = request.headers.get("Authorization", "")
+    expected = f"Bearer {cron_secret}"
+    if not cron_secret or not hmac.compare_digest(auth_header.encode("utf-8"), expected.encode("utf-8")):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized cron invocation.",
+        )
+    purged = run_purge_job(repo=get_repo(), storage=get_storage(), days=PURGE_DAYS)
+    return {
+        "purged_count": purged,
+        "retention_days": PURGE_DAYS,
+    }
 
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
