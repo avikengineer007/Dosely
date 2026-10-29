@@ -56,7 +56,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 if p and not p.startswith(b"__vc_path=")
             ]
             request.scope["query_string"] = b"&".join(qs_parts)
-        elif request.scope.get("path") == "/main.py":
+        elif request.scope.get("path") in ("/main.py", "main.py"):
             request.scope["path"] = "/"
             request.scope["raw_path"] = b"/"
 
