@@ -43,31 +43,71 @@ APP_PAGE_PATH = Path(__file__).resolve().parent / "frontend" / "app.html"
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
+def _find_file(rel_path: str) -> Path | None:
+    """Find a project file across local dev, testing, and Vercel serverless locations."""
+    candidates = [
+        Path(__file__).resolve().parent / rel_path,
+        Path(__file__).resolve().parent.parent / rel_path,
+        Path.cwd() / rel_path,
+        Path("/var/task") / rel_path,
+    ]
+    for c in candidates:
+        if c.exists() and c.is_file():
+            return c
+    return None
+
+
+def _find_dir(rel_path: str) -> Path | None:
+    """Find a project directory across local dev, testing, and Vercel serverless locations."""
+    candidates = [
+        Path(__file__).resolve().parent / rel_path,
+        Path(__file__).resolve().parent.parent / rel_path,
+        Path.cwd() / rel_path,
+        Path("/var/task") / rel_path,
+    ]
+    for c in candidates:
+        if c.exists() and c.is_dir():
+            return c
+    return None
+
+
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Normalize Vercel serverless rewrite path (?__vc_path=...) before routing
+        # Normalize Vercel serverless rewrite path (?__vc_path=..., x-forwarded-uri, etc.) before routing
         orig_scope_path = request.scope.get("path", "/")
         vc_path = request.query_params.get("__vc_path")
-        ignored_targets = (
+        fwd_uri = request.headers.get("x-forwarded-uri") or request.headers.get("x-matched-path")
+        fwd_path = fwd_uri.split("?")[0] if fwd_uri else None
+
+        ignored_targets = {
             "/api",
             "/api/",
             "api",
             "/api/index",
+            "/api/index/",
             "/api/index.py",
+            "/api/index.py/",
             "api/index",
             "api/index.py",
+            "/index",
+            "/index.py",
+            "index",
+            "index.py",
             "/main.py",
             "main.py",
             "/$1",
             "/:path*",
             "",
-        )
+        }
+
         if vc_path and vc_path not in ignored_targets:
             clean_path = "/" + vc_path.lstrip("/")
-        elif orig_scope_path in ignored_targets or (vc_path and vc_path in ignored_targets):
-            clean_path = "/"
-        else:
+        elif fwd_path and fwd_path not in ignored_targets:
+            clean_path = "/" + fwd_path.lstrip("/")
+        elif orig_scope_path not in ignored_targets:
             clean_path = orig_scope_path
+        else:
+            clean_path = "/"
 
         request.scope["path"] = clean_path
         request.scope["raw_path"] = clean_path.encode("utf-8")
@@ -152,6 +192,7 @@ app = FastAPI(
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    redirect_slashes=False,
     lifespan=lifespan,
 )
 
@@ -167,8 +208,10 @@ app.include_router(prescriptions_router)
 app.include_router(router)
 
 from starlette.staticfiles import StaticFiles
-if STATIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+_resolved_static = _find_dir("static")
+if _resolved_static and _resolved_static.exists():
+    app.mount("/static", StaticFiles(directory=str(_resolved_static)), name="static")
+    app.mount("/api/static", StaticFiles(directory=str(_resolved_static)), name="api_static")
 
 from fastapi.exceptions import RequestValidationError
 import logging
@@ -218,19 +261,30 @@ async def vercel_cron_purge(request: Request) -> dict[str, int]:
 
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
+@app.get("/api", include_in_schema=False, response_class=HTMLResponse)
+@app.get("/api/", include_in_schema=False, response_class=HTMLResponse)
+@app.get("/api/index", include_in_schema=False, response_class=HTMLResponse)
+@app.get("/api/index.py", include_in_schema=False, response_class=HTMLResponse)
+@app.get("/index", include_in_schema=False, response_class=HTMLResponse)
+@app.get("/index.py", include_in_schema=False, response_class=HTMLResponse)
+@app.get("/main.py", include_in_schema=False, response_class=HTMLResponse)
 async def landing_page() -> HTMLResponse:
     """Serve single-file static landing page with Three.js visualization."""
-    if not LANDING_PAGE_PATH.exists():
+    landing_path = _find_file("dosely.html")
+    if not landing_path or not landing_path.exists():
         return HTMLResponse("<h1>Dosely Landing Page Not Found</h1>", status_code=404)
-    content = LANDING_PAGE_PATH.read_text(encoding="utf-8")
+    content = landing_path.read_text(encoding="utf-8")
     return HTMLResponse(content=content, status_code=200)
 
 
 @app.get("/app", include_in_schema=False, response_class=HTMLResponse)
 @app.get("/app/{path:path}", include_in_schema=False, response_class=HTMLResponse)
+@app.get("/api/app", include_in_schema=False, response_class=HTMLResponse)
+@app.get("/api/app/{path:path}", include_in_schema=False, response_class=HTMLResponse)
 async def app_page(path: str = "") -> HTMLResponse:
     """Serve the Dosely application shell with deep-link support."""
-    if not APP_PAGE_PATH.exists():
+    app_path = _find_file("frontend/app.html")
+    if not app_path or not app_path.exists():
         return HTMLResponse("<h1>Dosely App Not Found</h1>", status_code=404)
-    content = APP_PAGE_PATH.read_text(encoding="utf-8")
+    content = app_path.read_text(encoding="utf-8")
     return HTMLResponse(content=content, status_code=200)

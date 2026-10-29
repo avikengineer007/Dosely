@@ -130,7 +130,7 @@ def test_vercel_cron_purge_endpoint(monkeypatch):
 
 
 def test_vercel_rewrite_path_normalization():
-    """Verify Vercel rewrite URLs (/main.py?__vc_path=..., /api?__vc_path=..., /api/index?__vc_path=...) route cleanly to /, /app, and API endpoints."""
+    """Verify Vercel rewrite URLs (/main.py?__vc_path=..., /api/index.py, x-forwarded-uri, etc.) route cleanly to /, /app, and API endpoints."""
     client = TestClient(main.app)
 
     r_root = client.get("/main.py?__vc_path=/")
@@ -150,6 +150,10 @@ def test_vercel_rewrite_path_normalization():
     assert r_api_index.status_code == 200
     assert "Dosely" in r_api_index.text
 
+    r_api_index_py = client.get("/api/index.py")
+    assert r_api_index_py.status_code == 200
+    assert "Dosely" in r_api_index_py.text
+
     r_app = client.get("/main.py?__vc_path=/app")
     assert r_app.status_code == 200
     assert 'id="root"' in r_app.text
@@ -158,6 +162,18 @@ def test_vercel_rewrite_path_normalization():
     r_app_api = client.get("/api/index?__vc_path=/app")
     assert r_app_api.status_code == 200
     assert 'id="root"' in r_app_api.text
+
+    r_app_direct_api = client.get("/api/app")
+    assert r_app_direct_api.status_code == 200
+    assert 'id="root"' in r_app_direct_api.text
+
+    r_fwd_app = client.get("/api/index.py", headers={"x-forwarded-uri": "/app"})
+    assert r_fwd_app.status_code == 200
+    assert 'id="root"' in r_fwd_app.text
+
+    r_fwd_health = client.get("/api/index.py", headers={"x-forwarded-uri": "/api/v1/health"})
+    assert r_fwd_health.status_code == 200
+    assert r_fwd_health.json() == {"status": "ok"}
 
     r_health = client.get("/main.py?__vc_path=/api/v1/health")
     assert r_health.status_code == 200

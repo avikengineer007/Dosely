@@ -2,13 +2,14 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "api/*.py": {
+      "includeFiles": "{dosely.html,frontend/**,data/**,static/**}",
       "maxDuration": 60
     }
   },
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/api/index?__vc_path=/$1"
+      "destination": "/api/index.py"
     }
   ],
   "crons": [
