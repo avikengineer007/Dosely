@@ -1,17 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
+    "main.py": {
+      "includeFiles": "{dosely.html,frontend/**,data/**,static/**}",
+      "maxDuration": 60
+    },
     "api/*.py": {
       "includeFiles": "{dosely.html,frontend/**,data/**,static/**}",
       "maxDuration": 60
     }
   },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/api/index.py"
-    }
-  ],
   "crons": [
     {
       "path": "/api/cron/purge",
