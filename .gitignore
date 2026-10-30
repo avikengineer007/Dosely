@@ -49,3 +49,6 @@ data/synthetic_handwriting/
 data/degraded_test_images/
 eval/output_samples/
 get-shit-done-antigravity/
+node_modules/
+frontend/node_modules/
+frontend/dist/
