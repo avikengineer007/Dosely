@@ -108,12 +108,18 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "/api/index.py/",
             "api/index",
             "api/index.py",
+            "/api/main",
+            "/api/main.py",
+            "/main",
+            "/main.py",
+            "main",
+            "main.py",
             "/index",
             "/index.py",
+            "/index.html",
             "index",
             "index.py",
-            "/main.py",
-            "main.py",
+            "index.html",
             "/$1",
             "/:path*",
             "",
@@ -305,12 +311,14 @@ async def vercel_cron_purge(request: Request) -> dict[str, int]:
 
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
+@app.get("/index.html", include_in_schema=False, response_class=HTMLResponse)
 @app.get("/api", include_in_schema=False, response_class=HTMLResponse)
 @app.get("/api/", include_in_schema=False, response_class=HTMLResponse)
 @app.get("/api/index", include_in_schema=False, response_class=HTMLResponse)
 @app.get("/api/index.py", include_in_schema=False, response_class=HTMLResponse)
 @app.get("/index", include_in_schema=False, response_class=HTMLResponse)
 @app.get("/index.py", include_in_schema=False, response_class=HTMLResponse)
+@app.get("/main", include_in_schema=False, response_class=HTMLResponse)
 @app.get("/main.py", include_in_schema=False, response_class=HTMLResponse)
 async def landing_page() -> HTMLResponse:
     """Serve single-file static landing page with Three.js visualization."""

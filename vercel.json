@@ -1,15 +1,57 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "main.py": {
-      "includeFiles": "{dosely.html,frontend/**,data/**,static/**}",
-      "maxDuration": 60
-    },
     "api/*.py": {
-      "includeFiles": "{dosely.html,frontend/**,data/**,static/**}",
+      "includeFiles": "{dosely.html,index.html,frontend/**,data/**,static/**}",
       "maxDuration": 60
     }
   },
+  "rewrites": [
+    {
+      "source": "/app/:path*",
+      "destination": "/frontend/app.html"
+    },
+    {
+      "source": "/app",
+      "destination": "/frontend/app.html"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/api",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/auth/(.*)",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/auth",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/prescriptions/(.*)",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/prescriptions",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/health",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/docs",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/openapi.json",
+      "destination": "/api/index.py"
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron/purge",
