@@ -346,3 +346,12 @@ async def app_page(path: str = "") -> HTMLResponse:
     else:
         return HTMLResponse("<h1>Dosely App Not Found</h1>", status_code=404)
     return HTMLResponse(content=content, status_code=200)
+
+
+@app.api_route("/{full_path:path}", methods=["GET", "HEAD"], include_in_schema=False)
+async def catch_all(full_path: str = "") -> HTMLResponse:
+    """Universal frontend catch-all: guarantees 200 HTML response instead of 404 {"detail":"Not Found"}."""
+    clean = full_path.strip("/")
+    if clean == "app" or clean.startswith("app/"):
+        return await app_page(path=clean[3:].lstrip("/"))
+    return await landing_page()
