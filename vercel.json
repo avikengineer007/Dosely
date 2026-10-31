@@ -40,6 +40,14 @@
       "dest": "/api/index.py"
     },
     {
+      "src": "/admin/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/admin",
+      "dest": "/api/index.py"
+    },
+    {
       "src": "/prescriptions/(.*)",
       "dest": "/api/index.py"
     },

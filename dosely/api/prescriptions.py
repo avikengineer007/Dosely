@@ -13,6 +13,7 @@ FastAPI endpoints for Phase 4 Prescription workflow:
 from __future__ import annotations
 
 import base64
+import os
 import io
 import re
 import uuid
@@ -840,3 +841,134 @@ async def admin_purge(
         "purged_count": purged,
         "retention_days": payload.retention_days,
     }
+
+
+@router.get(
+    "/admin/diagnostics",
+    summary="Admin diagnostics report (no keys or patient content leaked)",
+    include_in_schema=False,
+    dependencies=[Depends(rate_limit(max_requests=10, window_seconds=60))],
+)
+async def admin_diagnostics(
+    current_user: Annotated[dict[str, Any], Depends(require_admin)],
+) -> dict[str, Any]:
+    """
+    Protected diagnostics endpoint (admin only).
+    Reports environment and infrastructure readiness without leaking any secret values:
+      - Present environment variable names (never values)
+      - Configured vision model name
+      - Minimal 1-token test call to Anthropic API (reports only 'success' or error class)
+      - Minimal 1-token test call to Gemini API if configured
+      - Library import status (cv2, numpy, PIL, pypdfium2, etc.)
+      - Bundle versions
+      - Current preprocessing timeout
+    """
+    from dosely.config import PREPROCESSING_TIMEOUT_SECONDS
+
+    # 1. Known environment variable names present (never values)
+    known_keys = [
+        "ADMIN_KEY",
+        "ANTHROPIC_API_KEY",
+        "CLAUDE_MAX_TOKENS",
+        "CLAUDE_MODEL",
+        "CRON_SECRET",
+        "DATABASE_URL",
+        "ENV",
+        "GEMINI_API_KEY",
+        "GEMINI_MAX_TOKENS",
+        "GEMINI_MODEL",
+        "IMAGE_ENCRYPTION_KEY",
+        "JWT_SECRET_KEY",
+        "LLM_PROVIDER",
+        "POSTGRES_URL",
+        "PREPROCESSING_TIMEOUT_SECONDS",
+        "TURSO_AUTH_TOKEN",
+        "TURSO_DATABASE_URL",
+        "VERCEL",
+        "VERCEL_ENV",
+    ]
+    present_keys = sorted([k for k in known_keys if bool(os.getenv(k))])
+
+    # 2. Configured model name
+    active_provider = os.getenv("LLM_PROVIDER", "anthropic").strip().lower() or "anthropic"
+    configured_model = (
+        os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        if active_provider == "gemini"
+        else os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+    )
+
+    # 3. Minimal 1-token test call to Anthropic API (returns only success or error class)
+    anthropic_token_test = "key_not_set"
+    ant_key = os.getenv("ANTHROPIC_API_KEY")
+    if ant_key:
+        try:
+            import anthropic
+            ant_client = anthropic.Anthropic(api_key=ant_key, timeout=5.0)
+            target_claude = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+            ant_client.messages.create(
+                model=target_claude,
+                max_tokens=1,
+                messages=[{"role": "user", "content": "ping"}],
+            )
+            anthropic_token_test = "success"
+        except Exception as exc:
+            anthropic_token_test = exc.__class__.__name__
+
+    # Optional 1-token test call to Gemini if key is set
+    gemini_token_test = "key_not_set"
+    gem_key = os.getenv("GEMINI_API_KEY")
+    if gem_key:
+        try:
+            from google import genai
+            from google.genai import types
+            gem_client = genai.Client(api_key=gem_key)
+            g_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+            gem_client.models.generate_content(
+                model=g_model,
+                contents="ping",
+                config=types.GenerateContentConfig(max_output_tokens=1),
+            )
+            gemini_token_test = "success"
+        except Exception as exc:
+            gemini_token_test = exc.__class__.__name__
+
+    # 4. Library import status
+    def _check_lib(name: str) -> dict[str, Any]:
+        try:
+            mod = __import__(name)
+            ver = getattr(mod, "__version__", "present")
+            return {"available": True, "version": str(ver)}
+        except Exception as exc:
+            return {"available": False, "error": exc.__class__.__name__}
+
+    library_import_status = {
+        "cv2": _check_lib("cv2"),
+        "numpy": _check_lib("numpy"),
+        "PIL": _check_lib("PIL"),
+        "pypdfium2": _check_lib("pypdfium2"),
+        "fitz": _check_lib("fitz"),
+        "anthropic": _check_lib("anthropic"),
+        "google.genai": _check_lib("google.genai"),
+    }
+
+    # 5. Bundle versions
+    bundle_versions = {
+        "fastapi": _check_lib("fastapi").get("version"),
+        "pydantic": _check_lib("pydantic").get("version"),
+        "starlette": _check_lib("starlette").get("version"),
+        "httpx": _check_lib("httpx").get("version"),
+        "cryptography": _check_lib("cryptography").get("version"),
+    }
+
+    return {
+        "status": "ok",
+        "env_var_names_present": present_keys,
+        "llm_provider": active_provider,
+        "configured_model": configured_model,
+        "anthropic_1token_test": anthropic_token_test,
+        "gemini_1token_test": gemini_token_test,
+        "library_import_status": library_import_status,
+        "bundle_versions": bundle_versions,
+        "preprocessing_timeout_seconds": PREPROCESSING_TIMEOUT_SECONDS,
+    }
+

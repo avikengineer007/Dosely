@@ -16,7 +16,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from dosely.storage import init_secrets
@@ -123,12 +123,28 @@ async def get_current_user(
 
 
 async def require_admin(
-    current_user: dict[str, Any] = Depends(get_current_user),
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_bearer),
 ) -> dict[str, Any]:
-    """FastAPI dependency that requires the user to have role='admin' in their JWT.
+    """FastAPI dependency that requires admin authorization via JWT role='admin' or valid admin secret header.
 
-    Raises HTTP 403 Forbidden if the role claim is absent or not 'admin'.
+    Raises HTTP 401 Unauthorized if unauthenticated, or HTTP 403 Forbidden if not admin.
     """
+    admin_header = request.headers.get("x-admin-secret", "").strip()
+    cron_secret = os.getenv("CRON_SECRET", "").strip()
+    jwt_secret = os.getenv("JWT_SECRET_KEY", "").strip()
+    admin_key = os.getenv("ADMIN_KEY", "").strip()
+    for valid_s in (cron_secret, jwt_secret, admin_key):
+        if admin_header and valid_s and hmac.compare_digest(admin_header.encode("utf-8"), valid_s.encode("utf-8")):
+            return {"sub": "admin-secret-header", "role": "admin"}
+
+    if not credentials or not credentials.credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing Authorization header or Bearer token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    current_user = decode_access_token(credentials.credentials)
     if current_user.get("role") != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
