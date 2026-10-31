@@ -79,7 +79,9 @@ class EvalMetrics:
 
 
 def check_api_credit_available() -> bool:
-    """Check if live Anthropic API key is configured and valid."""
+    """Check if a live vision API key is configured for the active LLM_PROVIDER."""
+    if os.getenv("LLM_PROVIDER", "anthropic").strip().lower() == "gemini":
+        return len(os.getenv("GEMINI_API_KEY", "")) > 20
     key = os.getenv("ANTHROPIC_API_KEY", "")
     return bool(key and key.startswith("sk-ant-") and len(key) > 20)
 

@@ -194,7 +194,7 @@ def setup_secure_logging() -> None:
             named_logger.setLevel(logging.INFO)
 
     # Force third-party loggers to WARNING or above
-    for name in ("anthropic", "httpx", "httpcore", "urllib3", "uvicorn.access"):
+    for name in ("anthropic", "google_genai", "google.genai", "google", "httpx", "httpcore", "urllib3", "uvicorn.access"):
         tp_logger = logging.getLogger(name)
         tp_logger.setLevel(logging.WARNING)
         if not any(isinstance(f, HealthDataRedactionFilter) for f in tp_logger.filters):

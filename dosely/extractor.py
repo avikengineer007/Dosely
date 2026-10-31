@@ -20,9 +20,18 @@ Usage::
 
 Environment variables
 ---------------------
+LLM_PROVIDER        optional  "anthropic" (default) or "gemini"
+
+Anthropic (LLM_PROVIDER=anthropic):
 ANTHROPIC_API_KEY   required  Your Anthropic API key
 CLAUDE_MODEL        optional  Default: claude-3-5-sonnet-20241022
 CLAUDE_MAX_TOKENS   optional  Default: 2048
+
+Gemini (LLM_PROVIDER=gemini):
+GEMINI_API_KEY      required  Google AI Studio API key (read from env only)
+GEMINI_MODEL        optional  Default: gemini-2.5-flash
+GEMINI_MAX_TOKENS   optional  Default: 8192 (thinking tokens count toward this)
+GEMINI_THINKING_BUDGET optional  Integer; unset = model default
 """
 
 from __future__ import annotations
@@ -39,6 +48,15 @@ from typing import Any
 
 import anthropic
 from PIL import Image
+
+try:  # Optional: only required when LLM_PROVIDER=gemini
+    from google import genai as _genai
+    from google.genai import errors as _genai_errors
+    from google.genai import types as _genai_types
+except ImportError:  # pragma: no cover - exercised only when SDK is absent
+    _genai = None
+    _genai_errors = None
+    _genai_types = None
 from pydantic import ValidationError
 
 from dosely.config import (
@@ -67,12 +85,58 @@ logger = logging.getLogger(__name__)
 CLAUDE_MODEL: str = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
 CLAUDE_MAX_TOKENS: int = int(os.getenv("CLAUDE_MAX_TOKENS", "2048"))
 
-# Lazy singleton — created on first use so tests can monkey-patch env vars
+GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MAX_TOKENS: int = int(os.getenv("GEMINI_MAX_TOKENS", "8192"))
+_thinking_raw = os.getenv("GEMINI_THINKING_BUDGET", "").strip()
+GEMINI_THINKING_BUDGET: int | None = int(_thinking_raw) if _thinking_raw else None
+
+_VALID_PROVIDERS = ("anthropic", "gemini")
+
+
+class LLMEmptyResponseError(RuntimeError):
+    """Raised when the vision model returns no text (e.g. blocked or empty candidate)."""
+
+
+# Provider-neutral API error classes (used for graceful-fallback handling).
+_API_ERRORS: tuple[type[BaseException], ...] = (anthropic.APIError, LLMEmptyResponseError)
+if _genai_errors is not None:
+    _API_ERRORS = _API_ERRORS + (_genai_errors.APIError,)
+
+
+def _provider() -> str:
+    """Return the active LLM provider, read from the environment at call time."""
+    value = os.getenv("LLM_PROVIDER", "anthropic").strip().lower() or "anthropic"
+    if value not in _VALID_PROVIDERS:
+        raise EnvironmentError(
+            f"LLM_PROVIDER must be one of {', '.join(_VALID_PROVIDERS)}."
+        )
+    return value
+
+
+def _active_model() -> str:
+    return GEMINI_MODEL if _provider() == "gemini" else CLAUDE_MODEL
+
+
+# Lazy singletons — created on first use so tests can monkey-patch env vars
 _anthropic_client: anthropic.Anthropic | None = None
+_gemini_client: Any = None
 
 
-def _get_client() -> anthropic.Anthropic:
-    global _anthropic_client
+def _get_client() -> Any:
+    """Return the vision client for the active provider. Keys come from env vars only."""
+    global _anthropic_client, _gemini_client
+    if _provider() == "gemini":
+        if _gemini_client is None:
+            if _genai is None:
+                raise EnvironmentError(
+                    "google-genai is not installed but LLM_PROVIDER=gemini."
+                )
+            api_key = os.getenv("GEMINI_API_KEY")
+            if not api_key:
+                raise EnvironmentError("GEMINI_API_KEY environment variable is not set.")
+            _gemini_client = _genai.Client(api_key=api_key)
+        return _gemini_client
+
     if _anthropic_client is None:
         api_key = os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
@@ -130,14 +194,69 @@ def _build_image_content(png_bytes: bytes) -> dict[str, Any]:
     }
 
 
+def _to_gemini_contents(messages: list[dict[str, Any]]) -> list[Any]:
+    """Convert the internal (Anthropic-shaped) message list to Gemini ``Content`` objects."""
+    contents: list[Any] = []
+    for message in messages:
+        role = "model" if message.get("role") == "assistant" else "user"
+        raw = message.get("content")
+        blocks = [{"type": "text", "text": raw}] if isinstance(raw, str) else list(raw or [])
+        parts: list[Any] = []
+        for block in blocks:
+            if block.get("type") == "image":
+                source = block["source"]
+                parts.append(
+                    _genai_types.Part.from_bytes(
+                        data=base64.b64decode(source["data"]),
+                        mime_type=source.get("media_type", "image/png"),
+                    )
+                )
+            else:
+                parts.append(_genai_types.Part.from_text(text=str(block.get("text", ""))))
+        contents.append(_genai_types.Content(role=role, parts=parts))
+    return contents
+
+
+def _call_gemini(
+    client: Any,
+    messages: list[dict[str, Any]],
+    system_prompt: str,
+) -> str:
+    """Make a single synchronous Gemini call and return the text response."""
+    config_kwargs: dict[str, Any] = {
+        "system_instruction": system_prompt,
+        "max_output_tokens": GEMINI_MAX_TOKENS,
+        "temperature": 0.0,
+        "response_mime_type": "application/json",
+    }
+    if GEMINI_THINKING_BUDGET is not None:
+        config_kwargs["thinking_config"] = _genai_types.ThinkingConfig(
+            thinking_budget=GEMINI_THINKING_BUDGET
+        )
+    response = client.models.generate_content(
+        model=GEMINI_MODEL,
+        contents=_to_gemini_contents(messages),
+        config=_genai_types.GenerateContentConfig(**config_kwargs),
+    )
+    text = getattr(response, "text", None)
+    if not text:
+        raise LLMEmptyResponseError("Model returned no text.")
+    return text
+
+
 def _call_claude(
-    client: anthropic.Anthropic,
+    client: Any,
     messages: list[dict[str, Any]],
     system_prompt: str,
 ) -> str:
     """
-    Make a single synchronous call to Claude and return the text response.
+    Make a single synchronous call to the active vision model and return the text.
+
+    Name kept for backward compatibility: dispatches to Gemini when
+    ``LLM_PROVIDER=gemini``, otherwise calls Claude.
     """
+    if _provider() == "gemini":
+        return _call_gemini(client, messages, system_prompt)
     response = client.messages.create(
         model=CLAUDE_MODEL,
         max_tokens=CLAUDE_MAX_TOKENS,
@@ -364,7 +483,7 @@ def extract(
 
     try:
         client = _get_client()
-        logger.info("[%s] Calling Claude (%s) ...", rx_id, CLAUDE_MODEL)
+        logger.info("[%s] Calling %s vision model (%s) ...", rx_id, _provider(), _active_model())
         claude_response = _call_claude(client, messages, system_prompt)
     except Exception as exc:
         err_rx = _handle_api_error(rx_id, quality, exc.__class__.__name__)
@@ -406,8 +525,8 @@ def extract(
             json_str = _extract_json(retry_response)
             prescription = _parse_and_validate(json_str, rx_id)
             logger.info("[%s] Extraction succeeded on retry.", rx_id)
-        except anthropic.APIError as exc:
-            logger.exception("[%s] Claude API error on retry", rx_id)
+        except _API_ERRORS as exc:
+            logger.error("[%s] Vision API error on retry (%s)", rx_id, exc.__class__.__name__)
             err_rx = _make_error_prescription(
                 rx_id, quality, f"API error on retry: {exc.__class__.__name__}"
             )

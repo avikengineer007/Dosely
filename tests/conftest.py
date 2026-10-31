@@ -65,6 +65,12 @@ def skewed_png() -> bytes:
     return _make_skewed_text_png(angle_deg=4.0)
 
 
+@pytest.fixture(autouse=True)
+def _default_llm_provider(monkeypatch):
+    """Pin the provider so a developer's local LLM_PROVIDER never changes test behaviour."""
+    monkeypatch.setenv("LLM_PROVIDER", "anthropic")
+
+
 # ---------------------------------------------------------------------------
 # Mock Claude client
 # ---------------------------------------------------------------------------

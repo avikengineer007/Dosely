@@ -261,7 +261,7 @@
         const reviewSummary = extractedData.review_summary || [];
         const hasApiError = reviewSummary.some(s => s.toLowerCase().includes("api error") || s.toLowerCase().includes("badrequesterror"));
         const errorDetail = hasApiError
-          ? "Anthropic Claude Vision API credit balance is too low ($0 balance). The model could not run to transcribe handwriting."
+          ? "The AI reading service is temporarily unavailable, so this prescription could not be read automatically."
           : "The handwriting in this image could not be transcribed with high confidence.";
 
         medsListHtml = `

@@ -1,4 +1,5 @@
 anthropic>=0.34.0
+google-genai>=1.0.0     # Gemini vision provider (LLM_PROVIDER=gemini)
 fastapi>=0.115.0
 uvicorn>=0.30.0
 pydantic>=2.8.0
