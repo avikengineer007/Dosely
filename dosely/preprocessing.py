@@ -1473,9 +1473,23 @@ def run_pipeline(
             continue
         stage_instance = stage_cls()
         cfg = configs.get(stage_name, {})
-        current_img, report = stage_instance.process(current_img, config=cfg)
-        reports.append(report)
-        warnings.extend(report.warnings)
+        try:
+            next_img, report = stage_instance.process(current_img, config=cfg)
+            current_img = next_img
+            reports.append(report)
+            warnings.extend(report.warnings)
+        except Exception as stage_exc:
+            warn_msg = f"Stage '{stage_name}' failed with {stage_exc.__class__.__name__}; fell back to pre-stage image."
+            warnings.append(warn_msg)
+            reports.append(
+                StageReport(
+                    name=stage_name,
+                    applied=False,
+                    skip_reason=f"error_{stage_exc.__class__.__name__}",
+                    duration_ms=0.0,
+                    warnings=[warn_msg],
+                )
+            )
 
     total_dt = (time.perf_counter() - t_start) * 1000.0
 

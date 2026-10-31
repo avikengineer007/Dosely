@@ -104,44 +104,76 @@
   }
 
   async function compressImageIfNeeded(file) {
-    const MAX_SERVERLESS_BYTES = 3.5 * 1024 * 1024;
-    if (!file || file.size <= MAX_SERVERLESS_BYTES || !file.type.startsWith("image/")) {
+    const TARGET_MAX_BYTES = 3 * 1024 * 1024; // Target under 3 MB
+
+    if (!file) return file;
+
+    // For non-image uploads (e.g. PDF), enforce 3 MB limit directly
+    if (!file.type.startsWith("image/")) {
+      if (file.size > TARGET_MAX_BYTES) {
+        throw new Error(`The prescription file is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Please upload a file under 3 MB.`);
+      }
       return file;
     }
-    return new Promise((resolve) => {
+
+    return new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
-      img.onload = function () {
+      img.onload = async function () {
         URL.revokeObjectURL(url);
-        const MAX_DIM = 2400;
         let width = img.width;
         let height = img.height;
-        if (width > MAX_DIM || height > MAX_DIM) {
+        const maxEdge = Math.max(width, height);
+
+        // Long edge target: at least 2000 px, cap at 2400 px
+        const TARGET_LONG_EDGE = 2400;
+        if (maxEdge > TARGET_LONG_EDGE) {
           if (width > height) {
-            height = Math.round((height * MAX_DIM) / width);
-            width = MAX_DIM;
+            height = Math.round((height * TARGET_LONG_EDGE) / width);
+            width = TARGET_LONG_EDGE;
           } else {
-            width = Math.round((width * MAX_DIM) / height);
-            height = MAX_DIM;
+            width = Math.round((width * TARGET_LONG_EDGE) / height);
+            height = TARGET_LONG_EDGE;
           }
         }
+
+        // Draw onto canvas to resize AND strip EXIF metadata
         const canvas = document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(
-          function (blob) {
-            if (blob && blob.size < file.size) {
-              const newName = file.name.replace(/\.[^.]+$/, "") + ".jpg";
-              resolve(new File([blob], newName, { type: "image/jpeg" }));
-            } else {
-              resolve(file);
-            }
-          },
-          "image/jpeg",
-          0.85
-        );
+
+        const tryQuality = (q) =>
+          new Promise((resBlob) => {
+            canvas.toBlob((blob) => resBlob(blob), "image/jpeg", q);
+          });
+
+        let blob = await tryQuality(0.85);
+
+        // If still over 3 MB, try progressively lower compression ratios
+        if (blob && blob.size > TARGET_MAX_BYTES) {
+          blob = await tryQuality(0.72);
+        }
+        if (blob && blob.size > TARGET_MAX_BYTES && Math.max(width, height) > 2000) {
+          // Scale down to 2000 px minimum floor if still too large
+          canvas.width = Math.round(width * 0.85);
+          canvas.height = Math.round(height * 0.85);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          blob = await tryQuality(0.70);
+        }
+
+        if (blob && blob.size > TARGET_MAX_BYTES) {
+          reject(new Error(`The compressed image is too large (${(blob.size / (1024 * 1024)).toFixed(1)} MB). Please select or take a photo under 3 MB.`));
+          return;
+        }
+
+        if (blob) {
+          const newName = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+          resolve(new File([blob], newName, { type: "image/jpeg" }));
+        } else {
+          resolve(file);
+        }
       };
       img.onerror = function () {
         URL.revokeObjectURL(url);
@@ -151,22 +183,90 @@
     });
   }
 
-  async function handleFileUpload(file) {
-    if (!file) return;
+  function renderProcessingState(stage, details = {}) {
+    const fileName = details.fileName || "";
+    let title = "Processing Prescription...";
+    let sub = "Please wait while your prescription is verified.";
+    let badgeText = "Processing";
 
-    // Show loading state
+    if (stage === "uploading") {
+      title = "Uploading Prescription...";
+      sub = "Compressing image, stripping metadata, and uploading securely...";
+      badgeText = "Step 1 of 2: Uploading";
+    } else if (stage === "reading") {
+      title = "Reading Prescription with AI...";
+      sub = "Transcribing handwriting, verifying dosages, and matching medications...";
+      badgeText = "Step 2 of 2: Clinical AI Reading";
+    }
+
     root.innerHTML = `
-      <h1>Analyzing Prescription...</h1>
-      <p style="color:var(--text-muted)">Validating image, extracting medicine details, and checking safety rules...</p>
-      <div style="margin:40px 0;text-align:center">
-        <div style="display:inline-block;width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin 1s linear infinite"></div>
-        <p style="margin-top:16px;color:var(--text-muted);font-size:14px">Processing file: ${escapeHtml(file.name)}</p>
+      <div style="max-width:560px;margin:40px auto;text-align:center">
+        <span style="background:rgba(225, 6, 0, 0.15);color:var(--red);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.5px">
+          ${escapeHtml(badgeText)}
+        </span>
+        <h1 style="margin:20px 0 10px">${escapeHtml(title)}</h1>
+        <p style="color:var(--text-muted);font-size:14px;margin-bottom:30px">${escapeHtml(sub)}</p>
+        <div style="margin:20px 0">
+          <div style="display:inline-block;width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin 1s linear infinite"></div>
+        </div>
+        ${fileName ? `<p style="color:var(--text-muted);font-size:13px;margin-top:16px">File: <code>${escapeHtml(fileName)}</code></p>` : ""}
       </div>
       <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
     `;
+  }
+
+  function renderError(message, reasonClass = "other") {
+    let title = "Upload Error";
+    let desc = message;
+    let showManual = false;
+
+    if (reasonClass === "service_unavailable" || message.toLowerCase().includes("temporarily unavailable")) {
+      title = "Reading Is Temporarily Unavailable";
+      desc = "The clinical AI vision service is temporarily unavailable. Please try again in a few moments, or click below to enter medicine details manually.";
+      showManual = true;
+    } else if (reasonClass === "file_too_large" || message.toLowerCase().includes("too large")) {
+      title = "File Exceeds Size Limit";
+      desc = message;
+    } else if (reasonClass === "validation_error") {
+      title = "Invalid Prescription Format";
+      desc = message;
+    }
+
+    root.innerHTML = `
+      <div style="max-width:540px;margin:40px auto;text-align:center">
+        <div style="font-size:40px;margin-bottom:12px">⚠️</div>
+        <h1 style="color:#ef4444;font-size:24px;margin-bottom:12px">${escapeHtml(title)}</h1>
+        <p style="color:var(--text-muted);margin:16px 0 28px;line-height:1.5;font-size:14px">${escapeHtml(desc)}</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button class="btn" id="retry-btn">Try Another Prescription</button>
+          ${showManual ? `<button class="btn" id="manual-btn" style="background:#334155;color:#fff">Enter Medicines Manually</button>` : ""}
+        </div>
+      </div>
+    `;
+
+    document.getElementById("retry-btn").addEventListener("click", function () {
+      window.location.reload();
+    });
+
+    const manualBtn = document.getElementById("manual-btn");
+    if (manualBtn) {
+      manualBtn.addEventListener("click", function () {
+        renderConfirmScreen({
+          id: "manual-" + Date.now().toString(36),
+          extracted_data: { medicines: [], image_quality: "fair", needs_human_review: true, review_summary: ["Manual entry mode."] },
+        });
+      });
+    }
+  }
+
+  async function handleFileUpload(file) {
+    if (!file) return;
 
     try {
+      renderProcessingState("uploading", { fileName: file.name });
       const processedFile = await compressImageIfNeeded(file);
+
+      renderProcessingState("reading", { fileName: file.name });
       const formData = new FormData();
       formData.append("file", processedFile);
 
@@ -177,29 +277,28 @@
 
       if (!res.ok) {
         let errMsg = "Upload failed (HTTP " + res.status + ")";
+        let reasonClass = "upload_failed";
+        if (res.status === 503) {
+          reasonClass = "service_unavailable";
+        } else if (res.status === 413) {
+          reasonClass = "file_too_large";
+        } else if (res.status === 422) {
+          reasonClass = "validation_error";
+        }
         try {
           const errData = await res.json();
           errMsg = errData.detail || errMsg;
         } catch (_) {}
-        throw new Error(errMsg);
+        renderError(errMsg, reasonClass);
+        return;
       }
 
       const rxData = await res.json();
       renderConfirmScreen(rxData);
     } catch (err) {
-      renderError(err.message);
+      const isSize = err.message && err.message.includes("too large");
+      renderError(err.message, isSize ? "file_too_large" : "upload_failed");
     }
-  }
-
-  function renderError(message) {
-    root.innerHTML = `
-      <h1 style="color:#ef4444">Upload Error</h1>
-      <p style="color:var(--text-muted);margin:16px 0">${escapeHtml(message)}</p>
-      <button class="btn" id="retry-btn">Try Another Prescription</button>
-    `;
-    document.getElementById("retry-btn").addEventListener("click", function () {
-      window.location.reload();
-    });
   }
 
   async function renderConfirmScreen(rx) {
@@ -256,15 +355,32 @@
         `;
       }
 
-      let medsListHtml = "";
+      let retakeGuidanceHtml = "";
+      const reviewSummary = extractedData.review_summary || [];
+      const retakeTip = reviewSummary.find(s => s.toLowerCase().startsWith("retake guidance:"));
+      if (extractedData.image_quality === "poor" || retakeTip) {
+        const tipText = retakeTip
+          ? retakeTip.replace(/^retake guidance:\s*/i, "")
+          : "Photo quality was low. For better results, retake with good lighting, flat paper, and steady focus.";
+        retakeGuidanceHtml = `
+          <div style="background:rgba(239, 68, 68, 0.08);border:1px solid rgba(239, 68, 68, 0.3);border-radius:8px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px">
+            <span style="font-size:18px">📷</span>
+            <div style="font-size:12px;color:#fca5a5;text-align:left">
+              <strong style="color:#ef4444;display:block;margin-bottom:2px">Retake Guidance</strong>
+              ${escapeHtml(tipText)}
+            </div>
+          </div>
+        `;
+      }
+
+      let medsListHtml = retakeGuidanceHtml;
       if (!hasMeds) {
-        const reviewSummary = extractedData.review_summary || [];
-        const hasApiError = reviewSummary.some(s => s.toLowerCase().includes("api error") || s.toLowerCase().includes("badrequesterror"));
+        const hasApiError = reviewSummary.some(s => s.toLowerCase().includes("api error") || s.toLowerCase().includes("badrequesterror") || s.toLowerCase().includes("temporarily unavailable"));
         const errorDetail = hasApiError
           ? "The AI reading service is temporarily unavailable, so this prescription could not be read automatically."
-          : "The handwriting in this image could not be transcribed with high confidence.";
+          : "No medicines could be transcribed with high confidence from this image.";
 
-        medsListHtml = `
+        medsListHtml += `
           <div style="background:rgba(245, 158, 11, 0.08);border:1px dashed #f59e0b;border-radius:8px;padding:20px;text-align:center;margin-bottom:16px">
             <p style="color:#fbbf24;font-size:14px;font-weight:600;margin-bottom:8px">No medicines detected automatically</p>
             <p style="color:#ef4444;font-size:12px;margin-bottom:10px;background:rgba(239, 68, 68, 0.1);padding:6px 10px;border-radius:6px;display:inline-block">

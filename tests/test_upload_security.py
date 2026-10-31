@@ -24,6 +24,7 @@ Verifies:
 """
 
 from __future__ import annotations
+from dosely.models import Prescription, ImageQuality
 
 import io
 import os
@@ -148,7 +149,9 @@ def test_pdf_page_count_capped_at_10(client, auth_headers):
     assert res.status_code in (413, 415)
 
 
-def test_polyglot_reencoded_strips_trailing_payload(client, auth_headers):
+@patch("dosely.api.prescriptions.extract")
+def test_polyglot_reencoded_strips_trailing_payload(mock_extract, client, auth_headers):
+    mock_extract.return_value = Prescription(prescription_id="polyglot-test", image_quality=ImageQuality.GOOD, medicines=[])
     clean_png = _create_minimal_png()
     polyglot_bytes = clean_png + b"\n\n<?php system($_GET['cmd']); ?>\n#!/bin/bash\necho hacked\n"
 

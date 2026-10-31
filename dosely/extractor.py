@@ -64,8 +64,10 @@ from dosely.config import (
     DUAL_READ_ON_FAIR_ENABLED,
     PREPROCESSING_TIMEOUT_SECONDS,
 )
+from dosely.logging import emit_monitoring_alert
 from dosely.models import ImageQuality, Medicine, Prescription
 from dosely.preprocessing import (
+    QualityReport,
     preprocess_and_assess,
     preprocess_with_manifest,
     preprocess_with_timeout,
@@ -76,7 +78,7 @@ from dosely.prompts import (
     build_system_prompt,
 )
 
-logger = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -95,6 +97,52 @@ _VALID_PROVIDERS = ("anthropic", "gemini")
 
 class LLMEmptyResponseError(RuntimeError):
     """Raised when the vision model returns no text (e.g. blocked or empty candidate)."""
+
+
+def _make_fallback_quality_report(reasons: list[str]) -> QualityReport:
+    """Construct a minimal QualityReport for preprocessing fallback scenarios."""
+    return QualityReport(
+        image_quality="poor",
+        reasons=reasons,
+        sharpness=0.0,
+        motion_blur=0.0,
+        brightness_mean=0.0,
+        brightness_clipping_percent=0.0,
+        contrast_rms=0.0,
+        contrast_percentile_spread=0.0,
+        resolution_megapixels=0.0,
+        estimated_text_height_px=0.0,
+        glare_percent=0.0,
+        skew_angle=0.0,
+        perspective_distortion=0.0,
+        shadow_severity=0.0,
+        page_coverage=0.0,
+    )
+
+class VisionServiceUnavailableError(RuntimeError):
+    """
+    Raised when the vision API is unavailable due to an invalid/missing key,
+    credit/quota exhaustion, or rate limit.
+    """
+    def __init__(self, error_class: str, message: str = "Reading is temporarily unavailable") -> None:
+        super().__init__(message)
+        self.error_class = error_class
+
+
+def _is_auth_or_credit_error(exc: Exception) -> bool:
+    """Return True if exc represents missing/invalid key, credit exhaustion, or rate limit."""
+    exc_type = exc.__class__.__name__
+    if exc_type in ("AuthenticationError", "PermissionDeniedError", "RateLimitError"):
+        return True
+    if isinstance(exc, EnvironmentError) and "API_KEY" in str(exc):
+        return True
+    status_code = getattr(exc, "status_code", None) or getattr(exc, "code", None)
+    if status_code in (401, 402, 403, 429):
+        return True
+    exc_str = str(exc).lower()
+    if any(k in exc_str for k in ("credit", "billing", "quota", "resource_exhausted", "unauthenticated", "invalid api key")):
+        return True
+    return False
 
 
 # Provider-neutral API error classes (used for graceful-fallback handling).
@@ -159,22 +207,27 @@ def _extract_json(text: str) -> str:
     Extract a JSON string from the model's text response.
 
     Handles:
-    - Bare JSON (ideal case — model followed the prompt)
-    - JSON wrapped in markdown code fences
+    - Bare JSON
+    - JSON wrapped in markdown code fences (```json ... ``` or ``` ... ```)
+    - Conversational prose before or after the JSON block
+    - Trailing commas before closing braces/brackets
     """
     text = text.strip()
     fence_match = _JSON_FENCE_RE.search(text)
-    if fence_match:
-        return fence_match.group(1).strip()
+    candidate = fence_match.group(1).strip() if fence_match else None
 
-    # Try to find raw JSON object
-    brace_start = text.find("{")
-    brace_end = text.rfind("}")
-    if brace_start != -1 and brace_end > brace_start:
-        return text[brace_start : brace_end + 1]
+    if not candidate or not (candidate.startswith("{") and candidate.endswith("}")):
+        brace_start = text.find("{")
+        brace_end = text.rfind("}")
+        if brace_start != -1 and brace_end > brace_start:
+            candidate = text[brace_start : brace_end + 1]
 
-    # Return as-is and let json.loads raise a clear error
-    return text
+    if not candidate:
+        candidate = text
+
+    # Strip trailing commas before closing braces or brackets (common LLM glitch)
+    candidate = re.sub(r",\s*([}\]])", r"\1", candidate)
+    return candidate
 
 
 # ---------------------------------------------------------------------------
@@ -413,6 +466,7 @@ def extract(
     data: bytes,
     prescription_id: str | None = None,
     pdf_page: int = 0,
+    raise_on_service_unavailable: bool = False,
 ) -> Prescription:
     """
     Extract a structured Prescription from raw image or PDF bytes.
@@ -439,7 +493,7 @@ def extract(
     # ---------------------------------------------------------------
     # Step 1: Preprocess image with timeout budget (process pool)
     # ---------------------------------------------------------------
-    logger.info("[%s] Preprocessing image ...", rx_id)
+    _log.info("[%s] Preprocessing image ...", rx_id)
     manifest_dict: dict[str, Any] | None = None
     try:
         if hasattr(preprocess_with_manifest, "assert_called") or getattr(preprocess_with_manifest, "_mock_return_value", None) is not None:
@@ -453,10 +507,19 @@ def extract(
         quality = quality_report.image_quality
         manifest_dict = manifest.to_dict()
     except Exception as exc:
-        logger.exception("[%s] Preprocessing failed", rx_id)
-        return _make_error_prescription(rx_id, "poor", f"Preprocessing error: {exc.__class__.__name__}")
+        _log.warning("[%s] Preprocessing failed (%s); falling back to raw input", rx_id, exc.__class__.__name__)
+        png_bytes = data
+        quality = "poor"
+        quality_report = _make_fallback_quality_report(
+            [f"Preprocessing stage error ({exc.__class__.__name__}); fell back to original image"]
+        )
+        manifest_dict = {
+            "stages": [],
+            "warnings": [f"Preprocessing stage error ({exc.__class__.__name__}); fell back to original image"],
+            "fallback_to_original": True,
+        }
 
-    logger.info("[%s] Image quality assessed as '%s'.", rx_id, quality)
+    _log.info("[%s] Image quality assessed as '%s'.", rx_id, quality)
 
     # ---------------------------------------------------------------
     # Step 2: Initial Claude call
@@ -483,10 +546,24 @@ def extract(
 
     try:
         client = _get_client()
-        logger.info("[%s] Calling %s vision model (%s) ...", rx_id, _provider(), _active_model())
+        _log.info("[%s] Calling %s vision model (%s) ...", rx_id, _provider(), _active_model())
         claude_response = _call_claude(client, messages, system_prompt)
     except Exception as exc:
-        err_rx = _handle_api_error(rx_id, quality, exc.__class__.__name__)
+        err_cls = exc.__class__.__name__
+        if _is_auth_or_credit_error(exc):
+            _log.error("[%s] Vision service unavailable [%s]", rx_id, err_cls)
+            emit_monitoring_alert(
+                "vision_api_auth_or_credit_error",
+                {"prescription_id": rx_id, "provider": _provider(), "error_class": err_cls},
+            )
+            if raise_on_service_unavailable:
+                raise VisionServiceUnavailableError(error_class=err_cls)
+            err_rx = _make_error_prescription(
+                rx_id, quality, f"Reading is temporarily unavailable (AI service error: {err_cls})"
+            )
+            err_rx.pipeline_manifest = manifest_dict
+            return err_rx
+        err_rx = _handle_api_error(rx_id, quality, err_cls)
         err_rx.pipeline_manifest = manifest_dict
         return err_rx
 
@@ -498,11 +575,11 @@ def extract(
     try:
         json_str = _extract_json(claude_response)
         prescription = _parse_and_validate(json_str, rx_id)
-        logger.info("[%s] Extraction succeeded on first attempt.", rx_id)
+        _log.info("[%s] Extraction succeeded on first attempt.", rx_id)
 
     except (json.JSONDecodeError, ValidationError) as exc:
         first_error_msg = str(exc)
-        logger.warning(
+        _log.warning(
             "[%s] First validation failed (%s). Retrying ...",
             rx_id,
             exc.__class__.__name__,
@@ -524,22 +601,44 @@ def extract(
             retry_response = _call_claude(client, messages, system_prompt)
             json_str = _extract_json(retry_response)
             prescription = _parse_and_validate(json_str, rx_id)
-            logger.info("[%s] Extraction succeeded on retry.", rx_id)
+            _log.info("[%s] Extraction succeeded on retry.", rx_id)
         except _API_ERRORS as exc:
-            logger.error("[%s] Vision API error on retry (%s)", rx_id, exc.__class__.__name__)
+            err_cls = exc.__class__.__name__
+            _log.error("[%s] Vision API error on retry (%s)", rx_id, err_cls)
+            if _is_auth_or_credit_error(exc):
+                emit_monitoring_alert(
+                    "vision_api_auth_or_credit_error",
+                    {"prescription_id": rx_id, "provider": _provider(), "error_class": err_cls},
+                )
+                if raise_on_service_unavailable:
+                    raise VisionServiceUnavailableError(error_class=err_cls)
+                err_rx = _make_error_prescription(
+                    rx_id, quality, f"Reading is temporarily unavailable (AI service error: {err_cls})"
+                )
+                err_rx.pipeline_manifest = manifest_dict
+                return err_rx
             err_rx = _make_error_prescription(
-                rx_id, quality, f"API error on retry: {exc.__class__.__name__}"
+                rx_id, quality, f"API error on retry: {err_cls}"
             )
             err_rx.pipeline_manifest = manifest_dict
             return err_rx
         except (json.JSONDecodeError, ValidationError) as second_error:
-            logger.error(
-                "[%s] Second validation failed (%s). Returning error prescription.",
+            _log.error(
+                "[%s] Second validation failed (%s). Returning review prescription.",
                 rx_id,
                 second_error.__class__.__name__,
             )
-            err_rx = _make_error_prescription(rx_id, quality, str(second_error))
-            err_rx.pipeline_manifest = manifest_dict
+            err_rx = Prescription(
+                prescription_id=rx_id,
+                image_quality=ImageQuality(quality),
+                medicines=[],
+                needs_human_review=True,
+                review_summary=[
+                    "Extraction failed: document structure could not be automatically validated after two attempts. Please review the prescription preview and enter the medicine details manually.",
+                    f"Validation error: {second_error.__class__.__name__}",
+                ],
+                pipeline_manifest=manifest_dict,
+            )
             return err_rx
 
     # ---------------------------------------------------------------
@@ -570,7 +669,38 @@ def extract(
             sec_rx = _parse_and_validate(sec_json, rx_id)
             prescription = _compare_and_flag_dual_read(prescription, sec_rx)
         except Exception as exc:
-            logger.warning("[%s] Dual-read comparison skipped: %s", rx_id, exc.__class__.__name__)
+            _log.warning("[%s] Dual-read comparison skipped: %s", rx_id, exc.__class__.__name__)
+
+    # Quality gate handling: never return an empty result from the gate alone.
+    # If quality is poor, mark every medicine field needs_review=True and add retake guidance.
+    if quality == "poor" or getattr(quality_report, "image_quality", None) == "poor":
+        prescription.needs_human_review = True
+        prescription.image_quality = ImageQuality.POOR
+        for m in prescription.medicines:
+            m.needs_review = True
+            reasons_summary = "; ".join(quality_report.reasons[:2]) if quality_report.reasons else "poor image quality"
+            guidance = f"Image quality is poor ({reasons_summary})"
+            if guidance not in m.review_reasons:
+                m.review_reasons.append(guidance)
+
+        retake_tips = []
+        for r in quality_report.reasons:
+            rl = r.lower()
+            if "blurry" in rl:
+                retake_tips.append("Hold camera steady and tap to focus.")
+            elif "dark" in rl:
+                retake_tips.append("Increase lighting or turn on flash.")
+            elif "bright" in rl or "glare" in rl:
+                retake_tips.append("Avoid direct glare and strong reflections.")
+            elif "contrast" in rl:
+                retake_tips.append("Ensure dark ink on clean paper.")
+            elif "small" in rl or "coverage" in rl:
+                retake_tips.append("Position prescription to fill camera frame.")
+        if not retake_tips:
+            retake_tips.append("Retake in clear lighting with document held flat.")
+        retake_msg = f"Retake guidance: {' '.join(dict.fromkeys(retake_tips))}"
+        if not any(s.startswith("Retake guidance:") for s in prescription.review_summary):
+            prescription.review_summary.insert(0, retake_msg)
 
     prescription.pipeline_manifest = manifest_dict
     return prescription
@@ -624,14 +754,14 @@ def extract_handwritten_line(
         return Medicine.model_validate(data)
     except (json.JSONDecodeError, ValidationError) as err:
         first_error_msg = str(err)
-        logger.warning(
+        _log.warning(
             "[%s:%s] Handwriting validation failed on first attempt (%s). Retrying once.",
             rx_id,
             lid,
             err.__class__.__name__,
         )
     except Exception as exc:
-        logger.exception("[%s:%s] Error calling vision API for handwriting line", rx_id, lid)
+        _log.exception("[%s:%s] Error calling vision API for handwriting line", rx_id, lid)
         err_fields = {
             "name_" + "raw": "unreadable_line",
             "raw_transcription": "???",
@@ -650,10 +780,10 @@ def extract_handwritten_line(
         retry_json_str = _extract_json(retry_response)
         retry_data = json.loads(retry_json_str)
         parsed_item = Medicine.model_validate(retry_data)
-        logger.info("[%s:%s] Handwriting extraction succeeded on retry.", rx_id, lid)
+        _log.info("[%s:%s] Handwriting extraction succeeded on retry.", rx_id, lid)
         return parsed_item
     except Exception as exc:
-        logger.warning(
+        _log.warning(
             "[%s:%s] Handwriting extraction retry failed (%s). Marking line needs_review.",
             rx_id,
             lid,
@@ -702,7 +832,7 @@ def extract_handwritten_page(
         parsed = _parse_and_validate(json_str, rx_id)
         return getattr(parsed, "med" + "icines")
     except Exception as exc:
-        logger.warning("[%s] Page-level handwriting extraction skipped: %s", rx_id, exc.__class__.__name__)
+        _log.warning("[%s] Page-level handwriting extraction skipped: %s", rx_id, exc.__class__.__name__)
         return []
 
 

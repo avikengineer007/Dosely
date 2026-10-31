@@ -92,3 +92,4 @@ def test_diagnostics_not_in_public_openapi():
     schema = main.app.openapi()
     paths = schema.get("paths", {})
     assert "/admin/diagnostics" not in paths
+

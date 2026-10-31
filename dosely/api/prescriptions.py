@@ -13,6 +13,7 @@ FastAPI endpoints for Phase 4 Prescription workflow:
 from __future__ import annotations
 
 import base64
+import logging
 import os
 import io
 import re
@@ -38,7 +39,7 @@ _create_access_token = create_access_token
 
 from dosely.drug_db import DrugDatabase
 from dosely.drug_matcher import DrugMatcher
-from dosely.extractor import extract
+from dosely.extractor import extract, VisionServiceUnavailableError
 from dosely.models import IngredientInfo, Medicine, Prescription
 from dosely.rate_limiter import rate_limit
 from dosely.repository import PrescriptionRepository
@@ -47,6 +48,8 @@ from dosely.scheduler.models import DrugInput
 from dosely.storage import EncryptedStorage
 from dosely.upload_validator import validate_and_sanitize_upload
 
+from logging import getLogger as _getLogger
+_api_log = _getLogger("dosely.api")
 router = APIRouter(prefix="", tags=["prescriptions"])
 
 # Shared singletons
@@ -194,7 +197,11 @@ async def upload_prescription(
 
     # Perform extraction
     try:
-        extracted: Prescription = extract(clean_bytes, prescription_id=prescription_id)
+        extracted: Prescription = extract(
+            clean_bytes,
+            prescription_id=prescription_id,
+            raise_on_service_unavailable=True,
+        )
         matcher_instance = get_matcher()
         for m in extracted.medicines:
             if m.name_raw:
@@ -215,6 +222,12 @@ async def upload_prescription(
                 elif m_res.lasa_warning:
                     m.lasa_warning = m_res.lasa_warning
         extracted_dict = extracted.model_dump(mode="json")
+    except VisionServiceUnavailableError as exc:
+        _api_log.error("Upload aborted: vision service unavailable [%s]", exc.error_class)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Reading is temporarily unavailable",
+        )
     except Exception as exc:
         # Graceful fallback: return extraction with needs_human_review=True
         extracted_dict = {

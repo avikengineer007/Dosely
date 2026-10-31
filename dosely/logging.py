@@ -186,7 +186,7 @@ def setup_secure_logging() -> None:
                 h.setFormatter(StructuredJsonFormatter())
 
     # Apply directly to well-known application loggers
-    for name in ("dosely", "uvicorn", "uvicorn.error", "fastapi"):
+    for name in ("dosely", "dosely.monitoring", "uvicorn", "uvicorn.error", "fastapi"):
         named_logger = logging.getLogger(name)
         if not any(isinstance(f, HealthDataRedactionFilter) for f in named_logger.filters):
             named_logger.addFilter(redaction_filter)
@@ -199,3 +199,17 @@ def setup_secure_logging() -> None:
         tp_logger.setLevel(logging.WARNING)
         if not any(isinstance(f, HealthDataRedactionFilter) for f in tp_logger.filters):
             tp_logger.addFilter(redaction_filter)
+
+
+def emit_monitoring_alert(event_type: str, details: dict[str, Any]) -> None:
+    """
+    Emit an operational alert to the monitoring channel (dosely.monitoring).
+    Logs strictly sanitized error metadata with zero secret keys, tokens, or patient PII.
+    """
+    m_logger = logging.getLogger("dosely.monitoring")
+    sanitized = {
+        str(k): str(v)
+        for k, v in details.items()
+        if "key" not in str(k).lower() and "token" not in str(k).lower() and "secret" not in str(k).lower()
+    }
+    m_logger.error("[MONITORING_ALERT] event=%s details=%s", event_type, json.dumps(sanitized))
