@@ -6,50 +6,66 @@
       "maxDuration": 60
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/app/:path*",
-      "destination": "/frontend/app.html"
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
     },
     {
-      "source": "/app",
-      "destination": "/frontend/app.html"
+      "src": "/frontend/(.*)",
+      "dest": "/frontend/$1"
     },
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "src": "/app/(.*)",
+      "dest": "/frontend/app.html"
     },
     {
-      "source": "/api",
-      "destination": "/api/index.py"
+      "src": "/app",
+      "dest": "/frontend/app.html"
     },
     {
-      "source": "/auth/(.*)",
-      "destination": "/api/index.py"
+      "src": "/api/cron/purge",
+      "dest": "/api/index.py"
     },
     {
-      "source": "/auth",
-      "destination": "/api/index.py"
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
     },
     {
-      "source": "/prescriptions/(.*)",
-      "destination": "/api/index.py"
+      "src": "/auth/(.*)",
+      "dest": "/api/index.py"
     },
     {
-      "source": "/prescriptions",
-      "destination": "/api/index.py"
+      "src": "/auth",
+      "dest": "/api/index.py"
     },
     {
-      "source": "/health",
-      "destination": "/api/index.py"
+      "src": "/prescriptions/(.*)",
+      "dest": "/api/index.py"
     },
     {
-      "source": "/docs",
-      "destination": "/api/index.py"
+      "src": "/prescriptions",
+      "dest": "/api/index.py"
     },
     {
-      "source": "/openapi.json",
-      "destination": "/api/index.py"
+      "src": "/docs",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/openapi.json",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/health",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.py"
     }
   ],
   "crons": [

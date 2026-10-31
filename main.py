@@ -127,10 +127,10 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         if vc_path and vc_path not in ignored_targets:
             clean_path = "/" + vc_path.lstrip("/")
-        elif fwd_path and fwd_path not in ignored_targets:
-            clean_path = "/" + fwd_path.lstrip("/")
         elif orig_scope_path not in ignored_targets:
             clean_path = orig_scope_path
+        elif fwd_path and fwd_path not in ignored_targets:
+            clean_path = "/" + fwd_path.lstrip("/")
         else:
             clean_path = "/"
 
@@ -308,6 +308,12 @@ async def vercel_cron_purge(request: Request) -> dict[str, int]:
         "purged_count": purged,
         "retention_days": PURGE_DAYS,
     }
+
+
+@app.get("/health", include_in_schema=False)
+@app.get("/api/health", include_in_schema=False)
+async def health_shortcut():
+    return {"status": "ok"}
 
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
