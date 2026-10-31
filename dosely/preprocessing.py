@@ -1650,11 +1650,17 @@ def preprocess_with_timeout(
       4. Manifest records timed_out=True and logs the timeout in manifest warnings.
     """
     import concurrent.futures
+    import multiprocessing as mp
 
     if timeout_seconds <= 0:
         return preprocess_with_manifest(data, pdf_page=pdf_page, stage_configs=stage_configs)
 
-    executor = concurrent.futures.ProcessPoolExecutor(max_workers=1)
+    try:
+        mp_ctx = mp.get_context("spawn")
+        executor = concurrent.futures.ProcessPoolExecutor(max_workers=1, mp_context=mp_ctx)
+    except Exception:
+        executor = concurrent.futures.ProcessPoolExecutor(max_workers=1)
+
     try:
         future = executor.submit(
             preprocess_with_manifest,
@@ -1667,7 +1673,14 @@ def preprocess_with_timeout(
         # Hung stage: forcibly terminate worker processes to release CPU immediately
         for proc in list(getattr(executor, "_processes", {}).values()):
             try:
-                proc.terminate()
+                proc.kill()
+            except Exception:
+                try:
+                    proc.terminate()
+                except Exception:
+                    pass
+            try:
+                proc.join(timeout=0.2)
             except Exception:
                 pass
         executor.shutdown(wait=False, cancel_futures=True)
